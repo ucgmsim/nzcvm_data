@@ -45,6 +45,8 @@ We welcome contributions of new or updated velocity model datasets from across t
 - 🔧 Tools or scripts for processing model inputs (e.g., resampling, formatting)
 
 ### 🪜 Contribution Process
+<img width="1536" height="1024" alt="Reviewing_Process" src="https://github.com/user-attachments/assets/c7168097-75fa-4c7e-b717-eef5472c84a0" />
+
 
 1. **Fork** this repository to your own GitHub account.
 2. **Create a new directory** (if needed) under either:
