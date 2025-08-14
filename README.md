@@ -113,4 +113,4 @@ Thanks for contributing to the NZCVM community!
 
 # Data Formats
 
-See [DataFormats.md](wiki/DataFormats.md) for detailed information about supported data formats and conventions.
+See [DataFormats](wiki/DataFormats.md) for detailed information about supported data formats and conventions.
