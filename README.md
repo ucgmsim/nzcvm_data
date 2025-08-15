@@ -53,7 +53,7 @@ We welcome contributions of new or updated velocity model datasets from across t
    - `global/` (for national-scale datasets)
    - `regional/<RegionName>/` (for local basin or subregion data)
 3. **Add your data**:
-   - Include relevant data files (e.g., `surface.h5`, `boundary.geojson`, `v1d.fd_modfile`). See [DataFormats.md](wiki/DataFormats.md) for format specifications.
+   - Include relevant data files (e.g., `surface.h5`, `boundary.geojson`, `v1d.fd_modfile`). See [DataFormats](wiki/DataFormats.md) for format specifications.
    - Provide a `README.md` describing:
      - Source and authorship
      - Format and units
