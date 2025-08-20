@@ -45,13 +45,15 @@ We welcome contributions of new or updated velocity model datasets from across t
 - 🔧 Tools or scripts for processing model inputs (e.g., resampling, formatting)
 
 ### 🪜 Contribution Process
+<img width="500" alt="Reviewing_Process" src="https://github.com/user-attachments/assets/c7168097-75fa-4c7e-b717-eef5472c84a0" />
+
 
 1. **Fork** this repository to your own GitHub account.
 2. **Create a new directory** (if needed) under either:
    - `global/` (for national-scale datasets)
    - `regional/<RegionName>/` (for local basin or subregion data)
 3. **Add your data**:
-   - Include relevant data files (e.g., `surface.h5`, `boundary.geojson`, `v1d.fd_modfile`). See [DataFormats.md](wiki/DataFormats.md) for format specifications.
+   - Include relevant data files (e.g., `surface.h5`, `boundary.geojson`, `v1d.fd_modfile`). See [DataFormats](wiki/DataFormats.md) for format specifications.
    - Provide a `README.md` describing:
      - Source and authorship
      - Format and units
@@ -113,4 +115,4 @@ Thanks for contributing to the NZCVM community!
 
 # Data Formats
 
-See [DataFormats.md](wiki/DataFormats.md) for detailed information about supported data formats and conventions.
+See [DataFormats](wiki/DataFormats.md) for detailed information about supported data formats and conventions.
