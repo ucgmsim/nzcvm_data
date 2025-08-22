@@ -10,7 +10,7 @@
 
 
 ## Images
-![](../images/regional/Whakatane_basin_map.png)
+<a href="../images/regional/Whakatane_basin_map.png"><img src="../images/regional/Whakatane_basin_map.png" width="75%"></a>
 
 *Figure 1 Location*
 
@@ -27,4 +27,4 @@
 - [Whakatane_smoothing.txt](../../velocity_modelling/data/regional/Whakatane/Whakatane_smoothing.txt)
 
 ---
-*Page generated on: August 22, 2025, 15:03 NZST/NZDT*
+*Page generated on: August 22, 2025, 15:24 NZST/NZDT*

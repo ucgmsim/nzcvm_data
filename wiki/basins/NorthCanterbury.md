@@ -3,10 +3,11 @@
 ## Overview
 |         |                     |
 |---------|---------------------|
-| Version | 19p1           |
+| Version | 25p8           |
 | Type    | 1        |
 | Author  | Robin Lee            |
-| Created | 2019-01           |
+| Created | 2025-08           |
+| Older Versions | 19p1 |
 
 
 ## Images
@@ -14,26 +15,18 @@
 
 *Figure 1 Location*
 
-<a href="../images/regional/NorthCanterbury_basin_map.png"><img src="../images/regional/NorthCanterbury_basin_map.png" width="75%"></a>
+<a href="../images/regional/NorthCanterbury_basin_map_v25p8.png"><img src="../images/regional/NorthCanterbury_basin_map_v25p8.png" width="75%"></a>
 
-*Figure 2 Northcanterbury Basin Map*
+*Figure 2 Northcanterbury Basin Map V25p8*
 
 
 ## Data
 ### Boundaries
-- NorthCanterbury_outline_WGS84 : [TXT](../../velocity_modelling/data/regional/NorthCanterbury/NorthCanterbury_outline_WGS84.txt) / [GeoJSON](../../velocity_modelling/data/regional/NorthCanterbury/NorthCanterbury_outline_WGS84.geojson)
+- NorthCanterbury_outline_WGS84_v25p8 : 
 
 ### Surfaces
-- NZ_DEM_HD : [HDF5](../../velocity_modelling/data/global/surface/NZ_DEM_HD.h5) / [TXT](../../velocity_modelling/data/global/surface/NZ_DEM_HD.in) (Submodel: canterbury1d_v2)
-- NorthCanterbury_basement_WGS84 : [HDF5](../../velocity_modelling/data/regional/NorthCanterbury/NorthCanterbury_basement_WGS84.h5) / [TXT](../../velocity_modelling/data/regional/NorthCanterbury/NorthCanterbury_basement_WGS84.in) (Submodel: N/A)
-
-## Data retrieved from
-### Boundaries
-- [NorthCanterbury_Polygon_WGS84.txt](https://github.com/ucgmsim/Velocity-Model/tree/main/Data/SI_BASINS/NorthCanterbury_Polygon_WGS84.txt)
-
-### Surfaces
-- [NZ_DEM_HD.in](https://github.com/ucgmsim/Velocity-Model/tree/main/Data/DEM/NZ_DEM_HD.in)
-- [NorthCanterbury_Basement_WGS84_v0p0.in](https://github.com/ucgmsim/Velocity-Model/tree/main/Data/SI_BASINS/NorthCanterbury_Basement_WGS84_v0p0.in)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- NorthCanterbury_basement_WGS84_v25p8 :  (Submodel: N/A)
 
 ---
-*Page generated on: June 18, 2025, 17:14 NZST/NZDT*
+*Page generated on: August 22, 2025, 15:24 NZST/NZDT*

@@ -10,7 +10,7 @@
 
 
 ## Images
-![](../images/regional/CastleHill_basin_map.png)
+<a href="../images/regional/CastleHill_basin_map.png"><img src="../images/regional/CastleHill_basin_map.png" width="75%"></a>
 
 *Figure 1 Location*
 
@@ -24,4 +24,4 @@
 - CastleHill_basement_WGS84 :  (Submodel: N/A)
 
 ---
-*Page generated on: August 22, 2025, 15:03 NZST/NZDT*
+*Page generated on: August 22, 2025, 15:24 NZST/NZDT*

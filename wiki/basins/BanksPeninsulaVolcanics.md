@@ -24,19 +24,11 @@
 
 ## Data
 ### Boundaries
-- BanksPeninsulaVolcanics_outline_WGS84 : [TXT](../../velocity_modelling/data/regional/BanksPeninsulaVolcanics/BanksPeninsulaVolcanics_outline_WGS84.txt) / [GeoJSON](../../velocity_modelling/data/regional/BanksPeninsulaVolcanics/BanksPeninsulaVolcanics_outline_WGS84.geojson)
+- BanksPeninsulaVolcanics_outline_WGS84 : 
 
 ### Surfaces
-- BanksPeninsulaVolcanics_basement_WGS84 : [HDF5](../../velocity_modelling/data/regional/BanksPeninsulaVolcanics/BanksPeninsulaVolcanics_basement_WGS84.h5) / [TXT](../../velocity_modelling/data/regional/BanksPeninsulaVolcanics/BanksPeninsulaVolcanics_basement_WGS84.in) (Submodel: bpv_submod_v4)
-- BanksPeninsulaVolcanics_Miocene_WGS84 : [HDF5](../../velocity_modelling/data/regional/BanksPeninsulaVolcanics/BanksPeninsulaVolcanics_Miocene_WGS84.h5) / [TXT](../../velocity_modelling/data/regional/BanksPeninsulaVolcanics/BanksPeninsulaVolcanics_Miocene_WGS84.in) (Submodel: N/A)
-
-## Data retrieved from
-### Boundaries
-- [BPVBoundary.txt](https://github.com/ucgmsim/Velocity-Model/tree/main/Data/Boundaries/BPVBoundary.txt)
-
-### Surfaces
-- [BPVTop.in](https://github.com/ucgmsim/Velocity-Model/tree/main/Data/Canterbury_Basin/BPV/BPVTop.in)
-- [MioceneTop.in](https://github.com/ucgmsim/Velocity-Model/tree/main/Data/Canterbury_Basin/Pre_Quaternary/MioceneTop.in)
+- BanksPeninsulaVolcanics_basement_WGS84 :  (Submodel: bpv_submod_v4)
+- BanksPeninsulaVolcanics_Miocene_WGS84 :  (Submodel: N/A)
 
 ---
-*Page generated on: June 18, 2025, 17:14 NZST/NZDT*
+*Page generated on: August 22, 2025, 15:24 NZST/NZDT*

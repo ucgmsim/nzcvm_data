@@ -920,7 +920,7 @@ basin:
     type: 1
     author: Ayushi Tiwari
     wiki_images:
-        - regional/QueenCharles_basin_map.png
+        - regional/QueenCharlotte_basin_map.png
     boundaries:
         - regional/QueenCharles/QueenCharles_outline_WGS84.geojson
     surfaces:

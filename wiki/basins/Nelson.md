@@ -26,14 +26,14 @@
 
 ## Data
 ### Boundaries
-- Nelson_outline_WGS84 : [TXT](../../velocity_modelling/data/regional/Nelson/Nelson_outline_WGS84.txt) / [GeoJSON](../../velocity_modelling/data/regional/Nelson/Nelson_outline_WGS84.geojson)
+- Nelson_outline_WGS84 : 
 
 ### Surfaces
-- NZ_DEM_HD : [HDF5](../../velocity_modelling/data/global/surface/NZ_DEM_HD.h5) / [TXT](../../velocity_modelling/data/global/surface/NZ_DEM_HD.in) (Submodel: canterbury1d_v2)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
 - Nelson_basement_WGS84_v25p5 :  (Submodel: N/A)
 
 ### Smoothing Boundaries
 - [Nelson_smoothing.txt](../../velocity_modelling/data/regional/Nelson/Nelson_smoothing.txt)
 
 ---
-*Page generated on: June 18, 2025, 17:14 NZST/NZDT*
+*Page generated on: August 22, 2025, 15:24 NZST/NZDT*

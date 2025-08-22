@@ -28,19 +28,11 @@
 
 ## Data
 ### Boundaries
-- Ranfurly_outline_WGS84 : [TXT](../../velocity_modelling/data/regional/Ranfurly/Ranfurly_outline_WGS84.txt) / [GeoJSON](../../velocity_modelling/data/regional/Ranfurly/Ranfurly_outline_WGS84.geojson)
+- Ranfurly_outline_WGS84 : 
 
 ### Surfaces
-- NZ_DEM_HD : [HDF5](../../velocity_modelling/data/global/surface/NZ_DEM_HD.h5) / [TXT](../../velocity_modelling/data/global/surface/NZ_DEM_HD.in) (Submodel: canterbury1d_v2)
-- Ranfurly_basement_WGS84 : [HDF5](../../velocity_modelling/data/regional/Ranfurly/Ranfurly_basement_WGS84.h5) / [TXT](../../velocity_modelling/data/regional/Ranfurly/Ranfurly_basement_WGS84.in) (Submodel: N/A)
-
-## Data retrieved from
-### Boundaries
-- [ranfurly_outline.txt](https://github.com/ucgmsim/Velocity-Model/tree/main/Data/USER20_BASINS/ranfurly_outline.txt)
-
-### Surfaces
-- [NZ_DEM_HD.in](https://github.com/ucgmsim/Velocity-Model/tree/main/Data/DEM/NZ_DEM_HD.in)
-- [ran-alex_proj_WGS84.in](https://github.com/ucgmsim/Velocity-Model/tree/main/Data/USER20_BASINS/ran-alex_proj_WGS84.in)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- Ranfurly_basement_WGS84 :  (Submodel: N/A)
 
 ---
-*Page generated on: June 18, 2025, 17:14 NZST/NZDT*
+*Page generated on: August 22, 2025, 15:24 NZST/NZDT*

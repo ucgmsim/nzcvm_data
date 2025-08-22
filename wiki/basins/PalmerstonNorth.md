@@ -3,28 +3,30 @@
 ## Overview
 |         |                     |
 |---------|---------------------|
-| Version | 25p5           |
+| Version | 25p8           |
 | Type    | 1        |
 | Author  | Ayushi Tiwari            |
-| Created | 2025-05           |
+| Created | 2025-08           |
+| Older Versions | 25p5 |
 
 
 ## Images
-<a href="../images/regional/PalmerstonNorth_basin_map.png"><img src="../images/regional/PalmerstonNorth_basin_map.png" width="75%"></a>
+<a href="../images/regional/PalmerstonNorth_basin_map_v25p8.png"><img src="../images/regional/PalmerstonNorth_basin_map_v25p8.png" width="75%"></a>
 
 *Figure 1 Location*
 
 
 ## Data
 ### Boundaries
-- PalmerstonNorth_outline_WGS84 : [TXT](../../velocity_modelling/data/regional/PalmerstonNorth/PalmerstonNorth_outline_WGS84.txt) / [GeoJSON](../../velocity_modelling/data/regional/PalmerstonNorth/PalmerstonNorth_outline_WGS84.geojson)
+- PalmerstonNorth_outline_WGS84 : 
 
 ### Surfaces
-- NZ_DEM_HD : [HDF5](../../velocity_modelling/data/global/surface/NZ_DEM_HD.h5) / [TXT](../../velocity_modelling/data/global/surface/NZ_DEM_HD.in) (Submodel: canterbury1d_v2)
-- PalmerstonNorth_basement_WGS84 : [HDF5](../../velocity_modelling/data/regional/PalmerstonNorth/PalmerstonNorth_basement_WGS84.h5) / [TXT](../../velocity_modelling/data/regional/PalmerstonNorth/PalmerstonNorth_basement_WGS84.in) (Submodel: N/A)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2_pliocene_enforced)
+- PalmerstonNorth_pliocenetop_WGS84_v25p8 :  (Submodel: pliocene_submod_v1)
+- PalmerstonNorth_basement_WGS84_v25p8 :  (Submodel: N/A)
 
 ### Smoothing Boundaries
 - [PalmerstonNorth_smoothing.txt](../../velocity_modelling/data/regional/PalmerstonNorth/PalmerstonNorth_smoothing.txt)
 
 ---
-*Page generated on: June 18, 2025, 17:14 NZST/NZDT*
+*Page generated on: August 22, 2025, 15:24 NZST/NZDT*

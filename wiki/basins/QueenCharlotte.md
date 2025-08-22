@@ -10,7 +10,7 @@
 
 
 ## Images
-![](../images/regional/QueenCharles_basin_map.png)
+<a href="../images/regional/QueenCharlotte_basin_map.png"><img src="../images/regional/QueenCharlotte_basin_map.png" width="75%"></a>
 
 *Figure 1 Location*
 
@@ -24,4 +24,4 @@
 - QueenCharles_basement_WGS84_v25p8 :  (Submodel: N/A)
 
 ---
-*Page generated on: August 22, 2025, 15:02 NZST/NZDT*
+*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
