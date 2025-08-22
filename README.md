@@ -21,9 +21,9 @@ This repository supports community contributions, collaborative review, and open
     └── ...
 
 ```
+- The **global/** directory holds national-scale inputs used as the base layer in NZCVM simulations. See [Tomography](wiki/Tomography.md) for details on national tomography models.
+- Each **regional/** subdirectory contains basin model data for that geographic area, including surface definitions, boundaries, and velocity overrides. See [Basins](wiki/Basins.md) for a list of supported basins.
 
-- Each **regional/** subdirectory contains basin model data for that geographic area, including surface definitions, boundaries, and velocity overrides.
-- The **global/** directory holds national-scale inputs used as the base layer in NZCVM simulations.
 
 ---
 
