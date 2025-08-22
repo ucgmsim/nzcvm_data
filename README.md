@@ -7,22 +7,19 @@ This repository supports community contributions, collaborative review, and open
 ---
 
 ## 📁 Repository Structure
-```
-.
-├── global/ # Nation-wide or reference datasets
-│   ├── surface/ # Surface elevation or topography grids
-│   ├── tomography/ # National tomography models (e.g., NZWIDE)
-│   │   └── tools/ # Utility scripts for processing tomography data
-│   ├── vm1d/ # 1D velocity models (reference profiles)
-│   └── vs30/ # Vs30 (shear-wave velocity) maps
-└── regional/ # Localised basin and crustal models by region
-    ├── Canterbury/
-    ├── Wellington/
-    └── ...
 
-```
-- The **global/** directory holds national-scale inputs used as the base layer in NZCVM simulations. See [Tomography](wiki/Tomography.md) for details on national tomography models.
-- Each **regional/** subdirectory contains basin model data for that geographic area, including surface definitions, boundaries, and velocity overrides. See [Basins](wiki/Basins.md) for a list of supported basins.
+- **global**: Contains national-scale datasets that serve as the foundation for NZCVM simulations.
+    - **surface/**: Holds surface elevation or topography grids used in model generation.
+    - **tomography/**: Contains national tomography models like NZWIDE, which provide the seismic velocity structure across New Zealand. See [Tomography](wiki/Tomography.md) for details on national tomography models.
+    - **vm1d/**: Includes 1D velocity models that define velocity profiles varying with depth.
+    - **vs30/**: Contains Vs30 maps, which provide shear-wave velocity values for
+- **regional**: Contains basin-specific datasets for local regions. See [Basins](wiki/Basins.md) for details on the 44 basin models.
+    - Each subdirectory (e.g., **Canterbury**, **Wellington**) contains:
+        - Basin model data (surfaces, boundaries, velocity overrides)
+        - 1D profiles or Vs30 maps specific to that region
+        - Tools or scripts for processing regional data
+- **wiki** : Contains documentations
+- **tools**: Contains scripts and utilities for processing, resampling, or converting model data formats.
 
 
 ---
