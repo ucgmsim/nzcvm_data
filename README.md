@@ -1,8 +1,9 @@
 # NZCVM Community Data Repository
 
-Welcome to the **New Zealand Community Velocity Model (NZCVM) Data Repository** — a curated, version-controlled archive of seismic velocity model input datasets for Aotearoa New Zealand.
-
+Welcome to the **New Zealand Community Velocity Model (NZCVM) Data Repository** — a curated, version-controlled archive of seismic velocity model input datasets for New Zealand.
+ 
 This repository supports community contributions, collaborative review, and open access to datasets used for building 3D velocity models, including tomography, 1D profiles, Vs30 surfaces, and region-specific basin models.
+ 
 
 ---
 
@@ -29,6 +30,56 @@ This repository supports community contributions, collaborative review, and open
 This repository serves as the **community-managed data layer** of the NZCVM software ecosystem. Datasets in this repository are used by the NZCVM engine to generate 3D seismic velocity models.
 
 All contributions follow a transparent review process and are tracked by version, enabling reproducibility and long-term stewardship.
+
+---
+## 🔽 Cloning this Repository (with Git LFS)
+
+Some datasets in this repo (e.g., `.h5` tomography/surface files) are large and tracked with **Git Large File Storage (LFS)**.
+If Git LFS is not installed, you will only download small pointer files (~100 B) and tools like `h5py` will fail to open them.
+
+### 1) Install Git LFS
+
+Follow the official guide:
+👉 https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage
+
+**macOS (Homebrew)**
+```bash
+brew install git-lfs
+git lfs install
+```
+
+**Linux**
+```bash
+sudo apt-get install -y git-lfs   # Debian/Ubuntu
+# or
+sudo yum install -y git-lfs       # RHEL/CentOS/Fedora
+git lfs install
+```
+
+**Windows**
+- Install from https://git-lfs.com/ (then run `git lfs install` in Git Bash or PowerShell).
+
+### 2) Clone and fetch LFS objects
+```bash
+git clone https://github.com/ucgmsim/nzcvm_data.git
+cd nzcvm_data
+git lfs pull
+```
+
+### 3) Verify that large files are materialized
+```bash
+ls -lh global/surface/
+# .h5 files should be MBs/GBs, not ~100 bytes.
+```
+
+**Troubleshooting**
+- If you still see ~100 B files, run:
+  ```bash
+  git lfs fetch --all
+  git lfs checkout
+  git lfs status
+  ```
+- If you’re using this repo via a symlink or submodule from another project, run the `git lfs` commands **inside this repo’s directory**.
 
 ---
 
