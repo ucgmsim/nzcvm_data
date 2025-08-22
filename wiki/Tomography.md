@@ -6,10 +6,10 @@ The tomography models in the NZCVM provide the background velocity structure for
 
 The NZCVM currently supports the following tomography models:
 
-
-1. EP2020: Integration of NZWide 2.2 model by Eberhart-Phillips et al. (2020). 
-2. EP2025: Integration of NZWide 3.1 model by Eberhart-Phillips et al. (2025).
-3. CHOW2020_EP2020_MIX: Combination of the CHOW2020 model (Chow 2020) in North Island and the EP2020 model for the rest
+1. EP2010: Based on New Zealand-wide model 1.0 by Eberhart-Phillips et al. (2010).
+2. EP2020: Based on NZWide 2.2 model by Eberhart-Phillips et al. (2020). 
+3. EP2025: Based on NZWide 3.1 model by Eberhart-Phillips et al. (2025).
+4. CHOW2020_EP2020_MIX: Combination of the CHOW2020 model (Chow et al. 2020) in North Island and the EP2020 model for the rest
 
 ## Tomography Model Definition
 
