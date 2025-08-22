@@ -1,0 +1,8 @@
+../regional/NorthCanterbury/NorthCanterbury_basement_WGS84_v19p1.h5 filter=lfs diff=lfs merge=lfs -text
+../regional/NorthCanterbury/NorthCanterbury_basement_WGS84_v25p8.h5 filter=lfs diff=lfs merge=lfs -text
+../regional/PalmerstonNorth/PalmerstonNorth_basement_WGS84_v25p5.h5 filter=lfs diff=lfs merge=lfs -text
+../regional/PalmerstonNorth/PalmerstonNorth_basement_WGS84_v25p8.h5 filter=lfs diff=lfs merge=lfs -text
+../regional/PalmerstonNorth/PalmerstonNorth_pliocenetop_WGS84_v25p8.h5 filter=lfs diff=lfs merge=lfs -text
+../regional/QueenCharlotte/QueenCharlotte_basement_WGS84.h5 filter=lfs diff=lfs merge=lfs -text
+../regional/Whakatane/Whakatane_basement_WGS84.h5 filter=lfs diff=lfs merge=lfs -text
+../regional/CastleHill/CastleHill_basement_WGS84.h5 filter=lfs diff=lfs merge=lfs -text
