@@ -46,7 +46,7 @@ submodel:
       module: ep_tomography_submod_v2010
 ```
 
-This submodel is a type of `tomography`, and it retrieves more information associated with the `tomography` value from the registry (in this case, `2010_NZ_OFFSHORE`). The `module` specifies the name of the accompanying Python code that prescribes how to calculate velocity at locations within the region below the `surface`.
+The `module` specifies the name of the accompanying Python code that prescribes how to calculate velocity at locations within the region below the `surface`.
 
 
 ## Data Format
