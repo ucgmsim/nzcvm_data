@@ -139,7 +139,7 @@ Tomography data is stored in HDF5 (`.h5`), containing 3D grids of velocity value
 **Python Access Example:**
 ```python
 import h5py
-with h5py.File('2010_NZ.h5', 'r') as f:
+with h5py.File('EP2010.h5', 'r') as f:
     elevations = list(f.keys())
     elev = elevations[0]
     latitudes = f[elev]['latitudes'][:]
