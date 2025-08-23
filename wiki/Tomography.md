@@ -35,42 +35,6 @@ The key components of a tomography model definition are:
 - **url**: URL where the model can be accessed or downloaded.
 
 
-
-## Usage in Model Versions
-
-Tomography models are specified in the model version configuration files. For example, in `2p03.yaml`:
-
-```yaml
-tomography:
-  - name: EP2020
-    vs30: nz_with_offshore
-    special_offshore_tapering: true
-
-```
-This indicates that the 2p03 model version uses the `EP2020` tomography model with the following parameters:
-
-- **vs30**: Name of the Vs30 (shear wave velocity in the top 30 meters) model defined in the registry. Needed for the Geotechnical Layer (GTL) model using a near-surface velocity adjustment (Ely 2010)
-- **special_offshore_tapering**: Indicates whether to apply a 1D velocity model for offshore region with very soft sediments. See the section below for more details.
-
-### Vs30 Model
-The Vs30 is shear wave velocity values for the top 30 meters of the subsurface. It is used in conjunction with the tomography models to adjust the near-surface velocities.
-
-```yaml
-vs30:
-  - name: nz_with_offshore
-    path: global/vs30/NZ_Vs30_with_offshore.h5
-```
-
-### Special Offshore Tapering
-If `special_offshore_tapering` is true, a specialized velocity adjustment is triggered for offshore regions with very soft sediments. This ensures a *smooth transition* from land-based velocity models to offshore conditions
-
-It is designed to provide a more accurate and consistent velocity profile in offshore areas, particularly in shallow waters where low-velocity sediments may not be captured accurately by the tomography model alone.
-
-The offshore point is determined by its distance from the shoreline (> 0) and the Vs30 value at that point (< 100 m/s, indicating soft ground).
-The code applies a pre-defined 1D velocity model to the offshore points that are deeper than desired depth (empirically derived from the shoreline distance).
-This creates a "smooth transition" from the land-based model to a more appropriate offshore model, preventing abrupt velocity changes.
-
-
 ## Tomography Submodels
 
 Tomography submodels are used to compute velocity values at specific locations based on the tomography model data. These submodels are defined in the `nzcvm_registry.yaml` file and are associated with surfaces in the model version configuration.
