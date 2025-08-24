@@ -16,7 +16,7 @@ This repository supports community contributions, collaborative review, and open
     - **tomography/**: Contains national tomography models like NZWIDE, which provide the seismic velocity structure across New Zealand. See [Tomography](wiki/Tomography.md) for details on national tomography models.
     - **vm1d/**: Includes 1D velocity models that define velocity profiles varying with depth.
     - **vs30/**: Contains Vs30 maps, which provide shear-wave velocity values for
-- **regional**: Contains basin-specific datasets for local regions. See [Basins](wiki/Basins.md) for details on the 44 basin models.
+- **regional**: Contains basin-specific datasets for local regions. See [Basins](wiki/Basins.md) for details on the 44 basin models (as of August 2025).
     - Each subdirectory (e.g., **Canterbury**, **Wellington**) contains:
         - Basin model data (surfaces, boundaries, velocity overrides)
         - 1D profiles or Vs30 maps specific to that region
