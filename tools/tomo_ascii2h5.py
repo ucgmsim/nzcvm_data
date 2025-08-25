@@ -10,17 +10,17 @@ output HDF5 file will contain groups for each elevation, with datasets for latit
 and the velocity types.
 
 Example usage:
-python tomo_ascii2h5.py /path/to/tomography_files output_name --out-dir /path/to/output_dir --dtype f32 --gzip 6 --chunk 128x128
+python tomo_ascii2h5.py /path/to/tomography_files output_name --out-dir /path/to/output_dir --dtype f32 --gzip 6
 
 This will convert the tomography files in /path/to/tomography_files to a file named output_name.h5
 in the same directory. If --out-dir is specified, the output file will be saved in that directory
 instead.
 """
 
-import re
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
+import re
 
 import h5py
 import numpy as np
@@ -67,7 +67,7 @@ def get_elevations_from_files(input_dir: Path) -> set[float]:
         or not elevations_by_type["vs"]
         or not elevations_by_type["rho"]
     ):
-        missing = [v for v, s in elevations_by_type.items() if not s]
+        missing = [vtype for vtype, elevs in elevations_by_type.items() if not elevs]
         raise ValueError(
             f"No elevation files found for {', '.join(missing)} in {input_dir}"
         )
@@ -84,36 +84,6 @@ def get_elevations_from_files(input_dir: Path) -> set[float]:
     return elevations_by_type["vp"]
 
 
-def chunk_from_shape(
-    shape: tuple[int, ...], chunk_2d: tuple[int, int]
-) -> tuple[int, ...] | bool:
-    """
-    Determine chunk size for HDF5 datasets based on shape and 2D chunk size.
-
-    Parameters
-    ----------
-    shape : tuple[int, ...]
-        Shape of the dataset (1D or 2D).
-
-    chunk_2d : tuple[int, int]
-        Desired chunk size for 2D datasets (H, W).
-
-    Returns
-    -------
-    tuple[int, ...] | bool
-        Chunk size as a tuple, or True if no chunking is needed.
-
-    """
-
-    if len(shape) == 2:
-        return (min(chunk_2d[0], shape[0]), min(chunk_2d[1], shape[1]))
-    if len(shape) == 1:
-        # 1D coords: let h5py decide or use a modest chunk
-        n = shape[0]
-        return (min(4096, max(256, n // 8)),)
-    return True
-
-
 def convert_ascii_to_hdf5(
     input_dir: Path,
     name: str,
@@ -121,7 +91,6 @@ def convert_ascii_to_hdf5(
     dtype_opt: str = "f64",  # "f64" or "f32" for vp/vs/rho
     gzip_level: int = 4,  # 1..9
     shuffle: bool = True,
-    chunk_2d: tuple[int, int] = (256, 256),
 ):
     """
     Convert ASCII tomography files to HDF5 format.
@@ -141,8 +110,6 @@ def convert_ascii_to_hdf5(
         Gzip compression level 1..9 (default 4).
     shuffle : bool, optional
         Enable shuffle filter (default is True).
-    chunk_2d : tuple[int, int], optional
-        2D chunk size as (H, W) tuple (default (256, 256)). This controls how data is chunked in the HDF5 file.
 
     """
 
@@ -174,7 +141,6 @@ def convert_ascii_to_hdf5(
         h5f.attrs["coord_dtype_lat_lon"] = "float64"
         h5f.attrs["compression"] = f"gzip:{gzip_level}"
         h5f.attrs["shuffle"] = bool(shuffle)
-        h5f.attrs["chunk_2d"] = chunk_2d
 
         for elev in elevations:
             elev_file_str = (
@@ -191,6 +157,8 @@ def convert_ascii_to_hdf5(
             if not ref_file.exists():
                 print(f"Warning: missing {ref_file}, skipping elevation {elev}")
                 continue
+
+            # Read header and coordinates
             with open(ref_file, "r") as f:
                 nlat, nlon = map(int, f.readline().split())
                 latitudes = np.array(
@@ -200,14 +168,13 @@ def convert_ascii_to_hdf5(
                     [float(x) for x in f.readline().split()], dtype=coord_dtype
                 )
 
-            # coords
+            # coords - let h5py auto-chunk 1D arrays
             g.create_dataset(
                 "latitudes",
                 data=latitudes,
                 compression="gzip",
                 compression_opts=gzip_level,
                 shuffle=shuffle,
-                chunks=chunk_from_shape(latitudes.shape, chunk_2d),
             )
             g.create_dataset(
                 "longitudes",
@@ -215,7 +182,6 @@ def convert_ascii_to_hdf5(
                 compression="gzip",
                 compression_opts=gzip_level,
                 shuffle=shuffle,
-                chunks=chunk_from_shape(longitudes.shape, chunk_2d),
             )
 
             # fields
@@ -226,14 +192,10 @@ def convert_ascii_to_hdf5(
                 if not filename.exists():
                     print(f"Warning: missing {filename}")
                     continue
-                with open(filename, "r") as f:
-                    f.readline()
-                    f.readline()
-                    f.readline()
-                    arr = np.array(
-                        [float(x) for x in f.read().split()], dtype=data_dtype
-                    )
-                    arr = arr.reshape(nlat, nlon)
+
+                # Use genfromtxt to skip header lines and load data directly
+                arr = np.genfromtxt(filename, skip_header=3, dtype=data_dtype)
+                arr = arr.reshape(nlat, nlon)
 
                 dset = g.create_dataset(
                     vtype,
@@ -241,10 +203,10 @@ def convert_ascii_to_hdf5(
                     compression="gzip",
                     compression_opts=gzip_level,
                     shuffle=shuffle,
-                    chunks=chunk_from_shape(arr.shape, chunk_2d),
+                    chunks=True,
                 )
                 dset.attrs["units"] = (
-                    "km/s" if vtype in ("vp", "vs") else "g/cc"
+                    "km/s" if vtype in ("vp", "vs") else "g/cm^3"
                 )  # adjust if needed
                 dset.attrs["dtype"] = (
                     "float32" if data_dtype == np.float32 else "float64"
@@ -276,10 +238,7 @@ def convert_tomo_to_h5(
         str, typer.Option(help="Data dtype for vp/vs/rho: f32 (default) or f64")
     ] = "f32",
     gzip: Annotated[int, typer.Option(help="gzip level 1..9 (default 4)")] = 4,
-    no_shuffle: Annotated[bool, typer.Option(help="Disable shuffle filter")] = False,
-    chunk: Annotated[
-        str, typer.Option(help="2D chunk as HxW, default 256x256")
-    ] = "256x256",
+    shuffle: Annotated[bool, typer.Option(help="Enable shuffle filter")] = True,
 ):
     """
     Convert ASCII tomography files to HDF5 format.
@@ -300,22 +259,18 @@ def convert_tomo_to_h5(
         Data dtype for vp/vs/rho: "f64" (default) or "f32".
     gzip : int, optional
         Gzip compression level 1..9 (default 4).
-    no_shuffle : bool, optional
-        Disable shuffle filter (default is enabled).
-    chunk : str, optional
-        2D chunk size as "HxW" (default "256x256"). This controls how data is chunked in the HDF5 file.
+    shuffle : bool, optional
+        Enable shuffle filter (default is True).
 
     """
 
-    h, w = (int(s) for s in chunk.lower().split("x"))
     convert_ascii_to_hdf5(
         input_dir,
         name,
         out_dir,
         dtype_opt=dtype,
         gzip_level=gzip,
-        shuffle=(not no_shuffle),
-        chunk_2d=(h, w),
+        shuffle=shuffle,
     )
 
 

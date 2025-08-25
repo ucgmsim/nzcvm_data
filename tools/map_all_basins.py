@@ -207,7 +207,9 @@ def generate_basin_map(
                 if gdf.empty:
                     continue
                 gdf = gdf.to_crs("EPSG:4326")
-                gdf.plot(ax=ax, color=color, edgecolor="black", linewidth=0.5, alpha=0.8)
+                gdf.plot(
+                    ax=ax, color=color, edgecolor="black", linewidth=0.5, alpha=0.8
+                )
                 any_valid = True
             except (fiona.errors.FionaError, ValueError) as e:
                 typer.echo(f"⚠️ Error reading {geojson_path}: {e}", err=True)

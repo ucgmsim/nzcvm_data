@@ -957,7 +957,7 @@ basin:
 
 vs30:
   - name: nz_with_offshore
-    path: global/vs30/NZ_Vs30_with_offshore.h5
+    path: global/vs30/NZ_Vs30_HD_With_Offshore.h5
   - name: nz_without_offshore
     path: global/vs30/NZ_Vs30.h5
 
