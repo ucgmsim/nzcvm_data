@@ -46,34 +46,39 @@ def ascii_to_hdf5(input_file_path: str | Path, output_file_path: str | Path):
     print(f"Converting {input_file_path} to {output_file_path}")
 
     try:
-        # Read the dimensions, latitude and longitude values
         with open(input_file_path, "r") as f:
             # Read dimensions
-            dimensions = f.readline().strip().split()
-            nrows, ncols = int(dimensions[0]), int(dimensions[1])
+            # (The .in format begins with: nrows ncols, then nrows lats, ncols lons,
+            # followed by nrows*ncols raster values, with arbitrary line breaks).
+            dims = f.readline().split()
+            if len(dims) < 2:
+                raise ValueError("First line must contain 'nrows ncols'")
+            nrows, ncols = int(dims[0]), int(dims[1])
 
-            # Read latitude values (full array)
-            lat_line = f.readline().strip().split()
-            lat_values = np.array([float(x) for x in lat_line])
+            # === Robust flat-stream reads (ignore physical line breaks) ===
+            #  read latitude as a flat stream of exactly nrows floats
+            lat_values = np.fromfile(f, dtype=float, count=nrows, sep=" ")
+            if lat_values.size != nrows:
+                raise ValueError(
+                    f"Expected {nrows} latitude values, got {lat_values.size}"
+                )
 
-            # Read longitude values (full array)
-            lon_line = f.readline().strip().split()
-            lon_values = np.array([float(x) for x in lon_line])
+            # read longitude as a flat stream of exactly ncols floats
+            lon_values = np.fromfile(f, dtype=float, count=ncols, sep=" ")
+            if lon_values.size != ncols:
+                raise ValueError(
+                    f"Expected {ncols} longitude values, got {lon_values.size}"
+                )
 
-            # Read elevation data - one row at a time
-            elevation_data = np.zeros((nrows, ncols))
-            for i in range(nrows):
-                # Read lines until we have enough values for this row
-                row_data = []
-                while len(row_data) < ncols:
-                    line = f.readline().strip().split()
-                    if not line:  # Handle end of file
-                        break
-                    row_data.extend(line)
+            # read raster as ONE flat stream of nrows*ncols floats
+            data = np.fromfile(f, dtype=float, count=nrows * ncols, sep=" ")
+            if data.size != nrows * ncols:
+                raise ValueError(
+                    f"Expected {nrows*ncols} raster values, got {data.size}"
+                )
 
-                # Fill the row with as many values as we have (up to ncols)
-                for j in range(min(ncols, len(row_data))):
-                    elevation_data[i, j] = float(row_data[j])
+            # reshape to (nrows, ncols) —  HDF5 loader uses [:].T later
+            elevation_data = data.reshape((nrows, ncols))
 
         # Create the output directory if it doesn't exist
         output_file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -85,6 +90,7 @@ def ascii_to_hdf5(input_file_path: str | Path, output_file_path: str | Path):
             hf.attrs["ncols"] = ncols
 
             # Create datasets with compression
+            # (Optionally add chunks; gzip default level is fine)
             hf.create_dataset("latitude", data=lat_values, compression="gzip")
             hf.create_dataset("longitude", data=lon_values, compression="gzip")
             hf.create_dataset("elevation", data=elevation_data, compression="gzip")
@@ -122,7 +128,6 @@ def convert_surface_to_h5(
         Output directory for the converted file. If not specified, the output
         file will be saved in the same directory as the input file with a .h5
         extension.
-
     """
     input_path = Path(input_file)
 
