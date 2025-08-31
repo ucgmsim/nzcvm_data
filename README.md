@@ -3,27 +3,8 @@
 # NZCVM Community Data Repository
 
 Welcome to the **New Zealand Community Velocity Model (NZCVM) Data Repository** — a curated, version-controlled archive of seismic velocity model input datasets for New Zealand.
- 
+
 This repository supports community contributions, collaborative review, and open access to datasets used for building 3D velocity models, including tomography, 1D profiles, Vs30 surfaces, and region-specific basin models.
- 
-
----
-
-## 📁 Repository Structure
-
-- **global**: Contains national-scale datasets that serve as the foundation for NZCVM simulations.
-    - **surface/**: Holds surface elevation or topography grids used in model generation.
-    - **tomography/**: Contains national tomography models like NZWIDE, which provide the seismic velocity structure across New Zealand. See [Tomography](wiki/Tomography.md) for details on national tomography models.
-    - **vm1d/**: Includes 1D velocity models that define velocity profiles varying with depth.
-    - **vs30/**: Contains Vs30 maps, which provide shear-wave velocity values for
-- **regional**: Contains basin-specific datasets for local regions. See [Basins](wiki/Basins.md) for details on the 44 basin models (as of August 2025).
-    - Each subdirectory (e.g., **Canterbury**, **Wellington**) contains:
-        - Basin model data (surfaces, boundaries, velocity overrides)
-        - 1D profiles or Vs30 maps specific to that region
-        - Tools or scripts for processing regional data
-- **wiki** : Contains documentations
-- **tools**: Contains scripts and utilities for processing, resampling, or converting model data formats.
-
 
 ---
 
@@ -32,6 +13,44 @@ This repository supports community contributions, collaborative review, and open
 This repository serves as the **community-managed data layer** of the NZCVM software ecosystem. Datasets in this repository are used by the NZCVM engine to generate 3D seismic velocity models.
 
 All contributions follow a transparent review process and are tracked by version, enabling reproducibility and long-term stewardship.
+
+---
+
+## 🧠 NZCVM Modeling Code
+
+The NZCVM engine that consumes these datasets is available at:
+
+🔗 [NZCVM Velocity Modeling Code](https://github.com/ucgmsim/velocity_modelling)
+
+This repository contains the core software for building and querying 3D seismic velocity models using the datasets hosted here. It includes:
+
+- Configuration templates for different regions and model types  
+- Tools for mesh generation, interpolation, and model validation  
+- Integration with the `nzcvm_registry.yaml` to discover available submodels  
+
+We recommend reviewing both repositories together to understand how data and code interact within the NZCVM ecosystem.
+
+---
+
+## 📁 Repository Structure
+
+- **global**: Contains national-scale datasets that serve as the foundation for NZCVM simulations.
+  - **surface/**: Holds surface elevation or topography grids used in model generation.
+  - **tomography/**: Contains national tomography models like NZWIDE, which provide the seismic velocity structure across New Zealand. See [Tomography](wiki/Tomography.md) for details.
+  - **vm1d/**: Includes 1D velocity models that define velocity profiles varying with depth.
+  - **vs30/**: Contains Vs30 maps, which provide shear-wave velocity values for near-surface layers.
+
+- **regional**: Contains basin-specific datasets for local regions. See [Basins](wiki/Basins.md) for details on the 44 basin models (as of August 2025).
+  - Each subdirectory (e.g., **Canterbury**, **Wellington**) contains:
+    - Basin model data (surfaces, boundaries, velocity overrides)
+    - 1D profiles or Vs30 maps specific to that region
+    - Tools or scripts for processing regional data
+
+- **wiki**: Contains documentation and format specifications.
+
+- **tools**: Contains scripts and utilities for processing, resampling, or converting model data formats.
+
+---
 
 ---
 ## 🔽 Cloning this Repository (with Git LFS)
