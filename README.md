@@ -162,9 +162,9 @@ Each entry in the registry follows a standard structure:
 - name: Canterbury_v19p1
   author: Robin Lee
   boundaries:
-    - regional/Canterbury/Canterbury_outline_WGS84.txt
+    - regional/Canterbury/Canterbury_outline_WGS84.geojson
   surfaces:
-    - path: regional/Canterbury/Canterbury_Basement_WGS84.in
+    - path: regional/Canterbury/Canterbury_Basement_WGS84.h5
   submodel: canterbury1d_v2
   notes:
     - Pre-Quaternary geology
