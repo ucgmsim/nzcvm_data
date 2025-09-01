@@ -11,15 +11,15 @@
 
 
 ## Images
-<a href="../images/maps/NI_south.png"><img src="../images/maps/NI_south.png" width="75%"></a>
+![](../images/maps/NI_south.png)
 
 *Figure 1 Location*
 
-<a href="../images/regional/Wellington_basin_map.png"><img src="../images/regional/Wellington_basin_map.png" width="75%"></a>
+![](../images/regional/Wellington_basin_map.png)
 
 *Figure 2 Wellington Basin Map*
 
-<a href="../images/basins/wellington_outline.png"><img src="../images/basins/wellington_outline.png" width="75%"></a>
+![](../images/basins/wellington_outline.png)
 
 *Figure 3 Wellington Outline*
 
@@ -31,14 +31,14 @@
 
 ## Data
 ### Boundaries
-- Wellington_outline_WGS84 : 
+- Wellington_outline_WGS84 : [GeoJSON](../../regional/Wellington/Wellington_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
-- Wellington_basement_WGS84_v25p5 :  (Submodel: N/A)
+- NZ_DEM_HD : [HDF5](../../global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
+- Wellington_basement_WGS84_v25p5 : [HDF5](../../regional/Wellington/Wellington_basement_WGS84_v25p5.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [Wellington_smoothing.txt](../../velocity_modelling/data/regional/Wellington/Wellington_smoothing.txt)
+- [Wellington_smoothing.txt](../../regional/Wellington/Wellington_smoothing.txt)
 
 ---
-*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
+*Page generated on: September 02, 2025, 09:14 NZST/NZDT*

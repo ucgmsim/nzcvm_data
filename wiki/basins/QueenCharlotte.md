@@ -10,7 +10,7 @@
 
 
 ## Images
-<a href="../images/regional/QueenCharlotte_basin_map.png"><img src="../images/regional/QueenCharlotte_basin_map.png" width="75%"></a>
+![](../images/regional/QueenCharlotte_basin_map.png)
 
 *Figure 1 Location*
 
@@ -20,8 +20,8 @@
 - QueenCharles_outline_WGS84 : 
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- NZ_DEM_HD : [HDF5](../../global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
 - QueenCharles_basement_WGS84_v25p8 :  (Submodel: N/A)
 
 ---
-*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
+*Page generated on: September 02, 2025, 09:14 NZST/NZDT*

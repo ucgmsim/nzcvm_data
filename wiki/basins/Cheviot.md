@@ -10,25 +10,25 @@
 
 
 ## Images
-<a href="../images/maps/cheviot_hanmer_northcanterbury.png"><img src="../images/maps/cheviot_hanmer_northcanterbury.png" width="75%"></a>
+![](../images/maps/cheviot_hanmer_northcanterbury.png)
 
 *Figure 1 Location*
 
-<a href="../images/regional/Cheviot_basin_map.png"><img src="../images/regional/Cheviot_basin_map.png" width="75%"></a>
+![](../images/regional/Cheviot_basin_map.png)
 
 *Figure 2 Cheviot Basin Map*
 
 
 ## Data
 ### Boundaries
-- Cheviot_outline_WGS84 : 
+- Cheviot_outline_WGS84 : [GeoJSON](../../regional/Cheviot/Cheviot_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
-- Cheviot_basement_WGS84 :  (Submodel: N/A)
+- NZ_DEM_HD : [HDF5](../../global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
+- Cheviot_basement_WGS84 : [HDF5](../../regional/Cheviot/Cheviot_basement_WGS84.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [Cheviot_smoothing.txt](../../velocity_modelling/data/regional/Cheviot/Cheviot_smoothing.txt)
+- [Cheviot_smoothing.txt](../../regional/Cheviot/Cheviot_smoothing.txt)
 
 ---
-*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
+*Page generated on: September 02, 2025, 09:14 NZST/NZDT*

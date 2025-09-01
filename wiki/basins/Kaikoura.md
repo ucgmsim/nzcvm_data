@@ -11,29 +11,29 @@
 
 
 ## Images
-<a href="../images/maps/kaikoura.png"><img src="../images/maps/kaikoura.png" width="75%"></a>
+![](../images/maps/kaikoura.png)
 
 *Figure 1 Location*
 
-<a href="../images/regional/Kaikoura_basin_map_v25p5.png"><img src="../images/regional/Kaikoura_basin_map_v25p5.png" width="75%"></a>
+![](../images/regional/Kaikoura_basin_map_v25p5.png)
 
 *Figure 2 Kaikoura Basin Map V25p5*
 
-<a href="../images/basins/kaikoura_basement.png"><img src="../images/basins/kaikoura_basement.png" width="75%"></a>
+![](../images/basins/kaikoura_basement.png)
 
 *Figure 3 Kaikoura Basement*
 
 
 ## Data
 ### Boundaries
-- Kaikoura_outline_WGS84_v25p5 : 
+- Kaikoura_outline_WGS84_v25p5 : [GeoJSON](../../regional/Kaikoura/Kaikoura_outline_WGS84_v25p5.geojson)
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
-- Kaikoura_basement_WGS84_v25p5 :  (Submodel: N/A)
+- NZ_DEM_HD : [HDF5](../../global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
+- Kaikoura_basement_WGS84_v25p5 : [HDF5](../../regional/Kaikoura/Kaikoura_basement_WGS84_v25p5.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [Kaikoura_smoothing_v25p5.txt](../../velocity_modelling/data/regional/Kaikoura/Kaikoura_smoothing_v25p5.txt)
+- [Kaikoura_smoothing_v25p5.txt](../../regional/Kaikoura/Kaikoura_smoothing_v25p5.txt)
 
 ---
-*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
+*Page generated on: September 02, 2025, 09:14 NZST/NZDT*

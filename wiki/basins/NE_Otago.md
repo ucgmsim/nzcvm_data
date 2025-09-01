@@ -10,15 +10,15 @@
 
 
 ## Images
-<a href="../images/maps/SI_se.png"><img src="../images/maps/SI_se.png" width="75%"></a>
+![](../images/maps/SI_se.png)
 
 *Figure 1 Location*
 
-<a href="../images/regional/NE_Otago_basin_map.png"><img src="../images/regional/NE_Otago_basin_map.png" width="75%"></a>
+![](../images/regional/NE_Otago_basin_map.png)
 
 *Figure 2 Ne Otago Basin Map*
 
-<a href="../images/basins/ne_otago_basins_classification-page-001.jpg"><img src="../images/basins/ne_otago_basins_classification-page-001.jpg" width="75%"></a>
+![](../images/basins/ne_otago_basins_classification-page-001.jpg)
 
 *Figure 3 Ne Otago Basins Classification-page-001*
 
@@ -28,15 +28,15 @@
 
 ## Data
 ### Boundaries
-- NE_Otago_outline_WGS84_1 : 
-- NE_Otago_outline_WGS84_2 : 
-- NE_Otago_outline_WGS84_3 : 
-- NE_Otago_outline_WGS84_4 : 
-- NE_Otago_outline_WGS84_5 : 
+- NE_Otago_outline_WGS84_1 : [GeoJSON](../../regional/NE_Otago/NE_Otago_outline_WGS84_1.geojson)
+- NE_Otago_outline_WGS84_2 : [GeoJSON](../../regional/NE_Otago/NE_Otago_outline_WGS84_2.geojson)
+- NE_Otago_outline_WGS84_3 : [GeoJSON](../../regional/NE_Otago/NE_Otago_outline_WGS84_3.geojson)
+- NE_Otago_outline_WGS84_4 : [GeoJSON](../../regional/NE_Otago/NE_Otago_outline_WGS84_4.geojson)
+- NE_Otago_outline_WGS84_5 : [GeoJSON](../../regional/NE_Otago/NE_Otago_outline_WGS84_5.geojson)
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
-- NE_Otago_basement_WGS84 :  (Submodel: N/A)
+- NZ_DEM_HD : [HDF5](../../global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
+- NE_Otago_basement_WGS84 : [HDF5](../../regional/NE_Otago/NE_Otago_basement_WGS84.h5) (Submodel: N/A)
 
 ---
-*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
+*Page generated on: September 02, 2025, 09:14 NZST/NZDT*

@@ -10,30 +10,30 @@
 
 
 ## Images
-<a href="../images/maps/NI_south.png"><img src="../images/maps/NI_south.png" width="75%"></a>
+![](../images/maps/NI_south.png)
 
 *Figure 1 Location*
 
-<a href="../images/regional/Porirua_basin_map.png"><img src="../images/regional/Porirua_basin_map.png" width="75%"></a>
+![](../images/regional/Porirua_basin_map.png)
 
 *Figure 2 Porirua Basin Map*
 
-<a href="../images/basins/porirua_outline.png"><img src="../images/basins/porirua_outline.png" width="75%"></a>
+![](../images/basins/porirua_outline.png)
 
 *Figure 3 Porirua Outline*
 
 
 ## Data
 ### Boundaries
-- Porirua_outline_WGS84_1 : 
-- Porirua_outline_WGS84_2 : 
+- Porirua_outline_WGS84_1 : [GeoJSON](../../regional/Porirua/Porirua_outline_WGS84_1.geojson)
+- Porirua_outline_WGS84_2 : [GeoJSON](../../regional/Porirua/Porirua_outline_WGS84_2.geojson)
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
-- Porirua_basement_WGS84 :  (Submodel: N/A)
+- NZ_DEM_HD : [HDF5](../../global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
+- Porirua_basement_WGS84 : [HDF5](../../regional/Porirua/Porirua_basement_WGS84.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [Porirua_smoothing.txt](../../velocity_modelling/data/regional/Porirua/Porirua_smoothing.txt)
+- [Porirua_smoothing.txt](../../regional/Porirua/Porirua_smoothing.txt)
 
 ---
-*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
+*Page generated on: September 02, 2025, 09:14 NZST/NZDT*

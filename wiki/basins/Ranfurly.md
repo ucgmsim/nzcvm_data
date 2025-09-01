@@ -10,15 +10,15 @@
 
 
 ## Images
-<a href="../images/maps/SI_mid.png"><img src="../images/maps/SI_mid.png" width="75%"></a>
+![](../images/maps/SI_mid.png)
 
 *Figure 1 Location*
 
-<a href="../images/regional/Ranfurly_basin_map.png"><img src="../images/regional/Ranfurly_basin_map.png" width="75%"></a>
+![](../images/regional/Ranfurly_basin_map.png)
 
 *Figure 2 Ranfurly Basin Map*
 
-<a href="../images/basins/alexandra-ranfurly_basins_classification_v2-page-001.jpg"><img src="../images/basins/alexandra-ranfurly_basins_classification_v2-page-001.jpg" width="75%"></a>
+![](../images/basins/alexandra-ranfurly_basins_classification_v2-page-001.jpg)
 
 *Figure 3 Alexandra-ranfurly Basins Classification V2-page-001*
 
@@ -28,11 +28,11 @@
 
 ## Data
 ### Boundaries
-- Ranfurly_outline_WGS84 : 
+- Ranfurly_outline_WGS84 : [GeoJSON](../../regional/Ranfurly/Ranfurly_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
-- Ranfurly_basement_WGS84 :  (Submodel: N/A)
+- NZ_DEM_HD : [HDF5](../../global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
+- Ranfurly_basement_WGS84 : [HDF5](../../regional/Ranfurly/Ranfurly_basement_WGS84.h5) (Submodel: N/A)
 
 ---
-*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
+*Page generated on: September 02, 2025, 09:14 NZST/NZDT*

@@ -10,19 +10,19 @@
 
 
 ## Images
-<a href="../images/maps/SI_se.png"><img src="../images/maps/SI_se.png" width="75%"></a>
+![](../images/maps/SI_se.png)
 
 *Figure 1 Location*
 
-<a href="../images/regional/Mosgiel_basin_map.png"><img src="../images/regional/Mosgiel_basin_map.png" width="75%"></a>
+![](../images/regional/Mosgiel_basin_map.png)
 
 *Figure 2 Mosgiel Basin Map*
 
-<a href="../images/basins/green_class.png"><img src="../images/basins/green_class.png" width="75%"></a>
+![](../images/basins/green_class.png)
 
 *Figure 3 Green Class*
 
-<a href="../images/basins/green_rock.png"><img src="../images/basins/green_rock.png" width="75%"></a>
+![](../images/basins/green_rock.png)
 
 *Figure 4 Green Rock*
 
@@ -34,11 +34,11 @@
 
 ## Data
 ### Boundaries
-- Mosgiel_outline_WGS84 : 
+- Mosgiel_outline_WGS84 : [GeoJSON](../../regional/Mosgiel/Mosgiel_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
-- Mosgiel_basement_WGS84 :  (Submodel: N/A)
+- NZ_DEM_HD : [HDF5](../../global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
+- Mosgiel_basement_WGS84 : [HDF5](../../regional/Mosgiel/Mosgiel_basement_WGS84.h5) (Submodel: N/A)
 
 ---
-*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
+*Page generated on: September 02, 2025, 09:14 NZST/NZDT*

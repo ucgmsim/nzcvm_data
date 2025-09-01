@@ -11,22 +11,22 @@
 
 
 ## Images
-<a href="../images/maps/cheviot_hanmer_northcanterbury.png"><img src="../images/maps/cheviot_hanmer_northcanterbury.png" width="75%"></a>
+![](../images/maps/cheviot_hanmer_northcanterbury.png)
 
 *Figure 1 Location*
 
-<a href="../images/regional/Hanmer_basin_map_v25p5.png"><img src="../images/regional/Hanmer_basin_map_v25p5.png" width="75%"></a>
+![](../images/regional/Hanmer_basin_map_v25p5.png)
 
 *Figure 2 Hanmer Basin Map V25p5*
 
 
 ## Data
 ### Boundaries
-- Hanmer_outline_WGS84_v25p3 : 
+- Hanmer_outline_WGS84_v25p3 : [GeoJSON](../../regional/Hanmer/Hanmer_outline_WGS84_v25p3.geojson)
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
-- Hanmer_basement_WGS84_v25p3 :  (Submodel: N/A)
+- NZ_DEM_HD : [HDF5](../../global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
+- Hanmer_basement_WGS84_v25p3 : [HDF5](../../regional/Hanmer/Hanmer_basement_WGS84_v25p3.h5) (Submodel: N/A)
 
 ---
-*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
+*Page generated on: September 02, 2025, 09:14 NZST/NZDT*

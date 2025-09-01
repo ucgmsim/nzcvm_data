@@ -163,6 +163,13 @@ def generate_wiki(
             help="Scale images to 75% size with a clickable link to full size",
         ),
     ] = False,
+    output_dir: Annotated[
+        Path,
+        typer.Option(
+            "--output-dir",
+            help="Directory to write Markdown files to (default: ../../wiki/basins)",
+        ),
+    ] = Path(__file__).parent.parent / "wiki" / "basins",
 ) -> None:
     """
     Generate Markdown files for basins from nzcvm_registry.yaml
@@ -179,7 +186,8 @@ def generate_wiki(
         Path to the nzcvm_registry.yaml file
     scale_images : bool, optional
         If True, scale images to 75% size with a clickable link to full size
-
+    output_dir : Path, optional
+        Directory to write Markdown files to
     """
     basin_versions = _get_basin_versions(registry)
 
@@ -190,10 +198,6 @@ def generate_wiki(
             print(f"Available basins: {', '.join(sorted(basin_versions.keys()))}")
             raise typer.Exit(code=1)
         basin_versions = {basin: basin_versions[basin]}
-
-    # Define the project root directory (four levels up from script location)
-    project_root = Path(__file__).parent.parent.parent
-    output_dir = project_root / "wiki" / "basins"
 
     # Ensure the output directory exists
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -286,8 +290,8 @@ def generate_wiki(
                 txt_path = f"{base_path}.txt"
 
                 # Use CVM_DATA path instead of GitHub URL
-                updated_txt_path = f"../../velocity_modelling/data/{txt_path}"
-                updated_geojson_path = f"../../velocity_modelling/data/{geojson_path}"
+                updated_txt_path = f"../../{txt_path}"
+                updated_geojson_path = f"../../{geojson_path}"
 
                 # Create links with format indicators
                 links = []
@@ -315,8 +319,8 @@ def generate_wiki(
                 in_path = f"{base_path}.in"
 
                 # Use CVM_DATA path instead of GitHub URL
-                updated_h5_path = f"../../velocity_modelling/data/{h5_path}"
-                updated_in_path = f"../../velocity_modelling/data/{in_path}"
+                updated_h5_path = f"../../{h5_path}"
+                updated_in_path = f"../../{in_path}"
 
                 # Create links with format indicators
                 links = []
@@ -336,23 +340,11 @@ def generate_wiki(
             md_content += "### Smoothing Boundaries\n"
             smoothing_filename = Path(smoothing).name
             # Use CVM_DATA path instead of GitHub URL
-            updated_smoothing_path = f"../../velocity_modelling/data/{smoothing}"
+            updated_smoothing_path = f"../../{smoothing}"
             md_content += f"- [{smoothing_filename}]({updated_smoothing_path})\n"
             md_content += "\n"
 
-        # Retrieved From Subsection
-        retrieved_from = basin_data.get("retrieved_from", {})
-        if retrieved_from:
-            md_content += "## Data retrieved from\n"
-            for item in retrieved_from:
-                for category, paths in item.items():
-                    md_content += f"### {category.capitalize()}\n"
-                    for path in paths:
-                        filename = Path(path).name
-                        # Use GitHub URL for retrieved_from paths
-                        updated_path = f"https://github.com/ucgmsim/Velocity-Model/tree/main/Data/{path}"
-                        md_content += f"- [{filename}]({updated_path})\n"
-                    md_content += "\n"
+
 
         # Add timestamp at the bottom in NZ time
         nz_tz = pytz.timezone("Pacific/Auckland")

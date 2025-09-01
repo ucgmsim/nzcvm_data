@@ -11,37 +11,37 @@
 
 
 ## Images
-<a href="../images/maps/motubay_whangaparoa.png"><img src="../images/maps/motubay_whangaparoa.png" width="75%"></a>
+![](../images/maps/motubay_whangaparoa.png)
 
 *Figure 1 Location*
 
-<a href="../images/regional/OmaioBay_basin_map.png"><img src="../images/regional/OmaioBay_basin_map.png" width="75%"></a>
+![](../images/regional/OmaioBay_basin_map.png)
 
 *Figure 2 Omaiobay Basin Map*
 
-<a href="../images/basins/moturiver_extended_outline.png"><img src="../images/basins/moturiver_extended_outline.png" width="75%"></a>
+![](../images/basins/moturiver_extended_outline.png)
 
 *Figure 3 Moturiver Extended Outline*
 
-<a href="../images/basins/eastcape_coastal_river_valleys.png"><img src="../images/basins/eastcape_coastal_river_valleys.png" width="75%"></a>
+![](../images/basins/eastcape_coastal_river_valleys.png)
 
 *Figure 4 Eastcape Coastal River Valleys*
 
 
 ## Data
 ### Boundaries
-- OmaioBay_outline_WGS84_1 : 
-- OmaioBay_outline_WGS84_2 : 
-- OmaioBay_outline_WGS84_3 : 
-- OmaioBay_outline_WGS84_4 : 
-- OmaioBay_outline_WGS84_5 : 
+- OmaioBay_outline_WGS84_1 : [GeoJSON](../../regional/OmaioBay/OmaioBay_outline_WGS84_1.geojson)
+- OmaioBay_outline_WGS84_2 : [GeoJSON](../../regional/OmaioBay/OmaioBay_outline_WGS84_2.geojson)
+- OmaioBay_outline_WGS84_3 : [GeoJSON](../../regional/OmaioBay/OmaioBay_outline_WGS84_3.geojson)
+- OmaioBay_outline_WGS84_4 : [GeoJSON](../../regional/OmaioBay/OmaioBay_outline_WGS84_4.geojson)
+- OmaioBay_outline_WGS84_5 : [GeoJSON](../../regional/OmaioBay/OmaioBay_outline_WGS84_5.geojson)
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
-- OmaioBay_basement_WGS84 :  (Submodel: N/A)
+- NZ_DEM_HD : [HDF5](../../global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
+- OmaioBay_basement_WGS84 : [HDF5](../../regional/OmaioBay/OmaioBay_basement_WGS84.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [OmaioBay_smoothing.txt](../../velocity_modelling/data/regional/OmaioBay/OmaioBay_smoothing.txt)
+- [OmaioBay_smoothing.txt](../../regional/OmaioBay/OmaioBay_smoothing.txt)
 
 ---
-*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
+*Page generated on: September 02, 2025, 09:14 NZST/NZDT*

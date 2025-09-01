@@ -10,34 +10,34 @@
 
 
 ## Images
-<a href="../images/maps/NI_mideast.png"><img src="../images/maps/NI_mideast.png" width="75%"></a>
+![](../images/maps/NI_mideast.png)
 
 *Figure 1 Location*
 
-<a href="../images/regional/Napier_basin_map.png"><img src="../images/regional/Napier_basin_map.png" width="75%"></a>
+![](../images/regional/Napier_basin_map.png)
 
 *Figure 2 Napier Basin Map*
 
-<a href="../images/basins/napier_outline.png"><img src="../images/basins/napier_outline.png" width="75%"></a>
+![](../images/basins/napier_outline.png)
 
 *Figure 3 Napier Outline*
 
 
 ## Data
 ### Boundaries
-- Napier_outline_WGS84_1 : 
-- Napier_outline_WGS84_2 : 
-- Napier_outline_WGS84_3 : 
-- Napier_outline_WGS84_4 : 
-- Napier_outline_WGS84_5 : 
-- Napier_outline_WGS84_6 : 
+- Napier_outline_WGS84_1 : [GeoJSON](../../regional/Napier/Napier_outline_WGS84_1.geojson)
+- Napier_outline_WGS84_2 : [GeoJSON](../../regional/Napier/Napier_outline_WGS84_2.geojson)
+- Napier_outline_WGS84_3 : [GeoJSON](../../regional/Napier/Napier_outline_WGS84_3.geojson)
+- Napier_outline_WGS84_4 : [GeoJSON](../../regional/Napier/Napier_outline_WGS84_4.geojson)
+- Napier_outline_WGS84_5 : [GeoJSON](../../regional/Napier/Napier_outline_WGS84_5.geojson)
+- Napier_outline_WGS84_6 : [GeoJSON](../../regional/Napier/Napier_outline_WGS84_6.geojson)
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
-- Napier_basement_WGS84 :  (Submodel: N/A)
+- NZ_DEM_HD : [HDF5](../../global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
+- Napier_basement_WGS84 : [HDF5](../../regional/Napier/Napier_basement_WGS84.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [Napier_smoothing.txt](../../velocity_modelling/data/regional/Napier/Napier_smoothing.txt)
+- [Napier_smoothing.txt](../../regional/Napier/Napier_smoothing.txt)
 
 ---
-*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
+*Page generated on: September 02, 2025, 09:14 NZST/NZDT*

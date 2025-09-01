@@ -11,11 +11,11 @@
 
 
 ## Images
-<a href="../images/maps/canterbury_region.png"><img src="../images/maps/canterbury_region.png" width="75%"></a>
+![](../images/maps/canterbury_region.png)
 
 *Figure 1 Location*
 
-<a href="../images/regional/Canterbury_basin_map.png"><img src="../images/regional/Canterbury_basin_map.png" width="75%"></a>
+![](../images/regional/Canterbury_basin_map.png)
 
 *Figure 2 Canterbury Basin Map*
 
@@ -25,17 +25,17 @@
 
 ## Data
 ### Boundaries
-- Canterbury_outline_WGS84 : 
+- Canterbury_outline_WGS84 : [GeoJSON](../../regional/Canterbury/Canterbury_outline_WGS84.geojson)
 
 ### Surfaces
-- CantDEM :  (Submodel: canterbury1d_v2_pliocene_enforced)
-- Canterbury_Pliocene_46_WGS84_v8p9p18 :  (Submodel: pliocene_submod_v1)
-- Canterbury_Miocene_WGS84 :  (Submodel: miocene_submod_v1)
-- Canterbury_Paleogene_WGS84 :  (Submodel: paleogene_submod_v1)
-- Canterbury_basement_WGS84 :  (Submodel: N/A)
+- CantDEM : [HDF5](../../global/surface/CantDEM.h5) (Submodel: canterbury1d_v2_pliocene_enforced)
+- Canterbury_Pliocene_46_WGS84_v8p9p18 : [HDF5](../../regional/Canterbury/Canterbury_Pliocene_46_WGS84_v8p9p18.h5) (Submodel: pliocene_submod_v1)
+- Canterbury_Miocene_WGS84 : [HDF5](../../regional/Canterbury/Canterbury_Miocene_WGS84.h5) (Submodel: miocene_submod_v1)
+- Canterbury_Paleogene_WGS84 : [HDF5](../../regional/Canterbury/Canterbury_Paleogene_WGS84.h5) (Submodel: paleogene_submod_v1)
+- Canterbury_basement_WGS84 : [HDF5](../../regional/Canterbury/Canterbury_basement_WGS84.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [Canterbury_smoothing.txt](../../velocity_modelling/data/regional/Canterbury/Canterbury_smoothing.txt)
+- [Canterbury_smoothing.txt](../../regional/Canterbury/Canterbury_smoothing.txt)
 
 ---
-*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
+*Page generated on: September 02, 2025, 09:14 NZST/NZDT*

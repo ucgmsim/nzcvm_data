@@ -10,19 +10,19 @@
 
 
 ## Images
-<a href="../images/maps/NI_mideast.png"><img src="../images/maps/NI_mideast.png" width="75%"></a>
+![](../images/maps/NI_mideast.png)
 
 *Figure 1 Location*
 
-<a href="../images/regional/HawkesBay_basin_map.png"><img src="../images/regional/HawkesBay_basin_map.png" width="75%"></a>
+![](../images/regional/HawkesBay_basin_map.png)
 
 *Figure 2 Hawkesbay Basin Map*
 
-<a href="../images/basins/hawkes_bay_outline.png"><img src="../images/basins/hawkes_bay_outline.png" width="75%"></a>
+![](../images/basins/hawkes_bay_outline.png)
 
 *Figure 3 Hawkes Bay Outline*
 
-<a href="../images/basins/hawkes_bay_outline_edited.png"><img src="../images/basins/hawkes_bay_outline_edited.png" width="75%"></a>
+![](../images/basins/hawkes_bay_outline_edited.png)
 
 *Figure 4 Hawkes Bay Outline Edited*
 
@@ -32,17 +32,17 @@
 
 ## Data
 ### Boundaries
-- HawkesBay_outline_WGS84_1 : 
-- HawkesBay_outline_WGS84_2 : 
-- HawkesBay_outline_WGS84_3 : 
-- HawkesBay_outline_WGS84_4 : 
+- HawkesBay_outline_WGS84_1 : [GeoJSON](../../regional/HawkesBay/HawkesBay_outline_WGS84_1.geojson)
+- HawkesBay_outline_WGS84_2 : [GeoJSON](../../regional/HawkesBay/HawkesBay_outline_WGS84_2.geojson)
+- HawkesBay_outline_WGS84_3 : [GeoJSON](../../regional/HawkesBay/HawkesBay_outline_WGS84_3.geojson)
+- HawkesBay_outline_WGS84_4 : [GeoJSON](../../regional/HawkesBay/HawkesBay_outline_WGS84_4.geojson)
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
-- HawkesBay_basement_WGS84 :  (Submodel: N/A)
+- NZ_DEM_HD : [HDF5](../../global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
+- HawkesBay_basement_WGS84 : [HDF5](../../regional/HawkesBay/HawkesBay_basement_WGS84.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [HawkesBay_smoothing.txt](../../velocity_modelling/data/regional/HawkesBay/HawkesBay_smoothing.txt)
+- [HawkesBay_smoothing.txt](../../regional/HawkesBay/HawkesBay_smoothing.txt)
 
 ---
-*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
+*Page generated on: September 02, 2025, 09:14 NZST/NZDT*

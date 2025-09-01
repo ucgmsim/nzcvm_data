@@ -11,22 +11,22 @@
 
 
 ## Images
-<a href="../images/regional/PalmerstonNorth_basin_map_v25p8.png"><img src="../images/regional/PalmerstonNorth_basin_map_v25p8.png" width="75%"></a>
+![](../images/regional/PalmerstonNorth_basin_map_v25p8.png)
 
 *Figure 1 Location*
 
 
 ## Data
 ### Boundaries
-- PalmerstonNorth_outline_WGS84 : 
+- PalmerstonNorth_outline_WGS84 : [GeoJSON](../../regional/PalmerstonNorth/PalmerstonNorth_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2_pliocene_enforced)
-- PalmerstonNorth_pliocenetop_WGS84_v25p8 :  (Submodel: pliocene_submod_v1)
-- PalmerstonNorth_basement_WGS84_v25p8 :  (Submodel: N/A)
+- NZ_DEM_HD : [HDF5](../../global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2_pliocene_enforced)
+- PalmerstonNorth_pliocenetop_WGS84_v25p8 : [HDF5](../../regional/PalmerstonNorth/PalmerstonNorth_pliocenetop_WGS84_v25p8.h5) (Submodel: pliocene_submod_v1)
+- PalmerstonNorth_basement_WGS84_v25p8 : [HDF5](../../regional/PalmerstonNorth/PalmerstonNorth_basement_WGS84_v25p8.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [PalmerstonNorth_smoothing.txt](../../velocity_modelling/data/regional/PalmerstonNorth/PalmerstonNorth_smoothing.txt)
+- [PalmerstonNorth_smoothing.txt](../../regional/PalmerstonNorth/PalmerstonNorth_smoothing.txt)
 
 ---
-*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
+*Page generated on: September 02, 2025, 09:14 NZST/NZDT*

@@ -10,22 +10,22 @@
 
 
 ## Images
-<a href="../images/maps/SI_north.png"><img src="../images/maps/SI_north.png" width="75%"></a>
+![](../images/maps/SI_north.png)
 
 *Figure 1 Location*
 
-<a href="../images/regional/SpringsJunction_basin_map.png"><img src="../images/regional/SpringsJunction_basin_map.png" width="75%"></a>
+![](../images/regional/SpringsJunction_basin_map.png)
 
 *Figure 2 Springsjunction Basin Map*
 
 
 ## Data
 ### Boundaries
-- SpringsJunction_outline_WGS84 : 
+- SpringsJunction_outline_WGS84 : [GeoJSON](../../regional/SpringsJunction/SpringsJunction_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
-- SpringsJunction_basement_WGS84 :  (Submodel: N/A)
+- NZ_DEM_HD : [HDF5](../../global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
+- SpringsJunction_basement_WGS84 : [HDF5](../../regional/SpringsJunction/SpringsJunction_basement_WGS84.h5) (Submodel: N/A)
 
 ---
-*Page generated on: August 22, 2025, 15:24 NZST/NZDT*
+*Page generated on: September 02, 2025, 09:14 NZST/NZDT*
