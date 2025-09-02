@@ -12,7 +12,7 @@ The HDF5 file will contain the following data:
   - `elevation`: 2D array of elevation or depth values [shape: (nrows, ncols)]
 
 Usage:
-    python surface_ascii2h5.py <input_file> [--out-dir <output_directory>]
+    python surface_in2h5.py <input_file> [--out-dir <output_directory>]
 
 """
 

@@ -10,7 +10,7 @@ output HDF5 file will contain groups for each elevation, with datasets for latit
 and the velocity types.
 
 Example usage:
-python tomo_ascii2h5.py /path/to/tomography_files output_name --out-dir /path/to/output_dir --dtype f32 --gzip 6
+python tomo_in2h5.py /path/to/tomography_files output_name --out-dir /path/to/output_dir --dtype f32 --gzip 6
 
 This will convert the tomography files in /path/to/tomography_files to a file named output_name.h5
 in the same directory. If --out-dir is specified, the output file will be saved in that directory
@@ -133,7 +133,7 @@ def convert_ascii_to_hdf5(
     with h5py.File(output_path, "w") as h5f:
         # file-level metadata to advertise decisions
         h5f.attrs["created"] = datetime.utcnow().isoformat() + "Z"
-        h5f.attrs["generator"] = "tomo_ascii2h5.py"
+        h5f.attrs["generator"] = "tomo_in2h5.py"
         h5f.attrs["schema"] = "NZTomographyLevelStacked v1"
         h5f.attrs["data_dtype_vp_vs_rho"] = (
             "float32" if data_dtype == np.float32 else "float64"
