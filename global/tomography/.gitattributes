@@ -1,6 +1,0 @@
-chow2020_ep2020_mix.h5 filter=lfs diff=lfs merge=lfs -text
-ep2010.h5 filter=lfs diff=lfs merge=lfs -text
-EP2010/ep2010.h5 filter=lfs diff=lfs merge=lfs -text
-EP2020/ep2020.h5 filter=lfs diff=lfs merge=lfs -text
-EP2025/ep2025.h5 filter=lfs diff=lfs merge=lfs -text
-CHOW2020_EP2020_MIX/chow2020_ep2020_mix.h5 filter=lfs diff=lfs merge=lfs -text
