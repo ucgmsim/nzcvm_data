@@ -7,7 +7,7 @@ the output to a GeoJSON file. It ensures the polygon is closed and valid. If the
 polygon is not closed, it appends the closing point to the input file.
 
 Usage:
-    python boundary_txt_to_geojson.py <input_txt_file>
+    python boundary_ascii2geojson.py <input_txt_file>
 
 
 """
