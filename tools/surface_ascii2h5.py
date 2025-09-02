@@ -74,7 +74,7 @@ def ascii_to_hdf5(input_file_path: str | Path, output_file_path: str | Path):
             data = np.fromfile(f, dtype=float, count=nrows * ncols, sep=" ")
             if data.size != nrows * ncols:
                 raise ValueError(
-                    f"Expected {nrows*ncols} raster values, got {data.size}"
+                    f"Expected {nrows * ncols} raster values, got {data.size}"
                 )
 
             # reshape to (nrows, ncols) —  HDF5 loader uses [:].T later

@@ -79,8 +79,8 @@ basin:
     type: 4
     author: Robin Lee
     wiki_images:
-      - maps/canterbury_region.png
-      - regional/Canterbury_basin_map.png
+      - images/canterbury_region.png
+      - images/Canterbury_basin_map.png
     notes:
       - Pre-Quaternary geology
 
@@ -103,8 +103,8 @@ basin:
     type: 1
     author: Robin Lee
     wiki_images:
-      - maps/canterbury_region.png
-      - regional/NorthCanterbury_basin_map_v19p1.png
+      - images/canterbury_region.png
+      - images/NorthCanterbury_basin_map_v19p1.png
     boundaries:
       - regional/NorthCanterbury/NorthCanterbury_outline_WGS84_v19p1.geojson
     surfaces:
@@ -117,8 +117,8 @@ basin:
     type: 1
     author: Robin Lee
     wiki_images:
-      - maps/canterbury_region.png
-      - regional/NorthCanterbury_basin_map_v25p8.png
+      - images/canterbury_region.png
+      - images/NorthCanterbury_basin_map_v25p8.png
     boundaries:
       - regional/NorthCanterbury/NorthCanterbury_outline_WGS84_v25p8.geojson
     surfaces:
@@ -130,8 +130,8 @@ basin:
     type: 4
     author: Robin Lee
     wiki_images:
-      - maps/canterbury_region.png
-      - regional/BanksPeninsulaVolcanics_basin_map.png
+      - images/canterbury_region.png
+      - images/BanksPeninsulaVolcanics_basin_map.png
     notes:
       - Miocene surface is the same as Canterbury
     boundaries:
@@ -146,9 +146,9 @@ basin:
     type: 2
     author: Robin Lee
     wiki_images:
-      - maps/kaikoura.png
-      - regional/Kaikoura_basin_map_v19p1.png
-      - basins/kaikoura_basement.png
+      - images/kaikoura.png
+      - images/Kaikoura_basin_map_v19p1.png
+      - images/kaikoura_basement.png
     boundaries:
       - regional/Kaikoura/Kaikoura_outline_WGS84.geojson
     surfaces:
@@ -162,9 +162,9 @@ basin:
     type: 2
     author: Robin Lee
     wiki_images:
-      - maps/kaikoura.png
-      - regional/Kaikoura_basin_map_v25p5.png
-      - basins/kaikoura_basement.png
+      - images/kaikoura.png
+      - images/Kaikoura_basin_map_v25p5.png
+      - images/kaikoura_basement.png
     boundaries:
       - regional/Kaikoura/Kaikoura_outline_WGS84_v25p5.geojson
     surfaces:
@@ -178,8 +178,8 @@ basin:
     type: 1
     author: Robin Lee
     wiki_images:
-      - maps/cheviot_hanmer_northcanterbury.png
-      - regional/Cheviot_basin_map.png
+      - images/cheviot_hanmer_northcanterbury.png
+      - images/Cheviot_basin_map.png
     boundaries:
       - regional/Cheviot/Cheviot_outline_WGS84.geojson
     surfaces:
@@ -193,9 +193,9 @@ basin:
     type: 1
     author: Robin Lee
     wiki_images:
-      - maps/cheviot_hanmer_northcanterbury.png
-      - regional/Hanmer_basin_map_v19p1.png
-      - basins/hanmer_basement.png
+      - images/cheviot_hanmer_northcanterbury.png
+      - images/Hanmer_basin_map_v19p1.png
+      - images/hanmer_basement.png
     boundaries:
       - regional/Hanmer/Hanmer_outline_WGS84_v19p1.geojson
     surfaces:
@@ -208,8 +208,8 @@ basin:
     type: 1
     author: Ayushi Tiwari / Robin Lee 
     wiki_images:
-      - maps/cheviot_hanmer_northcanterbury.png
-      - regional/Hanmer_basin_map_v25p5.png
+      - images/cheviot_hanmer_northcanterbury.png
+      - images/Hanmer_basin_map_v25p3.png
     boundaries:
       - regional/Hanmer/Hanmer_outline_WGS84_v25p3.geojson
     surfaces:
@@ -221,8 +221,8 @@ basin:
     type: 1
     author: Robin Lee
     wiki_images:
-      - maps/SI_north.png
-      - regional/Marlborough_basin_map.png
+      - images/SI_north.png
+      - images/Marlborough_basin_map.png
     boundaries:
       - regional/Marlborough/Marlborough_outline_WGS84.geojson
     surfaces:
@@ -236,8 +236,8 @@ basin:
     type: 2
     author: Robin Lee
     wiki_images:
-      - maps/SI_north.png
-      - regional/Nelson_basin_map_v19p1.png
+      - images/SI_north.png
+      - images/Nelson_basin_map_v19p1.png
     notes:
       - Sourced from https://nelson-richmond-geolmap.github.io/RGMap/ (for the geological map of the Nelson-Richmond area)
     boundaries:
@@ -253,8 +253,8 @@ basin:
     type: 2
     author: Robin Lee
     wiki_images:
-      - maps/SI_north.png
-      - regional/Nelson_basin_map_v25p5.png
+      - images/SI_north.png
+      - images/Nelson_basin_map_v25p5.png
     notes:
       - Sourced from https://nelson-richmond-geolmap.github.io/RGMap/ (for the geological map of the Nelson-Richmond area)
       - Based on Ghisetti2017
@@ -290,9 +290,9 @@ basin:
     type: 3
     author: Robin Lee / Matt Hill
     wiki_images:
-      - maps/NI_south.png
-      - regional/Wellington_basin_map.png
-      - basins/wellington_outline.png
+      - images/NI_south.png
+      - images/Wellington_basin_map.png
+      - images/wellington_outline.png
 
     boundaries:
       - regional/Wellington/Wellington_outline_WGS84.geojson
@@ -306,9 +306,9 @@ basin:
     type: 3
     author: Robin Lee / Matt Hill
     wiki_images:
-      - maps/NI_south.png
-      - regional/Wellington_basin_map.png
-      - basins/wellington_outline.png
+      - images/NI_south.png
+      - images/Wellington_basin_map.png
+      - images/wellington_outline.png
     notes:
       - 19.1,19.6 Robin Lee (basement update)
       - 21.8 Matt Hill (basement update)
@@ -327,9 +327,9 @@ basin:
     type: 1
     author: Andrew Stolte
     wiki_images:
-      - maps/waikato_hauraki_boundary.png
-      - regional/WaikatoHauraki_basin_map.png
-      - basins/waikato_hauraki_outline.png
+      - images/waikato_hauraki_boundary.png
+      - images/WaikatoHauraki_basin_map.png
+      - images/waikato_hauraki_outline.png
     boundaries:
       - regional/WaikatoHauraki/WaikatoHauraki_outline_WGS84.geojson
     surfaces:
@@ -343,9 +343,9 @@ basin:
     type: 1
     author: Cameron Douglas (USER2020)
     wiki_images:
-      - maps/SI_mid.png
-      - regional/Wanaka_basin_map.png
-      - basins/wanaka_boundary.png
+      - images/SI_mid.png
+      - images/Wanaka_basin_map.png
+      - images/wanaka_boundary.png
     boundaries:
       - regional/Wanaka/Wanaka_outline_WGS84.geojson
     surfaces:
@@ -359,9 +359,9 @@ basin:
     type: 1
     author: Cameron Douglas (USER2020)
     wiki_images:
-      - maps/SI_mid.png
-      - regional/Mackenzie_basin_map.png
-      - basins/mackenzie_boundary.png
+      - images/SI_mid.png
+      - images/Mackenzie_basin_map.png
+      - images/mackenzie_boundary.png
     boundaries:
       - regional/Mackenzie/Mackenzie_outline_WGS84.geojson
     surfaces:
@@ -374,8 +374,8 @@ basin:
     type: 1
     author: Tim Tuckey (USER2020)
     wiki_images:
-      - maps/SI_mid.png
-      - regional/Wakatipu_basin_map.png
+      - images/SI_mid.png
+      - images/Wakatipu_basin_map.png
     boundaries:
       - regional/Wakatipu/Wakatipu_outline_WGS84.geojson
     surfaces:
@@ -388,9 +388,9 @@ basin:
     type: 1
     author: Cameron Douglas (USER2020)
     wiki_images:
-      - maps/SI_mid.png
-      - regional/Alexandra_basin_map.png
-      - basins/alexandra-ranfurly_basins_classification_v2-page-001.jpg
+      - images/SI_mid.png
+      - images/Alexandra_basin_map.png
+      - images/alexandra-ranfurly_basins_classification_v2-page-001.jpg
     notes:
       - Alexandra, Ranfurly and NE_Otago share the same basement
     boundaries:
@@ -405,9 +405,9 @@ basin:
     type: 1
     author: Cameron Douglas (USER2020)
     wiki_images:
-      - maps/SI_mid.png
-      - regional/Ranfurly_basin_map.png
-      - basins/alexandra-ranfurly_basins_classification_v2-page-001.jpg
+      - images/SI_mid.png
+      - images/Ranfurly_basin_map.png
+      - images/alexandra-ranfurly_basins_classification_v2-page-001.jpg
     notes:
       - Alexandra, Ranfurly and NE_Otago share the same basement
     boundaries:
@@ -422,9 +422,9 @@ basin:
     type: 1
     author: Cameron Douglas (USER2020)
     wiki_images:
-      - maps/SI_se.png
-      - regional/NE_Otago_basin_map.png
-      - basins/ne_otago_basins_classification-page-001.jpg
+      - images/SI_se.png
+      - images/NE_Otago_basin_map.png
+      - images/ne_otago_basins_classification-page-001.jpg
     notes:
       - Alexandra, Ranfurly and NE_Otago share the same basement
     boundaries:
@@ -443,10 +443,10 @@ basin:
     type: 1
     author: Cameron Douglas (USER2020)
     wiki_images:
-      - maps/SI_se.png
-      - regional/Mosgiel_basin_map.png
-      - basins/green_class.png
-      - basins/green_rock.png
+      - images/SI_se.png
+      - images/Mosgiel_basin_map.png
+      - images/green_class.png
+      - images/green_rock.png
     notes:
       - Green area (in green_rock.png) tentatively regarded as a sedimentary rock (soft rock)
       - Implemented as two separate basins (Mosgiel/Balclutha) joined by the sedimentary rock
@@ -465,10 +465,10 @@ basin:
     type: 1
     author: Cameron Douglas (USER2020)
     wiki_images:
-      - maps/SI_se.png
-      - regional/Balclutha_basin_map.png
-      - basins/green_class.png
-      - basins/green_rock.png
+      - images/SI_se.png
+      - images/Balclutha_basin_map.png
+      - images/green_class.png
+      - images/green_rock.png
     notes:
       - Green area (in green_rock.png) tentatively regarded as a sedimentary rock (soft rock)
       - Implemented as two separate basins (Mosgiel/Balclutha) joined by the sedimentary rock
@@ -485,9 +485,9 @@ basin:
     type: 1
     author: Cameron Douglas (USER2020)
     wiki_images:
-      - maps/SI_se.png
-      - regional/Dunedin_basin_map.png
-      - basins/dunedin_outline.png
+      - images/SI_se.png
+      - images/Dunedin_basin_map.png
+      - images/dunedin_outline.png
     notes:
       - Port Chalmers needs an update.
       - Inlets need to be modelled.
@@ -505,9 +505,9 @@ basin:
     type: 1
     author: Tim Tuckey (USER2020)
     wiki_images:
-      - maps/SI_north.png
-      - regional/Murchison_basin_map.png
-      - basins/murchison_outline.png
+      - images/SI_north.png
+      - images/Murchison_basin_map.png
+      - images/murchison_outline.png
     boundaries:
       - regional/Murchison/Murchison_outline_WGS84.geojson
     surfaces:
@@ -521,9 +521,9 @@ basin:
     type: 1
     author: Cameron Douglas (USER2020)
     wiki_images:
-      - maps/SI_mid.png
-      - regional/Waitaki_basin_map.png
-      - basins/waitaki_hakataramea_outline.jpg
+      - images/SI_mid.png
+      - images/Waitaki_basin_map.png
+      - images/waitaki_hakataramea_outline.jpg
     notes:
       - (Comment from the author)
       - Interacts with the boundary of the Canterbury Basin- Need to check boundary depth.
@@ -541,9 +541,9 @@ basin:
     type: 1
     author: Cameron Douglas (USER2020)
     wiki_images:
-      - maps/SI_mid.png
-      - regional/Hakataramea_basin_map.png
-      - basins/waitaki_hakataramea_outline.jpg
+      - images/SI_mid.png
+      - images/Hakataramea_basin_map.png
+      - images/waitaki_hakataramea_outline.jpg
     notes:
       - Hakataramea and Waitaki share the same basement data.
     boundaries:
@@ -558,8 +558,8 @@ basin:
     type: 1
     author: Tim Tuckey (USER2020)
     wiki_images:
-      - maps/SI_north.png
-      - regional/Karamea_basin_map.png
+      - images/SI_north.png
+      - images/Karamea_basin_map.png
     boundaries:
       - regional/Karamea/Karamea_outline_WGS84.geojson
     surfaces:
@@ -573,8 +573,8 @@ basin:
     type: 1
     author: Tim Tuckey (USER2020)
     wiki_images:
-      - maps/SI_north.png
-      - regional/Collingwood_basin_map.png
+      - images/SI_north.png
+      - images/Collingwood_basin_map.png
     boundaries:
       - regional/Collingwood/Collingwood_outline_WGS84_1.geojson
       - regional/Collingwood/Collingwood_outline_WGS84_2.geojson
@@ -590,8 +590,8 @@ basin:
     type: 1
     author: Tim Tuckey (USER2020)
     wiki_images:
-      - maps/SI_north.png
-      - regional/SpringsJunction_basin_map.png
+      - images/SI_north.png
+      - images/SpringsJunction_basin_map.png
     boundaries:
       - regional/SpringsJunction/SpringsJunction_outline_WGS84.geojson
     surfaces:
@@ -604,10 +604,10 @@ basin:
     type: 1
     author: William Lee (USER2021)
     wiki_images:
-      - maps/NI_mideast.png
-      - regional/HawkesBay_basin_map.png
-      - basins/hawkes_bay_outline.png
-      - basins/hawkes_bay_outline_edited.png
+      - images/NI_mideast.png
+      - images/HawkesBay_basin_map.png
+      - images/hawkes_bay_outline.png
+      - images/hawkes_bay_outline_edited.png
     notes:
       - (Comment from the author) "The areas marked with black X's were either considered too shallow or sedimentary rock so weren't modelled as a basin."
     boundaries:
@@ -625,9 +625,9 @@ basin:
     type: 1
     author: William Lee (USER2021)
     wiki_images:
-      - maps/NI_mideast.png
-      - regional/Napier_basin_map.png
-      - basins/napier_outline.png
+      - images/NI_mideast.png
+      - images/Napier_basin_map.png
+      - images/napier_outline.png
     boundaries:
       - regional/Napier/Napier_outline_WGS84_1.geojson
       - regional/Napier/Napier_outline_WGS84_2.geojson
@@ -645,9 +645,9 @@ basin:
     type: 1
     author: William Lee (USER2021)
     wiki_images:
-      - maps/NI_south.png
-      - regional/GreaterWellington_basin_map.png
-      - basins/greater_wellington_outline.png
+      - images/NI_south.png
+      - images/GreaterWellington_basin_map.png
+      - images/greater_wellington_outline.png
     boundaries:
       - regional/GreaterWellington/GreaterWellington_outline_WGS84_1.geojson
       - regional/GreaterWellington/GreaterWellington_outline_WGS84_2.geojson
@@ -665,9 +665,9 @@ basin:
     type: 1
     author: William Lee (USER2021)
     wiki_images:
-      - maps/NI_south.png
-      - regional/Porirua_basin_map.png
-      - basins/porirua_outline.png
+      - images/NI_south.png
+      - images/Porirua_basin_map.png
+      - images/porirua_outline.png
     boundaries:
       - regional/Porirua/Porirua_outline_WGS84_1.geojson
       - regional/Porirua/Porirua_outline_WGS84_2.geojson
@@ -681,9 +681,9 @@ basin:
     type: 1
     author: William Lee (USER2021)
     wiki_images:
-      - maps/NI_mideast.png
-      - regional/Gisborne_basin_map.png
-      - basins/grisborne_basement.png
+      - images/NI_mideast.png
+      - images/Gisborne_basin_map.png
+      - images/grisborne_basement.png
     notes:
       - (Comment from the author)
       - Stop at Moto River, working around the East Cape from Gisborne. Haurere Point should be included in Whakatane
@@ -700,10 +700,10 @@ basin:
     type: 1
     author: William Lee (USER2021)
     wiki_images:
-      - maps/NI_mideast.png
-      - regional/SouthernHawkesBay_basin_map.png
-      - basins/southern_hawkes_bay_outline.png
-      - basins/southern_hawkes_bay_outline_extra.png
+      - images/NI_mideast.png
+      - images/SouthernHawkesBay_basin_map.png
+      - images/southern_hawkes_bay_outline.png
+      - images/southern_hawkes_bay_outline_extra.png
     notes:
       - (Comment from the author)
       - Will be near the Wairarapa and Manawatu-Whanganui / Taranaki basins, but does not physically touch due to rock.
@@ -721,8 +721,8 @@ basin:
     type: 1
     author: William Lee (USER2021)
     wiki_images:
-      - maps/NI_south.png
-      - regional/Wairarapa_basin_map.png
+      - images/NI_south.png
+      - images/Wairarapa_basin_map.png
     notes:
         - (Comment from the author) "Consider adding east coastal basins (e.g. Uruti Point)"
     boundaries:
@@ -738,10 +738,10 @@ basin:
     type: 1
     author: Cameron Davis / Emma Coumbe (USER2022)
     wiki_images:
-      - maps/motubay_whangaparoa.png
-      - regional/MotuBay_basin_map.png
-      - basins/moturiver_extended_outline.png
-      - basins/eastcape_coastal_river_valleys.png
+      - images/motubay_whangaparoa.png
+      - images/MotuBay_basin_map.png
+      - images/moturiver_extended_outline.png
+      - images/eastcape_coastal_river_valleys.png
     notes:
       - Renamed from MotuBay_v22p3
       - Rest of the coastal river valleys on the East Cape (Waiapu River, Hicks Bay, Waihau Bay, Motu River) to be added
@@ -762,10 +762,10 @@ basin:
     type: 1
     author: Cameron Davis / Emma Coumbe (USER2022)
     wiki_images:
-      - maps/motubay_whangaparoa.png
-      - regional/OmaioBay_basin_map.png
-      - basins/moturiver_extended_outline.png
-      - basins/eastcape_coastal_river_valleys.png
+      - images/motubay_whangaparoa.png
+      - images/OmaioBay_basin_map.png
+      - images/moturiver_extended_outline.png
+      - images/eastcape_coastal_river_valleys.png
 
     boundaries:
       - regional/OmaioBay/OmaioBay_outline_WGS84_1.geojson
@@ -786,8 +786,8 @@ basin:
     type: 1
     author: Cameron Davis / Emma Coumbe (USER2022)
     wiki_images:
-      - maps/motubay_whangaparoa.png
-      - regional/Whangaparoa_basin_map.png
+      - images/motubay_whangaparoa.png
+      - images/Whangaparoa_basin_map.png
     notes:
       - See [OmaioBay](OmaioBay.md) for additional notes
 
@@ -804,7 +804,7 @@ basin:
     type: 1
     author: Ayushi Tiwari
     wiki_images:
-      - regional/PalmerstonNorth_basin_map_v25p5.png
+      - images/PalmerstonNorth_basin_map_v25p5.png
     boundaries:
         - regional/PalmerstonNorth/PalmerstonNorth_outline_WGS84.geojson
     surfaces:
@@ -817,7 +817,7 @@ basin:
     type: 1
     author: Ayushi Tiwari
     wiki_images:
-      - regional/PalmerstonNorth_basin_map_v25p8.png
+      - images/PalmerstonNorth_basin_map_v25p8.png
     boundaries:
       - regional/PalmerstonNorth/PalmerstonNorth_outline_WGS84.geojson
     surfaces:
@@ -833,7 +833,7 @@ basin:
     type: 1
     author: Archie Goodrick
     wiki_images:
-      - regional/Southland_basin_map.png
+      - images/Southland_basin_map.png
 
     boundaries:
       - regional/Southland/Southland_outline_WGS84_1.geojson
@@ -849,7 +849,7 @@ basin:
     type: 1
     author: Jackson Turner / Ayushi Tiwari (ENCN493)
     wiki_images:
-      - regional/TeAnau_basin_map.png
+      - images/TeAnau_basin_map.png
     boundaries:
       - regional/TeAnau/TeAnau_outline_WGS84.geojson
     surfaces:
@@ -862,8 +862,8 @@ basin:
     type: 1
     author: Cameron Davis / Emma Coumbe (USER2022)
     wiki_images:
-      - regional/TolagaBay_basin_map.png
-      - basins/eastcape_coastal_river_valleys.png
+      - images/TolagaBay_basin_map.png
+      - images/eastcape_coastal_river_valleys.png
 
     boundaries:
       - regional/TolagaBay/TolagaBay_outline_WGS84.geojson
@@ -878,7 +878,7 @@ basin:
     type: 1
     author: Emma Coumbe
     wiki_images:
-      - regional/Waiapu_basin_map.png
+      - images/Waiapu_basin_map.png
 
     boundaries:
       - regional/Waiapu/Waiapu_outline_WGS84.geojson
@@ -893,7 +893,7 @@ basin:
     type: 1
     author: Ayhshi Tiwari / Hunter Brotherston
     wiki_images:
-      - regional/WestCoast_basin_map.png
+      - images/WestCoast_basin_map.png
     boundaries:
       - regional/WestCoast/WestCoast_outline_WGS84.geojson
     surfaces:
@@ -907,7 +907,7 @@ basin:
     type: 1
     author: Kaleb Finn / Ayushi Tiwari (ENCN493)
     wiki_images:
-      - regional/Westport_basin_map.png
+      - images/Westport_basin_map.png
     boundaries:
       - regional/Westport/Westport_outline_WGS84.geojson
     surfaces:
@@ -920,7 +920,7 @@ basin:
     type: 1
     author: Ayushi Tiwari
     wiki_images:
-        - regional/QueenCharlotte_basin_map.png
+        - images/QueenCharlotte_basin_map.png
     boundaries:
         - regional/QueenCharles/QueenCharles_outline_WGS84.geojson
     surfaces:
@@ -932,7 +932,7 @@ basin:
     type: 1
     author: Ayushi Tiwari
     wiki_images:
-        - regional/CastleHill_basin_map.png
+        - images/CastleHill_basin_map.png
     boundaries:
         - regional/CastleHill/CastleHill_outline_WGS84.geojson
     surfaces:
@@ -945,7 +945,7 @@ basin:
     type: 1
     author: Ayushi Tiwari
     wiki_images:
-        - regional/Whakatane_basin_map.png
+        - images/Whakatane_basin_map.png
     boundaries:
         - regional/Whakatane/Whakatane_outline_WGS84.geojson
     surfaces:

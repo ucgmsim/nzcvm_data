@@ -1,5 +1,5 @@
 """
-Generates a Markdown file summarizing basins defined in a YAML model version.
+Generates a README.md file in the regional folder summarizing basins defined in a YAML model version.
 It requires a nationwide basin map and a CSV mapping of basins to regions processed by "map_all_basins.py"
 
 Usage:
@@ -8,6 +8,7 @@ Usage:
 """
 
 import re
+import shutil
 from pathlib import Path
 from typing import Annotated
 
@@ -112,7 +113,7 @@ def generate_basin_markdown(
     basin_map_file: Annotated[
         Path,
         typer.Argument(
-            help="Relative path to the PNG map of basins from the wiki to be generated",
+            help="Path to the PNG map of basins to be copied to regional folder",
             exists=True,
         ),
     ],
@@ -122,12 +123,17 @@ def generate_basin_markdown(
             help="CSV mapping of basin to region (name,region)", exists=True
         ),
     ],
+    output_dir: Annotated[
+        Path,
+        typer.Option(
+            "--output-dir",
+            help="Directory to write README.md and copy files to (default: ../regional)",
+        ),
+    ] = Path(__file__).parent.parent / "regional",
 ) -> None:
     """
-    Generates a Markdown file summarizing basins by geographic region.
-    The model version file should be a YAML file containing basin definitions.
-    The basin map file should be a PNG image showing the basins.
-    The basin region CSV should map basin names to regions in the format "name,region".
+    Generates a README.md file in the regional folder summarizing basins by geographic region.
+    Also copies the basin map and CSV files to the regional folder.
 
     Parameters
     ----------
@@ -137,6 +143,8 @@ def generate_basin_markdown(
         Path to the PNG image file showing the basin map.
     basin_region_csv : Path
         Path to the CSV file mapping basin names to regions in the format "name,region".
+    output_dir : Path
+        Directory to write README.md and copy files to.
 
     """
     with open(model_version_file, "r") as f:
@@ -162,7 +170,21 @@ def generate_basin_markdown(
         region = region_lookup.get(base, "Uncategorized")
         region_basin_map.setdefault(region, []).append((base, version))
 
-    output_file = Path("Basins.md")
+    # Create output directory
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Copy basin map and CSV files to regional folder
+    basin_map_dest = output_dir / basin_map_file.name
+    basin_csv_dest = output_dir / basin_region_csv.name
+
+    shutil.copy2(basin_map_file, basin_map_dest)
+    shutil.copy2(basin_region_csv, basin_csv_dest)
+
+    typer.echo(f"✅ Copied {basin_map_file} to {basin_map_dest}")
+    typer.echo(f"✅ Copied {basin_region_csv} to {basin_csv_dest}")
+
+    # Generate README.md in regional folder
+    output_file = output_dir / "README.md"
     with open(output_file, "w") as out:
         out.write(
             f"# Basins in the New Zealand Velocity Model (version {model_version})\n\n"
@@ -172,14 +194,14 @@ def generate_basin_markdown(
         )
         out.write("<!-- Referenced map image -->\n")
         out.write(
-            f'<img src="{basin_map_file}" width="50%" alt="New Zealand basins overview">\n\n'
+            f'<img src="{basin_map_file.name}" width="50%" alt="New Zealand basins overview">\n\n'
         )
 
         # Write grouped content by region only
         for subregion in sorted(region_basin_map):
             out.write(f"## {subregion}\n")
             for base, version in sorted(region_basin_map[subregion]):
-                out.write(f"- [{base} {version}](basins/{base}.md)\n")
+                out.write(f"- [{base} {version}]({base}/README.md)\n")
             out.write("\n")
 
         out.write("## Version Information\n\n")
@@ -192,7 +214,7 @@ def generate_basin_markdown(
             "Newer versions typically include refinements to basin geometry or velocity structure.\n"
         )
 
-    typer.echo(f"✅ Markdown file written: {output_file}")
+    typer.echo(f"✅ README.md written: {output_file}")
 
 
 if __name__ == "__main__":

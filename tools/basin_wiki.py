@@ -25,6 +25,8 @@ import re
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
+import tempfile
+import shutil
 
 import pytz
 import typer
@@ -35,54 +37,24 @@ from qcore import cli
 app = typer.Typer(pretty_exceptions_enable=False)
 
 
+def _remove_timestamp_line(content: str) -> str:
+    """Remove the timestamp line from markdown content for comparison."""
+    lines = content.splitlines()
+    if lines and lines[-1].startswith("*Page generated on:"):
+        lines = lines[:-1]
+    return "\n".join(lines)
+
+
 def _get_basin_versions(registry_path: Path):
     """
     Reads and parses the registry yaml file to group models by basin name.
-
-    Parameters
-    ----------
-    registry_path : Path
-        Path to the nzcvm_registry.yaml file.
 
     Returns
     -------
     dict
         A dictionary where keys are basin names and values are lists of dictionaries
         containing basin details, including full name, version, version tuple, and data.
-
-    Raises
-    -------
-    FileNotFoundError
-        If the registry file does not exist at the specified path.
-    ValueError
-        If the registry file is not in the expected format or does not contain basin data.
-
-    Notes
-    -----
-    The function expects the registry file to contain a "basin" key with a list of basin entries.
-    Each basin entry should have a "name" field formatted as "BasinName_vXvY" where X and Y
-    are integers representing the version.
-    The version is split into a tuple of integers (major, minor) for easy comparison.
-
-    Example
-    -------
-    >>> registry_path = Path("nzcvm_registry.yaml")
-    >>> basin_versions = _get_basin_versions(registry_path)
-    >>> print(basin_versions["Canterbury"])
-    [
-        {
-            "full_name": "Canterbury_v20p7",
-            "version": "v20p7",
-            "version_tuple": (20, 7),
-            "data": {...}
-        },
-        ...
-    ]
-
-
-
     """
-
     if not registry_path.exists():
         print(f"Error: Registry file not found at {registry_path}")
         raise typer.Exit(code=1)
@@ -91,7 +63,6 @@ def _get_basin_versions(registry_path: Path):
         data = yaml.safe_load(file)
 
     basin_versions = {}
-    # The basin data can be a list of single-item dicts
     for basin_item in data.get("basin", []):
         full_name = basin_item.pop("name")
         match = re.match(r"^(.*?)_v(\d+p\d+)$", full_name)
@@ -127,15 +98,7 @@ def list_basins(
         ),
     ],
 ):
-    """
-    Lists all unique basin names found in the registry.
-
-    Parameters
-    ----------
-    registry : Path
-        Path to the nzcvm_registry.yaml file. Defaults to ../nzcvm_registry.yaml.
-
-    """
+    """Lists all unique basin names found in the registry."""
     basin_versions = _get_basin_versions(registry)
     for basin_name in sorted(basin_versions.keys()):
         print(basin_name)
@@ -167,31 +130,13 @@ def generate_wiki(
         Path,
         typer.Option(
             "--output-dir",
-            help="Directory to write Markdown files to (default: ../../wiki/basins)",
+            help="Directory to write basin subdirectories to (default: ../regional)",
         ),
-    ] = Path(__file__).parent.parent / "wiki" / "basins",
+    ] = Path(__file__).parent.parent / "regional",
 ) -> None:
-    """
-    Generate Markdown files for basins from nzcvm_registry.yaml
-
-    This command reads the nzcvm_registry.yaml file and generates a Markdown file
-    for each unique basin name. The Markdown file contains details such as the basin type,
-    author, images, notes, boundaries, surfaces, and smoothing boundaries.
-
-    Parameters
-    ----------
-    basin : str
-        Basin name to generate wiki for, or 'all' for all basins.
-    registry : Path, optional
-        Path to the nzcvm_registry.yaml file
-    scale_images : bool, optional
-        If True, scale images to 75% size with a clickable link to full size
-    output_dir : Path, optional
-        Directory to write Markdown files to
-    """
+    """Generate README.md files for basins from nzcvm_registry.yaml"""
     basin_versions = _get_basin_versions(registry)
 
-    # If a specific basin is requested, filter basin_versions
     if basin != "all":
         if basin not in basin_versions:
             print(f"Error: Basin '{basin}' not found in registry.")
@@ -199,16 +144,12 @@ def generate_wiki(
             raise typer.Exit(code=1)
         basin_versions = {basin: basin_versions[basin]}
 
-    # Ensure the output directory exists
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Process only the latest version of each basin
     for basin_name, versions in basin_versions.items():
-        # Sort versions by version_tuple to find the latest
         latest_version = max(versions, key=lambda x: x["version_tuple"])
         older_versions = [v for v in versions if v != latest_version]
 
-        # Extract details from the latest version
         version = latest_version["version"]
         basin_data = latest_version["data"]
 
@@ -220,15 +161,13 @@ def generate_wiki(
         surfaces = basin_data.get("surfaces", [])
         smoothing = basin_data.get("smoothing", "N/A")
 
-        # Derive "Created" from the latest version (e.g., v20p7 -> 2020-07)
         created = "Unknown"
         if "p" in version:
             year, month = version.split("p")
             year = f"20{year}"
-            month = f"{int(month):02d}"  # Ensure two-digit month (e.g., "7" -> "07")
+            month = f"{int(month):02d}"
             created = f"{year}-{month}"
 
-        # Construct the Markdown content
         md_content = f"# Basin : {basin_name}\n\n"
 
         # Overview Section
@@ -250,22 +189,17 @@ def generate_wiki(
         # Images Section
         if images:
             md_content += "## Images\n"
-
             for i, img in enumerate(images):
                 description = (
                     "Location"
                     if i == 0
                     else " ".join([s.capitalize() for s in Path(img).stem.split("_")])
-                )  # Use image filename as description
-
-                updated_img_path = f"../images/{img}"
+                )
 
                 if scale_images:
-                    md_content += f'<a href="{updated_img_path}"><img src="{updated_img_path}" width="75%"></a>\n\n*Figure {i + 1} {description}*\n\n'
+                    md_content += f'<a href="{img}"><img src="{img}" width="75%"></a>\n\n*Figure {i + 1} {description}*\n\n'
                 else:
-                    md_content += (
-                        f"![]({updated_img_path})\n\n*Figure {i + 1} {description}*\n\n"
-                    )
+                    md_content += f"![]({img})\n\n*Figure {i + 1} {description}*\n\n"
             md_content += "\n"
 
         # Notes Section
@@ -278,56 +212,40 @@ def generate_wiki(
         # Data Section
         md_content += "## Data\n"
 
-        # Boundaries Subsection
         if boundaries:
             md_content += "### Boundaries\n"
             for boundary in boundaries:
                 file_path = Path(boundary)
                 base_path = file_path.parent / file_path.stem
-
-                # Check if alternative formats exist
                 geojson_path = f"{base_path}.geojson"
                 txt_path = f"{base_path}.txt"
 
-                # Use CVM_DATA path instead of GitHub URL
-                updated_txt_path = f"../../{txt_path}"
-                updated_geojson_path = f"../../{geojson_path}"
-
-                # Create links with format indicators
                 links = []
-                if (output_dir / updated_txt_path).exists():
-                    links.append(f"[TXT]({updated_txt_path})")
-                if (output_dir / updated_geojson_path).exists():
-                    links.append(f"[GeoJSON]({updated_geojson_path})")
+                if (output_dir.parent / txt_path).exists():
+                    links.append(f"[TXT]({txt_path})")
+                if (output_dir.parent / geojson_path).exists():
+                    links.append(f"[GeoJSON]({geojson_path})")
 
                 link_text = " / ".join(links)
                 md_content += f"- {file_path.stem} : {link_text}\n"
             md_content += "\n"
 
-        # Surfaces Subsection
         if surfaces:
             md_content += "### Surfaces\n"
             for surface in surfaces:
-                # Handle direct path to surface files
                 surface_path = surface.get("path", "Path not found")
                 file_path = Path(surface_path)
                 base_path = file_path.parent / file_path.stem
                 submodel = surface.get("submodel", "N/A")
 
-                # Check if alternative formats exist
                 h5_path = f"{base_path}.h5"
                 in_path = f"{base_path}.in"
 
-                # Use CVM_DATA path instead of GitHub URL
-                updated_h5_path = f"../../{h5_path}"
-                updated_in_path = f"../../{in_path}"
-
-                # Create links with format indicators
                 links = []
-                if (output_dir / updated_h5_path).exists():
-                    links.append(f"[HDF5]({updated_h5_path})")
-                if (output_dir / updated_in_path).exists():
-                    links.append(f"[TXT]({updated_in_path})")
+                if (output_dir.parent / h5_path).exists():
+                    links.append(f"[HDF5]({h5_path})")
+                if (output_dir.parent / in_path).exists():
+                    links.append(f"[TXT]({in_path})")
 
                 link_text = " / ".join(links)
                 md_content += (
@@ -335,30 +253,163 @@ def generate_wiki(
                 )
             md_content += "\n"
 
-        # Smoothing Boundaries Subsection
         if smoothing != "N/A":
             md_content += "### Smoothing Boundaries\n"
             smoothing_filename = Path(smoothing).name
-            # Use CVM_DATA path instead of GitHub URL
-            updated_smoothing_path = f"../../{smoothing}"
-            md_content += f"- [{smoothing_filename}]({updated_smoothing_path})\n"
+            md_content += f"- [{smoothing_filename}]({smoothing})\n"
             md_content += "\n"
 
-
-
-        # Add timestamp at the bottom in NZ time
         nz_tz = pytz.timezone("Pacific/Auckland")
         timestamp = datetime.now(nz_tz).strftime("%B %d, %Y, %H:%M NZST/NZDT")
+
+        # Older versions section
+        if older_versions:
+            md_content += "## Older Versions\n\n"
+            sorted_older_versions = sorted(
+                older_versions, key=lambda x: x["version_tuple"], reverse=True
+            )
+
+            for old_version in sorted_older_versions:
+                old_version_data = old_version["data"]
+                old_version_name = old_version["version"]
+
+                old_created = "Unknown"
+                if "p" in old_version_name:
+                    year, month = old_version_name.split("p")
+                    year = f"20{year}"
+                    month = f"{int(month):02d}"
+                    old_created = f"{year}-{month}"
+
+                md_content += f"### {old_version_name}\n\n"
+                md_content += "|         |                     |\n"
+                md_content += "|---------|---------------------|\n"
+                md_content += f"| Version | {old_version_name}  |\n"
+                md_content += f"| Type    | {old_version_data.get('type', 'N/A')} |\n"
+                md_content += (
+                    f"| Author  | {old_version_data.get('author', 'Unknown')} |\n"
+                )
+                md_content += f"| Created | {old_created}       |\n\n"
+
+                old_images = old_version_data.get("wiki_images", [])
+                unique_old_images = [img for img in old_images if img not in images]
+
+                if unique_old_images:
+                    md_content += "**Images:**\n"
+                    for i, img in enumerate(unique_old_images):
+                        description = (
+                            "Location"
+                            if i == 0
+                            else " ".join(
+                                [s.capitalize() for s in Path(img).stem.split("_")]
+                            )
+                        )
+
+                        if scale_images:
+                            md_content += f'<a href="{img}"><img src="{img}" width="75%"></a>\n\n*Figure {i + 1} {description}*\n\n'
+                        else:
+                            md_content += (
+                                f"![]({img})\n\n*Figure {i + 1} {description}*\n\n"
+                            )
+                    md_content += "\n"
+
+                old_notes = old_version_data.get("notes", [])
+                if old_notes:
+                    md_content += "**Notes:**\n"
+                    for note in old_notes:
+                        md_content += f"- {note}\n"
+                    md_content += "\n"
+
+                old_boundaries = old_version_data.get("boundaries", [])
+                old_surfaces = old_version_data.get("surfaces", [])
+                old_smoothing = old_version_data.get("smoothing", "N/A")
+
+                if old_boundaries or old_surfaces or old_smoothing != "N/A":
+                    md_content += "**Data:**\n"
+
+                    if old_boundaries:
+                        md_content += "*Boundaries:*\n"
+                        for boundary in old_boundaries:
+                            file_path = Path(boundary)
+                            base_path = file_path.parent / file_path.stem
+                            geojson_path = f"{base_path}.geojson"
+                            txt_path = f"{base_path}.txt"
+
+                            links = []
+                            if (output_dir.parent / txt_path).exists():
+                                links.append(f"[TXT]({txt_path})")
+                            if (output_dir.parent / geojson_path).exists():
+                                links.append(f"[GeoJSON]({geojson_path})")
+
+                            link_text = " / ".join(links)
+                            md_content += f"- {file_path.stem} : {link_text}\n"
+                        md_content += "\n"
+
+                    if old_surfaces:
+                        md_content += "*Surfaces:*\n"
+                        for surface in old_surfaces:
+                            surface_path = surface.get("path", "Path not found")
+                            file_path = Path(surface_path)
+                            base_path = file_path.parent / file_path.stem
+                            submodel = surface.get("submodel", "N/A")
+
+                            h5_path = f"{base_path}.h5"
+                            in_path = f"{base_path}.in"
+
+                            links = []
+                            if (output_dir.parent / h5_path).exists():
+                                links.append(f"[HDF5]({h5_path})")
+                            if (output_dir.parent / in_path).exists():
+                                links.append(f"[TXT]({in_path})")
+
+                            link_text = " / ".join(links)
+                            md_content += f"- {file_path.stem} : {link_text} (Submodel: {submodel})\n"
+                        md_content += "\n"
+
+                    if old_smoothing != "N/A":
+                        md_content += "*Smoothing Boundaries:*\n"
+                        smoothing_filename = Path(old_smoothing).name
+                        md_content += f"- [{smoothing_filename}]({old_smoothing})\n"
+                        md_content += "\n"
+
+                md_content += "\n"
+
         md_content += f"---\n*Page generated on: {timestamp}*\n"
 
-        # Write to a .md file using only the basin_name
-        filename = output_dir / f"{basin_name}.md"
-        with filename.open("w", encoding="utf-8") as f:
-            f.write(md_content)
-        print(f"Generated {filename}")
+        basin_dir = output_dir / basin_name
+        basin_dir.mkdir(parents=True, exist_ok=True)
+        readme_path = basin_dir / "README.md"
 
-    # Print the number of files generated (number of unique basin names)
-    print(f"Generated {len(basin_versions)} .md files in {output_dir}")
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", delete=False, suffix=".md"
+        ) as temp_file:
+            temp_file.write(md_content)
+            temp_path = Path(temp_file.name)
+
+        try:
+            if readme_path.exists():
+                with open(readme_path, "r", encoding="utf-8") as f:
+                    existing_content = _remove_timestamp_line(f.read())
+
+                with open(temp_path, "r", encoding="utf-8") as f:
+                    new_content = _remove_timestamp_line(f.read())
+
+                if existing_content == new_content:
+                    print(f"No changes detected for {readme_path} - skipping")
+                    temp_path.unlink()
+                    continue
+                else:
+                    print(f"Changes detected - updating {readme_path}")
+            else:
+                print(f"Creating new file {readme_path}")
+
+            shutil.move(str(temp_path), str(readme_path))
+
+        except Exception as e:
+            if temp_path.exists():
+                temp_path.unlink()
+            raise e
+
+    print(f"Processed {len(basin_versions)} basins under {output_dir}")
 
 
 if __name__ == "__main__":
