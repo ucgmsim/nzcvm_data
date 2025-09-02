@@ -16,13 +16,15 @@ This model is explicitly defined in the `nzcvm_registry.yaml` file, which acts a
 
 * **Elevation Layers (`elev`):** The model is defined on 20 discrete elevation layers, specified in kilometers. These layers range from 15 km above sea level down to 750 km below, providing a deep velocity profile.
 
+| Original Data (TXT) | Interpolated Data (HDF5) |
+|---------------------|--------------------------|
+| <img src="ep2020_original_spatial_distribution.png" alt="Original Spatial Distribution" style="width:100%;"/> | <img src="ep2020_interpolated_spatial_distribution.png" alt="Interpolated Spatial Distribution" style="width:100%;"/> |
+
+The left panel (TXT) shows the original tomography dataset in its native EP2020 format, where grid points follow the model's rotated coordinate system and include irregular spacing near the dateline. The right panel (HDF5) shows the same model after interpolation onto a uniform rectilinear latitude–longitude grid, producing a contiguous domain (165–180°E, 36–48°S) suitable for consistent analysis and visualization.
 ## Data Integration and Visualization
 
 The raw data for the EP2020 model consists of scattered points of seismic velocity. For use within the 3D velocity model, this data is processed by interpolating these points onto a regular, uniform grid. The interpolated data forms a series of smooth planes at different elevations.
 
-The image below illustrates this process at the 1 km elevation layer. The image on the left shows the original data as individual, scattered points, while the image on the right shows the result after interpolation—a continuous, gridded plane that can be used for calculations and visualization.
-
-![The EP2020 model showing scattered original data points and the interpolated, continuous data plane at 1 km elevation.](uploaded:ksnip_20250806-163959.jpg-70db2902-ec5c-4be5-9153-c0fa1276a687)
 
 ## References
 
