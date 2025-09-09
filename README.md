@@ -22,85 +22,90 @@ The NZCVM engine that consumes these datasets is available at:
 
 🔗 [NZCVM Velocity Modeling Code](https://github.com/ucgmsim/velocity_modelling)
 
-This repository contains the core software for building and querying 3D seismic velocity models using the datasets hosted here. It includes:
-
-- Configuration templates for different regions and model types  
-- Tools for mesh generation, interpolation, and model validation  
-- Integration with the `nzcvm_registry.yaml` to discover available submodels  
-
-We recommend reviewing both repositories together to understand how data and code interact within the NZCVM ecosystem.
+This repository contains the core software for building and querying 3D seismic velocity models using the datasets hosted here.
 
 ---
 
 ## 📁 Repository Structure
 
-- **global**: Contains national-scale datasets that serve as the foundation for NZCVM simulations.
-  - **surface/**: Holds surface elevation or topography grids used in model generation.
-  - **tomography/**: Contains national tomography models like NZWIDE, which provide the seismic velocity structure across New Zealand. See [Tomography](global/tomography/README.md) for details.
-  - **vm1d/**: Includes 1D velocity models that define velocity profiles varying with depth.
-  - **vs30/**: Contains Vs30 maps, which provide shear-wave velocity values for near-surface layers.
-
-- **regional**: Contains basin-specific datasets for local regions. See [Basins](regional/README.md) for details on the 44 basin models (as of August 2025).
-  - Each subdirectory (e.g., **Canterbury**, **Wellington**) contains:
-    - Basin model data (surfaces, boundaries, velocity overrides)
-    - 1D profiles or Vs30 maps specific to that region
-    - Tools or scripts for processing regional data
-
-- **wiki**: Contains documentation and format specifications.
-
-- **tools**: Contains scripts and utilities for processing, resampling, or converting model data formats.
+- **surface/**: Surface elevation or topography grids used in model generation.
+- **tomography/**: National tomography models (e.g., NZWIDE, EP2020, EP2025).
+- **vm1d/**: 1D velocity models defining depth-dependent velocity profiles.
+- **vs30/**: Vs30 maps providing near-surface shear-wave velocity.
+- **regional/**: Basin-specific datasets for local regions across NZ (e.g., Canterbury, Wellington, Gisborne).
+- **wiki/**: Documentation and format specifications.
+- **tools/**: Scripts/utilities for processing model data.
+- **src/nzcvm_data/**: Python CLI package that manages data installation and configuration.
 
 ---
 
+## 🔽 Installing the Data Manager CLI
+
+This repository now provides a **pip-installable CLI** (`nzcvm-data`) that manages the dataset location.  
+The package contains only the CLI, not the heavy data files. Data are cloned or registered once into a canonical location on disk.
+
+### Option 1 — Developer install (you already cloned this repo)
+
+```bash
+git clone https://github.com/ucgmsim/nzcvm_data.git
+cd nzcvm_data
+pip install -e .
+nzcvm-data install --path ~/nzcvm_data   # register existing clone
+```
+
+### Option 2 — User install (direct from GitHub)
+
+```bash
+pip install git+https://github.com/ucgmsim/nzcvm_data.git
+```
+
+Then fetch the data:
+
+```bash
+# Full data (includes large HDF5 files via git-lfs)
+nzcvm-data install
+
+# Or, lightweight (only boundaries/small files, skips LFS)
+nzcvm-data install --no-lfs
+```
+
+Check the configured location:
+```bash
+nzcvm-data where
+```
+
+Optional environment variable for other tools:
+```bash
+export NZCVM_DATA_ROOT=$(nzcvm-data where)
+```
+
+### Data root resolution order
+
+When other projects (e.g. `velocity_modelling`) look for the data, they check in this order:
+
+1. `--nzcvm-data-root` CLI argument  
+2. `NZCVM_DATA_ROOT` environment variable  
+3. `~/.config/nzcvm_data/config.json` saved by `nzcvm-data install`  
+4. Default path `~/.local/cache/nzcvm_data_root`  
+5. Interactive prompt (if running in a terminal)
+
 ---
-## 🔽 Cloning this Repository (with Git LFS)
 
-Some datasets in this repo (e.g., `.h5` tomography/surface files) are large and tracked with **Git Large File Storage (LFS)**.
-If Git LFS is not installed, you will only download small pointer files (~100 B) and tools like `h5py` will fail to open them.
+## 🧰 Legacy Manual Install (advanced users)
 
-### 1) Install Git LFS
+If you prefer, you can still clone the repo and pull LFS objects manually:
 
-Follow the official guide:
-👉 https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage
-
-**macOS (Homebrew)**
-```bash
-brew install git-lfs
-git lfs install
-```
-
-**Linux**
-```bash
-sudo apt-get install -y git-lfs   # Debian/Ubuntu
-# or
-sudo yum install -y git-lfs       # RHEL/CentOS/Fedora
-git lfs install
-```
-
-**Windows**
-- Install from https://git-lfs.com/ (then run `git lfs install` in Git Bash or PowerShell).
-
-### 2) Clone and fetch LFS objects
 ```bash
 git clone https://github.com/ucgmsim/nzcvm_data.git
 cd nzcvm_data
 git lfs pull
 ```
 
-### 3) Verify that large files are materialized
+Verify large files:
 ```bash
-ls -lh global/surface/
+ls -lh surface/
 # .h5 files should be MBs/GBs, not ~100 bytes.
 ```
-
-**Troubleshooting**
-- If you still see ~100 B files, run:
-  ```bash
-  git lfs fetch --all
-  git lfs checkout
-  git lfs status
-  ```
-- If you’re using this repo via a symlink or submodule from another project, run the `git lfs` commands **inside this repo’s directory**.
 
 ---
 
@@ -146,42 +151,17 @@ We welcome contributions of new or updated velocity model datasets from across t
 
 We may suggest edits or clarifications before merging. Once accepted, your dataset will become part of the official NZCVM community archive.
 
+
+
+---
+
 ## 📑 Registry Integration
 
-All accepted datasets will be listed in the central `nzcvm_registry.yaml` file located in the root of this repository. 
-This registry defines which tomography models, basin models, and submodels are recognized by the NZCVM engine.
+All accepted datasets are listed in `nzcvm_registry.yaml`, which defines recognized tomography models, basin models, and submodels for the NZCVM engine.
 
-Once your data contribution is reviewed and merged:
-- A new **entry will be added to the registry**.
-- The entry includes dataset name, paths to boundaries/surfaces, version metadata, and references to submodels.
-- Your data will become discoverable and usable through NZCVM config files.
-
-Each entry in the registry follows a standard structure:
-
-```yaml
-- name: Canterbury_v19p1
-  author: Robin Lee
-  boundaries:
-    - regional/Canterbury/Canterbury_outline_WGS84.geojson
-  surfaces:
-    - path: regional/Canterbury/Canterbury_Basement_WGS84.h5
-  submodel: canterbury1d_v2
-  notes:
-    - Pre-Quaternary geology
-```
-To request inclusion:
-
-- Include a proposed entry in your pull request (or describe it in your PR message).
-- Maintainers will review and append it to nzcvm_registry.yaml if accepted.
 ---
 
 **Need help?**  
-Contact us via GitHub Issues or email: [sung.bae@canterbury.ac.nz]
+Open a GitHub Issue or email: [sung.bae@canterbury.ac.nz]
 
 Thanks for contributing to the NZCVM community!
-
----
-
-# Data Formats
-
-See [DataFormats](wiki/DataFormats.md) for detailed information about supported data formats and conventions.
