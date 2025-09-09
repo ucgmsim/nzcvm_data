@@ -93,7 +93,8 @@ When other projects (e.g. `velocity_modelling`) look for the data, they check in
 
 ## 🧰 Legacy Manual Install (advanced users)
 
-If you prefer, you can still clone the repo and pull LFS objects manually:
+If you prefer, you can still clone the repo and pull LFS objects manually. You will need [Git LFS](https://git-lfs.github.com/) installed.
+See [Git LFS installation instructions](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage) for installation details.
 
 ```bash
 git clone https://github.com/ucgmsim/nzcvm_data.git
@@ -123,8 +124,8 @@ We welcome contributions of new or updated velocity model datasets from across t
 
 
 1. **Fork** this repository to your own GitHub account.
-2. **Create a new directory** (if needed) under either:
-   - `global/` (for national-scale datasets)
+2. **Create a new subdirectory** (if needed) under the appropriate folder:
+   - `tomography/<ModelName>/` (for national tomography models)
    - `regional/<RegionName>/` (for local basin or subregion data)
 3. **Add your data**:
    - Include relevant data files (e.g., `surface.h5`, `boundary.geojson`, `v1d.fd_modfile`). See [DataFormats](wiki/DataFormats.md) for format specifications.
