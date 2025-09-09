@@ -18,9 +18,11 @@ def _save_config(root: Path):
 def _load_config() -> Path | None:
     if CONFIG_FILE.exists():
         try:
-            p = Path(json.loads(CONFIG_FILE.read_text()).get("data_root", ""))
-            return p if p.exists() else None
-        except Exception:
+            data = Path(json.loads(CONFIG_FILE.read_text())
+            if path_str := data.get("data_root", "")):
+                p = Path(path_str)
+                return p if p.exists() else None
+        except (json.JSONDecodeError, IOError):
             return None
     return None
 
@@ -35,6 +37,8 @@ def cmd_install(args):
 
     if root.exists() and any(root.iterdir()):
         print(f"[nzcvm-data] Using existing directory: {root}")
+        print("[nzcvm-data] Updating repository...")
+        _run(["git", "pull"], cwd=root)
     else:
         print(f"[nzcvm-data] Cloning into: {root}")
         _run(["git", "clone", REPO_URL, str(root)])
@@ -61,7 +65,7 @@ def cmd_where(_args):
 
 def app():
     p = argparse.ArgumentParser(prog="nzcvm-data", description="NZCVM data manager")
-    sub = p.add_subparsers(dest="cmd")
+    sub = p.add_subparsers(dest="cmd", required=True)
 
     i = sub.add_parser("install", help="Clone/pull the NZCVM LFS repo into a local cache.")
     i.add_argument("--path", type=str, help="Target directory (default: ~/.local/cache/nzcvm_data_root)")
