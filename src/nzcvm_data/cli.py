@@ -18,8 +18,8 @@ def _save_config(root: Path):
 def _load_config() -> Path | None:
     if CONFIG_FILE.exists():
         try:
-            data = Path(json.loads(CONFIG_FILE.read_text())
-            if path_str := data.get("data_root", "")):
+            data = json.loads(CONFIG_FILE.read_text())
+            if path_str:= data.get("data_root", ""):
                 p = Path(path_str)
                 return p if p.exists() else None
         except (json.JSONDecodeError, IOError):
