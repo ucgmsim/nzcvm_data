@@ -32,5 +32,5 @@ jobs:
 
       - name: Run Numpydoc Lint
         run: |
-          fdfind . velocity_modelling/ -E "__init__.py" --extension py -x numpydoc lint
+          fdfind . nzcvm_data/ -E "__init__.py" --extension py -x numpydoc lint
 
