@@ -8,6 +8,7 @@ a single GeoJSON FeatureCollection.
 
 import json
 import os
+import random
 from itertools import cycle
 from pathlib import Path
 from typing import Annotated
