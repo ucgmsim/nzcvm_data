@@ -144,7 +144,6 @@ def write_epstyle_hdf5(
     rho_stack : np.ndarray
         Density data (nz, nlat, nlon).
     """
-    nlat, nlon = len(lats), len(lons)
     lon_grid, lat_grid = np.meshgrid(lons, lats)
     coords = np.stack([lat_grid, lon_grid], axis=-1)  # shape: (nlat, nlon, 2)
 

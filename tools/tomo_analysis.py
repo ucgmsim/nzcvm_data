@@ -5,7 +5,6 @@ This script provides functionality to analyze tomography data, generate spatial
 distribution plots, check grid consistency, and create various visualizations.
 """
 
-import os
 from pathlib import Path
 from typing import Annotated
 
@@ -122,20 +121,42 @@ def check_grid_spacing(lat: np.ndarray, lon: np.ndarray, tol: float = 1e-6) -> N
     )
 
 
-def lons_centered_for_display(lon, center=180.0):
+def lons_centered_for_display(lon: np.ndarray, center: float = 180.0) -> np.ndarray:
     """
     Shift longitudes into a continuous range [center-180, center+180)
     so there's a single seam at 'center' (default 180°).
+
+    Parameters
+    ----------
+    lon : np.ndarray
+        Array of longitude values.
+    center : float, optional
+        Center longitude for the display range. Default is 180.0.
+
+    Returns
+    -------
+    np.ndarray
+        Shifted longitude values.
     """
     lon = np.asarray(lon, dtype=float)
     # wrap to [-180, 180) after subtracting the center, then shift back
     return ((lon - center + 180.0) % 360.0) - 180.0 + center
 
 
-def lons_centered_180(lon):
+def lons_centered_180(lon: np.ndarray) -> np.ndarray:
     """
     Convert arbitrary longitudes to the native range of
     PlateCarree(central_longitude=180), i.e. [-180, 180).
+
+    Parameters
+    ----------
+    lon : np.ndarray
+        Array of longitude values.
+
+    Returns
+    -------
+    np.ndarray
+        Converted longitude values in range [-180, 180).
     """
     lon = np.asarray(lon, dtype=float)
     # shift by -180, wrap to [-180,180), done
@@ -196,7 +217,7 @@ def plot_spatial_distribution(df: pd.DataFrame, title_suffix: str = "") -> None:
 
     ax_crs, data_crs, extent, extent_crs = choose_projection_and_extent(lats, lons)
 
-    fig = plt.figure(figsize=(10, 8))
+    plt.figure(figsize=(10, 8))
     ax = plt.axes(projection=ax_crs)
 
     # Set extent in the CRS it was computed in
@@ -219,7 +240,7 @@ def plot_spatial_distribution(df: pd.DataFrame, title_suffix: str = "") -> None:
     try:
         gl.right_labels = False
         gl.top_labels = False
-    except Exception:
+    except AttributeError:
         pass
 
     plt.title(f"Spatial Domain of Tomography Model {title_suffix}")
