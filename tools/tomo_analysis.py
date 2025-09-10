@@ -229,6 +229,14 @@ def plot_spatial_distribution(df: pd.DataFrame, title_suffix: str = "") -> None:
 
 
 def plot_spacing_histograms(df: pd.DataFrame) -> None:
+    """
+    Plot histograms of latitude and longitude spacing and density map.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame containing lat/lon data.
+    """
     lat_spacing = np.diff(np.sort(np.unique(df["lat"])))
     lon_spacing = np.diff(np.sort(np.unique(df["lon"])))
 
@@ -263,6 +271,14 @@ def plot_spacing_histograms(df: pd.DataFrame) -> None:
 
 
 def plot_density_map(df: pd.DataFrame) -> None:
+    """
+    Plot a density map of grid points.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame containing lat/lon data.
+    """
     lon_disp = lons_centered_for_display(df["lon"].values, center=180.0)
     plt.figure(figsize=(10, 6))
     plt.hexbin(lon_disp, df["lat"], gridsize=100, cmap="Reds", mincnt=1)
