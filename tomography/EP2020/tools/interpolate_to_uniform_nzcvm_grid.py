@@ -172,4 +172,30 @@ def main() -> None:
     This function orchestrates the entire interpolation workflow:
     1. Read EP2020 data
     2. Load NZCVM grid
-    3. Interpol
+    3. Interpolate data to grid
+    4. Save results to HDF5
+    """
+    input_txt = Path("vlnzw2p2dnxyzltln.tbl.txt")
+    ref_h5 = Path("../../EP2010/ep2010.h5")
+    out_h5 = Path("../ep2020_uniform.h5")
+
+    print("📥 Reading EP-style TXT...")
+    df = read_ep_txt(input_txt)
+    print(set(df['depth']))
+
+    print("📐 Loading NZCVM grid...")
+    lat, lon, depth = load_nzcvm_grid(ref_h5)
+
+    print("📊 Interpolating vp...")
+    vp = interpolate_property_to_grid(df, lat, lon, depth, "vp")
+    print("📊 Interpolating vs...")
+    vs = interpolate_property_to_grid(df, lat, lon, depth, "vs")
+    print("📊 Interpolating rho...")
+    rho = interpolate_property_to_grid(df, lat, lon, depth, "rho")
+
+    print("💾 Writing to output HDF5...")
+    write_epstyle_hdf5(out_h5, lat, lon, depth, vp, vs, rho)
+
+
+if __name__ == "__main__":
+    main()
