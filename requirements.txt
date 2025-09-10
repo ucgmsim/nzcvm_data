@@ -8,6 +8,7 @@ scipy>=1.7.0
 geopandas>=0.10.0
 fiona>=1.8.0
 cartopy>=0.20.0
+pyproj>=3.2.0
 
 # Plotting and visualization
 matplotlib>=3.5.0

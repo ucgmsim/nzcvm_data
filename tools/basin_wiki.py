@@ -32,8 +32,6 @@ import pytz
 import typer
 import yaml
 
-from qcore import cli
-
 app = typer.Typer(pretty_exceptions_enable=False)
 
 
@@ -104,7 +102,7 @@ def list_basins(
         print(basin_name)
 
 
-@cli.from_docstring(app)
+@app.command()
 def generate_wiki(
     basin: Annotated[
         str,

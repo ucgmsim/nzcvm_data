@@ -25,8 +25,6 @@ import h5py
 import numpy as np
 import typer
 
-from qcore import cli
-
 app = typer.Typer(pretty_exceptions_enable=False)
 
 
@@ -215,7 +213,7 @@ def convert_ascii_to_hdf5(
     print(f"Done: {output_path}")
 
 
-@cli.from_docstring(app)
+@app.command()
 def convert_tomo_to_h5(
     input_dir: Annotated[
         Path,
