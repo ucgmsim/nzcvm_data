@@ -143,7 +143,7 @@ def _extract_rings(geom: dict[str, Any]) -> list[list[Coord]]:
     if not gtype or not coords:
         raise ValueError("Geometry must have 'type' and 'coordinates'.")
 
-    rings: list[list[Coord]] = [] # List of rings to return
+    rings: list[list[Coord]] = []  # List of rings to return
 
     if gtype == "Polygon":
         for ring in coords:

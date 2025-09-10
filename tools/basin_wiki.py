@@ -22,11 +22,11 @@ Usage examples:
 """
 
 import re
+import shutil
+import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
-import tempfile
-import shutil
 
 import pytz
 import typer
@@ -36,7 +36,19 @@ app = typer.Typer(pretty_exceptions_enable=False)
 
 
 def _remove_timestamp_line(content: str) -> str:
-    """Remove the timestamp line from markdown content for comparison."""
+    """
+    Remove the timestamp line from markdown content for comparison.
+
+    Parameters
+    ----------
+    content : str
+        The markdown content as a string.
+
+    Returns
+    -------
+    str
+        The markdown content without the timestamp line.
+    """
     lines = content.splitlines()
     if lines and lines[-1].startswith("*Page generated on:"):
         lines = lines[:-1]
@@ -46,6 +58,11 @@ def _remove_timestamp_line(content: str) -> str:
 def _get_basin_versions(registry_path: Path):
     """
     Reads and parses the registry yaml file to group models by basin name.
+
+    Parameters
+    ----------
+    registry_path : Path
+        Path to the nzcvm_registry.yaml file.
 
     Returns
     -------
@@ -96,7 +113,16 @@ def list_basins(
         ),
     ],
 ):
-    """Lists all unique basin names found in the registry."""
+    """
+    List all available basins in the registry
+
+    Parameters
+    ----------
+    registry : Path
+        Path to the nzcvm_registry.yaml file.
+
+    """
+
     basin_versions = _get_basin_versions(registry)
     for basin_name in sorted(basin_versions.keys()):
         print(basin_name)
@@ -132,7 +158,21 @@ def generate_wiki(
         ),
     ] = Path(__file__).parent.parent / "regional",
 ) -> None:
-    """Generate README.md files for basins from nzcvm_registry.yaml"""
+    """
+    Generate README.md files for basins from nzcvm_registry.yaml
+
+    Parameters
+    ----------
+    basin : str
+        Basin name to generate wiki for, or 'all' for all basins.
+    registry : Path, optional
+        Path to the nzcvm_registry.yaml file.
+    scale_images : bool, optional
+        Scale images to 75% size with a clickable link to full size.
+    output_dir : Path, optional
+        Directory to write basin subdirectories to (default: ../regional).
+
+    """
     basin_versions = _get_basin_versions(registry)
 
     if basin != "all":

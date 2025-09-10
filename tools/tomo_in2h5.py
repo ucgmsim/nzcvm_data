@@ -16,10 +16,10 @@ in the same directory. If --out-dir is specified, the output file will be saved 
 instead.
 """
 
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
-import re
 
 import h5py
 import numpy as np
