@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Convert ASCII tomography files to HDF5 format (with dtype/compression options).
 
