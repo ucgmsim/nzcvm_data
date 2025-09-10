@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Convert ASCII tomography files to HDF5 format (with dtype/compression options).
 
@@ -17,16 +16,14 @@ in the same directory. If --out-dir is specified, the output file will be saved 
 instead.
 """
 
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
-import re
 
 import h5py
 import numpy as np
 import typer
-
-from qcore import cli
 
 app = typer.Typer(pretty_exceptions_enable=False)
 
@@ -216,7 +213,7 @@ def convert_ascii_to_hdf5(
     print(f"Done: {output_path}")
 
 
-@cli.from_docstring(app)
+@app.command()
 def convert_tomo_to_h5(
     input_dir: Annotated[
         Path,

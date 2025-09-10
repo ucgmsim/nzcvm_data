@@ -23,8 +23,6 @@ import h5py
 import numpy as np
 import typer
 
-from qcore import cli
-
 app = typer.Typer(pretty_exceptions_enable=False)
 
 
@@ -103,7 +101,7 @@ def ascii_to_hdf5(input_file_path: str | Path, output_file_path: str | Path):
         raise ValueError(f"Error during conversion: {str(e)}")
 
 
-@cli.from_docstring(app)
+@app.command()
 def convert_surface_to_h5(
     input_file: Annotated[
         Path,

@@ -22,8 +22,6 @@ import numpy as np
 import typer
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
 
-from qcore import cli
-
 app = typer.Typer(pretty_exceptions_enable=False)
 
 
@@ -63,7 +61,6 @@ def load_basement(file_path: Path) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     ----------
     file_path : Path
         Path to basement file.
-
 
 
     Returns
@@ -344,7 +341,7 @@ def plot_data(
     plt.close(fig)
 
 
-@cli.from_docstring(app)
+@app.command()
 def plot_basin_with_map(
     basin_name: Annotated[
         str, typer.Argument(help="Name of the basin for the map title")

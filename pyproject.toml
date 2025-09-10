@@ -26,3 +26,58 @@ include-package-data = false              # don’t auto-include non-code files
 where = ["src"]
 include = ["nzcvm_data*"]
 
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint]
+extend-select = [
+  # isort imports
+  "I",
+  # Use r'\s+' rather than '\s+'
+  "W605",
+  # All the naming errors, like using camel case for function names.
+  "N",
+  # Missing docstrings in classes, methods, and functions
+  "D101",
+  "D102",
+  "D103",
+  "D105",
+  "D107",
+  # Use f-string instead of a format call
+  "UP032",
+  # Standard library import is deprecated
+  "UP035",
+  # Missing function argument type annotation
+  "ANN001",
+  # Using except without specifying an exception type to catch
+  "BLE001"
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Ignore no docstring in __init__.py
+"__init__.py" = ["D104"]
+
+[tool.numpydoc_validation]
+checks = [
+  "GL05",
+  "GL08",
+  "GL10",
+  "PR01",
+  "PR02",
+  "PR03",
+  "PR04",
+  "PR05",
+  "PR06",
+  "PR07",
+  "RT01",
+  "RT02",
+  "RT03",
+  "RT04",
+  "YD01",
+]
+# remember to use single quotes for regex in TOML
+exclude = [  # don't report on objects that match any of these regex
+    '\.undocumented_method$',
+    '\.__repr__$',
+    '\.__init__$'
+]

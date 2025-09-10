@@ -1,0 +1,31 @@
+# Core scientific computing
+numpy>=1.20.0
+pandas>=1.3.0
+h5py>=3.0.0
+scipy>=1.7.0
+
+# Geospatial and mapping
+geopandas>=0.10.0
+fiona>=1.8.0
+cartopy>=0.20.0
+pyproj>=3.2.0
+
+# Plotting and visualization
+matplotlib>=3.5.0
+seaborn>=0.11.0
+
+# Data formats
+pyyaml>=6.0
+
+# Command line interface
+typer>=0.7.0
+
+# Time zone handling
+pytz>=2021.3
+
+# QCORE (assuming it's available via pip or conda)
+# qcore
+
+# Testing (optional)
+pytest>=6.0.0
+pytest-cov>=3.0.0

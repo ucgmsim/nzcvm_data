@@ -1,22 +1,39 @@
-# tomo_analysis.py
-import argparse
-import os
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+"""
+Analyze and plot tomography data from TXT or HDF5 files.
+
+This script provides functionality to analyze tomography data, generate spatial
+distribution plots, check grid consistency, and create various visualizations.
+"""
+
+from pathlib import Path
+from typing import Annotated
+
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-import seaborn as sns
 import h5py
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import typer
+
+app = typer.Typer(pretty_exceptions_enable=False)
 
 
-# -------------------------
-# I/O
-# -------------------------
 def load_txt_ep_format(txt_file: str) -> pd.DataFrame:
     """
     Load EP-style TXT tomography grid. Keeps longitudes as provided
     (may include values >180 or <0).
+
+    Parameters
+    ----------
+    txt_file : str
+        Path to the EP-style TXT tomography file.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing tomography data with columns for coordinates and properties.
     """
     col_names = [
         "vp", "vp_o_vs", "vs", "rho", "sf_vp", "sf_vp_o_vs",
@@ -36,6 +53,16 @@ def load_txt_ep_format(txt_file: str) -> pd.DataFrame:
 def load_hdf5_data(h5_file: str) -> pd.DataFrame:
     """
     Load a single depth slice from the HDF5 tomography file into a flat DataFrame.
+
+    Parameters
+    ----------
+    h5_file : str
+        Path to the HDF5 tomography file.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing flattened tomography data from the shallowest depth slice.
     """
     with h5py.File(h5_file, "r") as f:
         depth_keys = sorted(f.keys(), key=lambda x: float(x))
@@ -55,12 +82,14 @@ def load_hdf5_data(h5_file: str) -> pd.DataFrame:
     return df
 
 
-# -------------------------
-# Checks & utilities
-# -------------------------
 def check_latlon_consistency(h5_file: str) -> None:
     """
     Verify that all depth groups share identical latitude/longitude arrays.
+
+    Parameters
+    ----------
+    h5_file : str
+        Path to the HDF5 tomography file to check.
     """
     with h5py.File(h5_file, "r") as f:
         first_group = next(iter(f.keys()))
@@ -86,6 +115,15 @@ def check_grid_spacing(lat: np.ndarray, lon: np.ndarray, tol: float = 1e-6) -> N
     """
     Report unique spacings for lat/lon and whether they are regular.
     Prints approximate km for spacings.
+
+    Parameters
+    ----------
+    lat : np.ndarray
+        Array of latitude values in degrees.
+    lon : np.ndarray
+        Array of longitude values in degrees.
+    tol : float, optional
+        Tolerance for determining regularity. Default is 1e-6.
     """
     lat_spacing = np.diff(lat)
     lon_spacing = np.diff(lon)
@@ -117,20 +155,42 @@ def check_grid_spacing(lat: np.ndarray, lon: np.ndarray, tol: float = 1e-6) -> N
     )
 
 
-
-def lons_centered_for_display(lon, center=180.0):
+def lons_centered_for_display(lon: np.ndarray, center: float = 180.0) -> np.ndarray:
     """
     Shift longitudes into a continuous range [center-180, center+180)
     so there's a single seam at 'center' (default 180°).
+
+    Parameters
+    ----------
+    lon : np.ndarray
+        Array of longitude values.
+    center : float, optional
+        Center longitude for the display range. Default is 180.0.
+
+    Returns
+    -------
+    np.ndarray
+        Shifted longitude values.
     """
     lon = np.asarray(lon, dtype=float)
+    # wrap to [-180, 180) after subtracting the center, then shift back
     return ((lon - center + 180.0) % 360.0) - 180.0 + center
 
 
-def lons_centered_180(lon):
+def lons_centered_180(lon: np.ndarray) -> np.ndarray:
     """
     Convert arbitrary longitudes to the native range of
     PlateCarree(central_longitude=180), i.e. [-180, 180).
+
+    Parameters
+    ----------
+    lon : np.ndarray
+        Array of longitude values.
+
+    Returns
+    -------
+    np.ndarray
+        Converted longitude values in range [-180, 180).
     """
     lon = np.asarray(lon, dtype=float)
     # shift by -180, wrap to [-180,180), done
@@ -141,12 +201,23 @@ def choose_projection_and_extent(lats: np.ndarray, lons: np.ndarray):
     """
     Decide projection and compute a tight extent.
 
+    Parameters
+    ----------
+    lats : np.ndarray
+        Array of latitude values in degrees.
+    lons : np.ndarray
+        Array of longitude values in degrees.
+
     Returns
     -------
-    ax_crs : axes projection
-    data_crs : CRS of input data (always standard PlateCarree lon/lat)
-    extent : (minlon, maxlon, minlat, maxlat) in the CRS given by extent_crs
-    extent_crs : CRS that 'extent' is expressed in
+    ax_crs : cartopy.crs.CRS
+        Axes projection for plotting.
+    data_crs : cartopy.crs.CRS
+        CRS of input data (always standard PlateCarree lon/lat).
+    extent : tuple
+        Extent as (minlon, maxlon, minlat, maxlat) in the CRS given by extent_crs.
+    extent_crs : cartopy.crs.CRS
+        CRS that 'extent' is expressed in.
     """
     lats = np.asarray(lats, dtype=float)
     lons = np.asarray(lons, dtype=float)
@@ -181,18 +252,24 @@ def choose_projection_and_extent(lats: np.ndarray, lons: np.ndarray):
     return ax_crs, data_crs, extent, extent_crs
 
 
-
 def plot_spatial_distribution(df: pd.DataFrame, title_suffix: str = "") -> None:
     """
     Map the grid points without clipping across the dateline.
     Uses a 180°-centered axes when needed and sets extent in the matching CRS.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame containing latitude and longitude columns.
+    title_suffix : str, optional
+        Suffix to append to the plot title. Default is empty string.
     """
     lats = df["lat"].values
     lons = df["lon"].values
 
     ax_crs, data_crs, extent, extent_crs = choose_projection_and_extent(lats, lons)
 
-    fig = plt.figure(figsize=(10, 8))
+    plt.figure(figsize=(10, 8))
     ax = plt.axes(projection=ax_crs)
 
     # Set extent in the CRS it was computed in
@@ -215,7 +292,7 @@ def plot_spatial_distribution(df: pd.DataFrame, title_suffix: str = "") -> None:
     try:
         gl.right_labels = False
         gl.top_labels = False
-    except Exception:
+    except AttributeError:
         pass
 
     plt.title(f"Spatial Domain of Tomography Model {title_suffix}")
@@ -224,17 +301,15 @@ def plot_spatial_distribution(df: pd.DataFrame, title_suffix: str = "") -> None:
     plt.show()
 
 
-
-def lons_centered_for_display(lon, center=180):
-    """
-    Shift longitudes into a continuous range [center-180, center+180)
-    so there's a single seam at 'center' (default 180°).
-    """
-    lon = np.asarray(lon, dtype=float)
-    # wrap to [-180, 180) after subtracting the center, then shift back
-    return ((lon - center + 180.0) % 360.0) - 180.0 + center
-
 def plot_spacing_histograms(df: pd.DataFrame) -> None:
+    """
+    Plot histograms of latitude and longitude spacing and density map.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame containing lat/lon data.
+    """
     lat_spacing = np.diff(np.sort(np.unique(df["lat"])))
     lon_spacing = np.diff(np.sort(np.unique(df["lon"])))
 
@@ -268,8 +343,15 @@ def plot_spacing_histograms(df: pd.DataFrame) -> None:
     plt.show()
 
 
-
 def plot_density_map(df: pd.DataFrame) -> None:
+    """
+    Plot a density map of grid points.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame containing lat/lon data.
+    """
     lon_disp = lons_centered_for_display(df["lon"].values, center=180.0)
     plt.figure(figsize=(10, 6))
     plt.hexbin(lon_disp, df["lat"], gridsize=100, cmap="Reds", mincnt=1)
@@ -281,27 +363,35 @@ def plot_density_map(df: pd.DataFrame) -> None:
     plt.show()
 
 
+@app.command()
+def analyze(
+    input_file: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            dir_okay=False,
+            help="Input tomography file (.txt or .h5)"
+        ),
+    ],
+) -> None:
+    """
+    Analyze and plot tomography data from TXT or HDF5.
 
-# -------------------------
-# Main
-# -------------------------
-def main():
-    parser = argparse.ArgumentParser(
-        description="Analyze and plot tomography data from TXT or HDF5."
-    )
-    parser.add_argument("input_file", help="Input file (.txt or .h5)")
-    args = parser.parse_args()
-
-    ext = os.path.splitext(args.input_file)[1].lower()
+    Parameters
+    ----------
+    input_file : Path
+        Input tomography file (.txt or .h5).
+    """
+    ext = input_file.suffix.lower()
     if ext == ".h5":
-        df = load_hdf5_data(args.input_file)
-        check_latlon_consistency(args.input_file)
+        df = load_hdf5_data(str(input_file))
+        check_latlon_consistency(str(input_file))
         suffix = "(HDF5)"
     elif ext == ".txt":
-        df = load_txt_ep_format(args.input_file)
+        df = load_txt_ep_format(str(input_file))
         suffix = "(TXT)"
     else:
-        raise ValueError("Unsupported file type. Use .txt or .h5")
+        raise typer.BadParameter("Unsupported file type. Use .txt or .h5")
 
     print(f"Loaded {len(df)} points.")
     print("Unique latitudes:", len(np.unique(df["lat"])))
@@ -329,5 +419,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
-
+    app()
