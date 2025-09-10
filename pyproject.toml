@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nzcvm-data"                       # pip name (dash)
+version = "0.1.0"
+description = "NZCVM data manager: clones/pulls the real LFS repo into a local cache."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }                # SPDX string recommended
+authors = [{ name = "UC Quake Modelling" }]
+keywords = ["NZCVM", "seismology", "data"]
+dependencies = []                         # keep this empty
+
+# Console script: `nzcvm-data`
+[project.scripts]
+nzcvm-data = "nzcvm_data.cli:app"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = false              # don’t auto-include non-code files
+
+# Only package our code, not data folders at repo root
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["nzcvm_data*"]
+
