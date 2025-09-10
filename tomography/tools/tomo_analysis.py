@@ -24,6 +24,16 @@ def load_txt_ep_format(txt_file: str) -> pd.DataFrame:
     """
     Load EP-style TXT tomography grid. Keeps longitudes as provided
     (may include values >180 or <0).
+
+    Parameters
+    ----------
+    txt_file : str
+        Path to the EP-style TXT tomography file.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing tomography data with columns for coordinates and properties.
     """
     col_names = [
         "vp", "vp_o_vs", "vs", "rho", "sf_vp", "sf_vp_o_vs",
@@ -43,6 +53,16 @@ def load_txt_ep_format(txt_file: str) -> pd.DataFrame:
 def load_hdf5_data(h5_file: str) -> pd.DataFrame:
     """
     Load a single depth slice from the HDF5 tomography file into a flat DataFrame.
+
+    Parameters
+    ----------
+    h5_file : str
+        Path to the HDF5 tomography file.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing flattened tomography data from the shallowest depth slice.
     """
     with h5py.File(h5_file, "r") as f:
         depth_keys = sorted(f.keys(), key=lambda x: float(x))
@@ -65,6 +85,11 @@ def load_hdf5_data(h5_file: str) -> pd.DataFrame:
 def check_latlon_consistency(h5_file: str) -> None:
     """
     Verify that all depth groups share identical latitude/longitude arrays.
+
+    Parameters
+    ----------
+    h5_file : str
+        Path to the HDF5 tomography file to check.
     """
     with h5py.File(h5_file, "r") as f:
         first_group = next(iter(f.keys()))
@@ -90,6 +115,15 @@ def check_grid_spacing(lat: np.ndarray, lon: np.ndarray, tol: float = 1e-6) -> N
     """
     Report unique spacings for lat/lon and whether they are regular.
     Prints approximate km for spacings.
+
+    Parameters
+    ----------
+    lat : np.ndarray
+        Array of latitude values in degrees.
+    lon : np.ndarray
+        Array of longitude values in degrees.
+    tol : float, optional
+        Tolerance for determining regularity. Default is 1e-6.
     """
     lat_spacing = np.diff(lat)
     lon_spacing = np.diff(lon)
@@ -167,12 +201,23 @@ def choose_projection_and_extent(lats: np.ndarray, lons: np.ndarray):
     """
     Decide projection and compute a tight extent.
 
+    Parameters
+    ----------
+    lats : np.ndarray
+        Array of latitude values in degrees.
+    lons : np.ndarray
+        Array of longitude values in degrees.
+
     Returns
     -------
-    ax_crs : axes projection
-    data_crs : CRS of input data (always standard PlateCarree lon/lat)
-    extent : (minlon, maxlon, minlat, maxlat) in the CRS given by extent_crs
-    extent_crs : CRS that 'extent' is expressed in
+    ax_crs : cartopy.crs.CRS
+        Axes projection for plotting.
+    data_crs : cartopy.crs.CRS
+        CRS of input data (always standard PlateCarree lon/lat).
+    extent : tuple
+        Extent as (minlon, maxlon, minlat, maxlat) in the CRS given by extent_crs.
+    extent_crs : cartopy.crs.CRS
+        CRS that 'extent' is expressed in.
     """
     lats = np.asarray(lats, dtype=float)
     lons = np.asarray(lons, dtype=float)
@@ -211,6 +256,13 @@ def plot_spatial_distribution(df: pd.DataFrame, title_suffix: str = "") -> None:
     """
     Map the grid points without clipping across the dateline.
     Uses a 180°-centered axes when needed and sets extent in the matching CRS.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame containing latitude and longitude columns.
+    title_suffix : str, optional
+        Suffix to append to the plot title. Default is empty string.
     """
     lats = df["lat"].values
     lons = df["lon"].values
