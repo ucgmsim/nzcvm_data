@@ -178,4 +178,7 @@ unprocessed/
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 
+# old .in surface files are not stored in github
 *.in
+# old .txt basin outline files are not stored in github
+*outline_WGS84*.txt
