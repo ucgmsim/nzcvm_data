@@ -1,18 +1,26 @@
-# tomo_analysis.py
-import argparse
+"""
+Analyze and plot tomography data from TXT or HDF5 files.
+
+This script provides functionality to analyze tomography data, generate spatial
+distribution plots, check grid consistency, and create various visualizations.
+"""
+
 import os
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+from pathlib import Path
+from typing import Annotated
+
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-import seaborn as sns
 import h5py
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import typer
+
+app = typer.Typer(pretty_exceptions_enable=False)
 
 
-# -------------------------
-# I/O
-# -------------------------
 def load_txt_ep_format(txt_file: str) -> pd.DataFrame:
     """
     Load EP-style TXT tomography grid. Keeps longitudes as provided
@@ -55,9 +63,6 @@ def load_hdf5_data(h5_file: str) -> pd.DataFrame:
     return df
 
 
-# -------------------------
-# Checks & utilities
-# -------------------------
 def check_latlon_consistency(h5_file: str) -> None:
     """
     Verify that all depth groups share identical latitude/longitude arrays.
@@ -117,13 +122,13 @@ def check_grid_spacing(lat: np.ndarray, lon: np.ndarray, tol: float = 1e-6) -> N
     )
 
 
-
 def lons_centered_for_display(lon, center=180.0):
     """
     Shift longitudes into a continuous range [center-180, center+180)
     so there's a single seam at 'center' (default 180°).
     """
     lon = np.asarray(lon, dtype=float)
+    # wrap to [-180, 180) after subtracting the center, then shift back
     return ((lon - center + 180.0) % 360.0) - 180.0 + center
 
 
@@ -181,7 +186,6 @@ def choose_projection_and_extent(lats: np.ndarray, lons: np.ndarray):
     return ax_crs, data_crs, extent, extent_crs
 
 
-
 def plot_spatial_distribution(df: pd.DataFrame, title_suffix: str = "") -> None:
     """
     Map the grid points without clipping across the dateline.
@@ -224,16 +228,6 @@ def plot_spatial_distribution(df: pd.DataFrame, title_suffix: str = "") -> None:
     plt.show()
 
 
-
-def lons_centered_for_display(lon, center=180):
-    """
-    Shift longitudes into a continuous range [center-180, center+180)
-    so there's a single seam at 'center' (default 180°).
-    """
-    lon = np.asarray(lon, dtype=float)
-    # wrap to [-180, 180) after subtracting the center, then shift back
-    return ((lon - center + 180.0) % 360.0) - 180.0 + center
-
 def plot_spacing_histograms(df: pd.DataFrame) -> None:
     lat_spacing = np.diff(np.sort(np.unique(df["lat"])))
     lon_spacing = np.diff(np.sort(np.unique(df["lon"])))
@@ -268,7 +262,6 @@ def plot_spacing_histograms(df: pd.DataFrame) -> None:
     plt.show()
 
 
-
 def plot_density_map(df: pd.DataFrame) -> None:
     lon_disp = lons_centered_for_display(df["lon"].values, center=180.0)
     plt.figure(figsize=(10, 6))
@@ -281,27 +274,35 @@ def plot_density_map(df: pd.DataFrame) -> None:
     plt.show()
 
 
+@app.command()
+def analyze(
+    input_file: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            dir_okay=False,
+            help="Input tomography file (.txt or .h5)"
+        ),
+    ],
+) -> None:
+    """
+    Analyze and plot tomography data from TXT or HDF5.
 
-# -------------------------
-# Main
-# -------------------------
-def main():
-    parser = argparse.ArgumentParser(
-        description="Analyze and plot tomography data from TXT or HDF5."
-    )
-    parser.add_argument("input_file", help="Input file (.txt or .h5)")
-    args = parser.parse_args()
-
-    ext = os.path.splitext(args.input_file)[1].lower()
+    Parameters
+    ----------
+    input_file : Path
+        Input tomography file (.txt or .h5).
+    """
+    ext = input_file.suffix.lower()
     if ext == ".h5":
-        df = load_hdf5_data(args.input_file)
-        check_latlon_consistency(args.input_file)
+        df = load_hdf5_data(str(input_file))
+        check_latlon_consistency(str(input_file))
         suffix = "(HDF5)"
     elif ext == ".txt":
-        df = load_txt_ep_format(args.input_file)
+        df = load_txt_ep_format(str(input_file))
         suffix = "(TXT)"
     else:
-        raise ValueError("Unsupported file type. Use .txt or .h5")
+        raise typer.BadParameter("Unsupported file type. Use .txt or .h5")
 
     print(f"Loaded {len(df)} points.")
     print("Unique latitudes:", len(np.unique(df["lat"])))
@@ -329,5 +330,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
-
+    app()
