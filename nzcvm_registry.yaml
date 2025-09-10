@@ -922,11 +922,11 @@ basin:
     wiki_images:
         - images/QueenCharlotte_basin_map.png
     boundaries:
-        - regional/QueenCharles/QueenCharles_outline_WGS84.geojson
+        - regional/QueenCharlotte/QueenCharlotte_outline_WGS84.geojson
     surfaces:
         - path: surface/NZ_DEM_HD.h5
           submodel: canterbury1d_v2
-        - path: regional/QueenCharles/QueenCharles_basement_WGS84_v25p8.h5
+        - path: regional/QueenCharlotte/QueenCharlotte_basement_WGS84_v25p8.h5
 
   - name: CastleHill_v25p8
     type: 1
