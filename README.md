@@ -35,72 +35,28 @@ This repository contains the core software for building and querying 3D seismic 
 - **regional/**: Basin-specific datasets for local regions across NZ (e.g., Canterbury, Wellington, Gisborne).
 - **wiki/**: Documentation and format specifications.
 - **tools/**: Scripts/utilities for processing model data.
-- **src/nzcvm_data/**: Python CLI package that manages data installation and configuration.
+
 
 ---
 
-## 🔽 Installing the Data Manager CLI
+## Install (manual clone)
 
-This repository now provides a **pip-installable CLI** (`nzcvm-data`) that manages the dataset location.  
-The package contains only the CLI, not the heavy data files. Data are cloned or registered once into a canonical location on disk.
-
-### Option 1 — Developer install (you already cloned this repo)
+This repository is data-only. To use with `velocity_modelling`:
 
 ```bash
-git clone https://github.com/ucgmsim/nzcvm_data.git
-cd nzcvm_data
-pip install -e .
-nzcvm-data install --path ~/nzcvm_data   # register existing clone
-```
+# Clone the data
+git clone https://github.com/ucgmsim/nzcvm_data.git ~/nzcvm_data
+cd ~/nzcvm_data
 
-### Option 2 — User install (direct from GitHub)
+# Install Git LFS if you need large files (HDF5, etc.)
+# See: https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage
+git lfs install
+git lfs pull   # omit if you only need non-LFS assets
 
-```bash
-pip install git+https://github.com/ucgmsim/nzcvm_data.git
-```
+# (Optional) record your chosen path for future convenience
+mkdir -p ~/.config/nzcvm_data
+echo '{"data_root": "'$HOME'/nzcvm_data"}' > ~/.config/nzcvm_data/config.json
 
-Then fetch the data:
-
-```bash
-# Full data (includes large HDF5 files via git-lfs)
-nzcvm-data install
-
-# Or, lightweight (only boundaries/small files, skips LFS)
-nzcvm-data install --no-lfs
-```
-
-Check the configured location:
-```bash
-nzcvm-data where
-```
-
-Optional environment variable for other tools:
-```bash
-export NZCVM_DATA_ROOT=$(nzcvm-data where)
-```
-
-### Data root resolution order
-
-When other projects (e.g. `velocity_modelling`) look for the data, they check in this order:
-
-1. `--nzcvm-data-root` CLI argument  
-2. `NZCVM_DATA_ROOT` environment variable  
-3. `~/.config/nzcvm_data/config.json` saved by `nzcvm-data install`  
-4. Default path `~/.local/cache/nzcvm_data_root`  
-5. Interactive prompt (if running in a terminal)
-
----
-
-## 🧰 Legacy Manual Install (advanced users)
-
-If you prefer, you can still clone the repo and pull LFS objects manually. You will need [Git LFS](https://git-lfs.github.com/) installed.
-See [Git LFS installation instructions](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage) for installation details.
-
-```bash
-git clone https://github.com/ucgmsim/nzcvm_data.git
-cd nzcvm_data
-git lfs pull
-```
 
 Verify large files:
 ```bash
