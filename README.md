@@ -39,9 +39,17 @@ This repository contains the core software for building and querying 3D seismic 
 
 ---
 
-## Install (manual clone)
+## Install
 
-This repository is data-only. To use with `velocity_modelling`:
+If you are interested in both the data **and** the NZCVM modeling code, please visit:
+
+🔗 [NZCVM Velocity Modeling Code (velocity_modelling)](https://github.com/ucgmsim/velocity_modelling)
+
+That repository provides the full modeling engine and will guide you through linking to this data repository.
+
+---
+
+If you only want to obtain the **data** (for use with your own tools or to set up later with velocity_modelling), follow these steps:
 
 ```bash
 # Clone the data
@@ -56,13 +64,15 @@ git lfs pull   # omit if you only need non-LFS assets
 # (Optional) record your chosen path for future convenience
 mkdir -p ~/.config/nzcvm_data
 echo '{"data_root": "'$HOME'/nzcvm_data"}' > ~/.config/nzcvm_data/config.json
-
+```
 
 Verify large files:
 ```bash
 ls -lh surface/
 # .h5 files should be MBs/GBs, not ~100 bytes.
 ```
+
+You can always install [velocity_modelling](https://github.com/ucgmsim/velocity_modelling) later to use this data with the full NZCVM engine.
 
 ---
 
