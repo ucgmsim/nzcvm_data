@@ -49,7 +49,7 @@ That repository provides the full modeling engine and will guide you through lin
 
 ---
 
-If you only want to obtain the **data** (for use with your own tools or to set up later with velocity_modelling), follow these steps:
+If you only want to obtain the **data** (for use with your own tools or for later integration with `velocity_modelling`), follow these steps:
 
 ```bash
 # Clone the data
