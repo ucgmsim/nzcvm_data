@@ -31,10 +31,10 @@ import pytz
 import typer
 
 try:
-    from velocity_modelling.registry import get_basin_versions
+    from velocity_modelling.registry import get_all_basins_dict
 except ImportError as e:
     typer.echo(
-        "Error: Failed to import velocity_modelling.registry.get_basin_versions\n"
+        "Error: Failed to import velocity_modelling.registry.get_all_basins_dict\n"
         "Please install the velocity_modelling package:\n"
         " pip install git+https://github.com/ucgmsim/velocity_modelling.git\n",
         err=True,
@@ -86,7 +86,7 @@ def list_basins(
 
     """
 
-    basin_versions = get_basin_versions(registry)
+    basin_versions = get_all_basins_dict(registry)
     for basin_name in sorted(basin_versions.keys()):
         print(basin_name)
 
@@ -136,7 +136,7 @@ def generate_wiki(
         Directory to write basin subdirectories to (default: ../regional).
 
     """
-    basin_versions = get_basin_versions(registry)
+    basin_versions = get_all_basins_dict(registry)
 
     if basin != "all":
         if basin not in basin_versions:
