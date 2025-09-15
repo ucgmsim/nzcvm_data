@@ -21,7 +21,6 @@ Usage examples:
   python basin_wiki.py list-basins --registry /path/to/my_registry.yaml
 """
 
-import re
 import shutil
 import tempfile
 from datetime import datetime
@@ -30,7 +29,8 @@ from typing import Annotated
 
 import pytz
 import typer
-import yaml
+
+from velocity_modelling.registry import get_basin_versions
 
 app = typer.Typer(pretty_exceptions_enable=False)
 
@@ -55,52 +55,6 @@ def _remove_timestamp_line(content: str) -> str:
     return "\n".join(lines)
 
 
-def _get_basin_versions(registry_path: Path):
-    """
-    Reads and parses the registry yaml file to group models by basin name.
-
-    Parameters
-    ----------
-    registry_path : Path
-        Path to the nzcvm_registry.yaml file.
-
-    Returns
-    -------
-    dict
-        A dictionary where keys are basin names and values are lists of dictionaries
-        containing basin details, including full name, version, version tuple, and data.
-    """
-    if not registry_path.exists():
-        print(f"Error: Registry file not found at {registry_path}")
-        raise typer.Exit(code=1)
-
-    with open(registry_path, "r", encoding="utf-8") as file:
-        data = yaml.safe_load(file)
-
-    basin_versions = {}
-    for basin_item in data.get("basin", []):
-        full_name = basin_item.pop("name")
-        match = re.match(r"^(.*?)_v(\d+p\d+)$", full_name)
-        if not match:
-            continue
-        basin_name, version = match.groups()
-        version_parts = version.replace("v", "").split("p")
-        version_tuple = (int(version_parts[0]), int(version_parts[1]))
-
-        if basin_name not in basin_versions:
-            basin_versions[basin_name] = []
-        basin_versions[basin_name].append(
-            {
-                "full_name": full_name,
-                "version": version,
-                "version_tuple": version_tuple,
-                "data": basin_item,
-            }
-        )
-
-    return basin_versions
-
-
 @app.command()
 def list_basins(
     registry: Annotated[
@@ -123,7 +77,7 @@ def list_basins(
 
     """
 
-    basin_versions = _get_basin_versions(registry)
+    basin_versions = get_basin_versions(registry)
     for basin_name in sorted(basin_versions.keys()):
         print(basin_name)
 
@@ -173,7 +127,7 @@ def generate_wiki(
         Directory to write basin subdirectories to (default: ../regional).
 
     """
-    basin_versions = _get_basin_versions(registry)
+    basin_versions = get_basin_versions(registry)
 
     if basin != "all":
         if basin not in basin_versions:
