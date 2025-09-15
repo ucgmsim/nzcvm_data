@@ -30,7 +30,16 @@ from typing import Annotated
 import pytz
 import typer
 
-from velocity_modelling.registry import get_basin_versions
+try:
+    from velocity_modelling.registry import get_basin_versions
+except ImportError as e:
+    typer.echo(
+        "Error: Failed to import velocity_modelling.registry.get_basin_versions\n"
+        "Please install the velocity_modelling package:\n"
+        " pip install git+https://github.com/ucgmsim/velocity_modelling.git\n",
+        err=True,
+    )
+    raise typer.Exit(code=1) from e
 
 app = typer.Typer(pretty_exceptions_enable=False)
 

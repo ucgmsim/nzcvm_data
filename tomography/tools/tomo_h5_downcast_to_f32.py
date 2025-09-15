@@ -103,26 +103,15 @@ def downcast_hdf5(inp: str, outp: str, gzip_level: int = 4) -> None:
 def main(
     input_file: Annotated[
         Path,
-        typer.Argument(
-            exists=True,
-            dir_okay=False,
-            help="Input HDF5 file path"
-        ),
+        typer.Argument(exists=True, dir_okay=False, help="Input HDF5 file path"),
     ],
     output_file: Annotated[
         Path,
-        typer.Argument(
-            dir_okay=False,
-            help="Output HDF5 file path"
-        ),
+        typer.Argument(dir_okay=False, help="Output HDF5 file path"),
     ],
     gzip: Annotated[
         int,
-        typer.Option(
-            min=1,
-            max=9,
-            help="Gzip compression level (1-9)"
-        ),
+        typer.Option(min=1, max=9, help="Gzip compression level (1-9)"),
     ] = 4,
 ) -> None:
     """

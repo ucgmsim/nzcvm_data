@@ -250,66 +250,49 @@ def compare_levels(
 def main(
     file_a: Annotated[
         Path,
-        typer.Argument(
-            exists=True,
-            dir_okay=False,
-            help="First HDF5 file to compare"
-        ),
+        typer.Argument(exists=True, dir_okay=False, help="First HDF5 file to compare"),
     ],
     file_b: Annotated[
         Path,
-        typer.Argument(
-            exists=True,
-            dir_okay=False,
-            help="Second HDF5 file to compare"
-        ),
+        typer.Argument(exists=True, dir_okay=False, help="Second HDF5 file to compare"),
     ],
     vars: Annotated[
         list[str],
         typer.Option(
-            "-v", "--vars",
-            help=f"Datasets to compare (default: {', '.join(VARS_DEFAULT)})"
+            "-v",
+            "--vars",
+            help=f"Datasets to compare (default: {', '.join(VARS_DEFAULT)})",
         ),
     ] = list(VARS_DEFAULT),
     samples: Annotated[
         int,
         typer.Option(
-            "-n", "--samples",
+            "-n",
+            "--samples",
             min=1,
-            help="Target random points per level (unique after de-dup)"
+            help="Target random points per level (unique after de-dup)",
         ),
     ] = 200_000,
-    seed: Annotated[
-        int,
-        typer.Option(help="RNG seed")
-    ] = 0,
+    seed: Annotated[int, typer.Option(help="RNG seed")] = 0,
     first_level_only: Annotated[
         bool,
         typer.Option(
-            "--first-level-only",
-            help="Compare only the shallowest common level"
+            "--first-level-only", help="Compare only the shallowest common level"
         ),
     ] = False,
     with_replacement: Annotated[
         bool,
         typer.Option(
-            "--with-replacement",
-            help="Sample with replacement before unique()"
+            "--with-replacement", help="Sample with replacement before unique()"
         ),
     ] = False,
     eps: Annotated[
         float,
-        typer.Option(
-            min=0.0,
-            help="Epsilon for relative error denominator"
-        ),
+        typer.Option(min=0.0, help="Epsilon for relative error denominator"),
     ] = 1e-9,
     debug: Annotated[
         bool,
-        typer.Option(
-            "--debug",
-            help="Show tracebacks on errors"
-        ),
+        typer.Option("--debug", help="Show tracebacks on errors"),
     ] = False,
 ) -> None:
     """

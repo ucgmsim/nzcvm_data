@@ -155,15 +155,12 @@ def main(
         typer.Argument(
             exists=True,
             dir_okay=False,
-            help="Text file containing list of GeoJSON files (one per line)"
+            help="Text file containing list of GeoJSON files (one per line)",
         ),
     ],
     output_file: Annotated[
         Path,
-        typer.Argument(
-            dir_okay=False,
-            help="Output GeoJSON file path"
-        ),
+        typer.Argument(dir_okay=False, help="Output GeoJSON file path"),
     ],
 ) -> None:
     """
