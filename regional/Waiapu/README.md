@@ -10,21 +10,21 @@
 
 
 ## Images
-![](images/Waiapu_basin_map.png)
+<a href="images/Waiapu_basin_map.png"><img src="images/Waiapu_basin_map.png" width="75%"></a>
 
 *Figure 1 Location*
 
 
 ## Data
 ### Boundaries
-- Waiapu_outline_WGS84 : [GeoJSON](regional/Waiapu/Waiapu_outline_WGS84.geojson)
+- Waiapu_outline_WGS84 : [GeoJSON](Waiapu_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD : [HDF5](global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
-- Waiapu_basement_WGS84 : [HDF5](regional/Waiapu/Waiapu_basement_WGS84.h5) (Submodel: N/A)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- Waiapu_basement_WGS84 : [HDF5](Waiapu_basement_WGS84.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [Waiapu_smoothing.txt](regional/Waiapu/Waiapu_smoothing.txt)
+- [Waiapu_smoothing.txt](Waiapu_smoothing.txt)
 
 ---
-*Page generated on: September 02, 2025, 12:43 NZST/NZDT*
+*Page generated on: September 23, 2025, 15:46 NZST/NZDT*

@@ -154,6 +154,10 @@ def generate_wiki(
         version = latest_version["version"]
         basin_data = latest_version["data"]
 
+        # Define basin_dir early so it can be used throughout
+        basin_dir = output_dir / basin_name
+        basin_dir.mkdir(parents=True, exist_ok=True)
+
         basin_type = basin_data.get("type", "N/A")
         author = basin_data.get("author", "Unknown")
         images = basin_data.get("wiki_images", [])
@@ -217,18 +221,19 @@ def generate_wiki(
             md_content += "### Boundaries\n"
             for boundary in boundaries:
                 file_path = Path(boundary)
-                base_path = file_path.parent / file_path.stem
-                geojson_path = f"{base_path}.geojson"
-                txt_path = f"{base_path}.txt"
+                base_name = file_path.stem
+
+                geojson_filename = f"{base_name}.geojson"
+                txt_filename = f"{base_name}.txt"
 
                 links = []
-                if (output_dir.parent / txt_path).exists():
-                    links.append(f"[TXT]({txt_path})")
-                if (output_dir.parent / geojson_path).exists():
-                    links.append(f"[GeoJSON]({geojson_path})")
+                if (basin_dir / geojson_filename).exists():
+                    links.append(f"[GeoJSON]({geojson_filename})")
+                if (basin_dir / txt_filename).exists():
+                    links.append(f"[TXT]({txt_filename})")
 
                 link_text = " / ".join(links)
-                md_content += f"- {file_path.stem} : {link_text}\n"
+                md_content += f"- {base_name} : {link_text}\n"
             md_content += "\n"
 
         if surfaces:
@@ -236,28 +241,28 @@ def generate_wiki(
             for surface in surfaces:
                 surface_path = surface.get("path", "Path not found")
                 file_path = Path(surface_path)
-                base_path = file_path.parent / file_path.stem
+                base_name = file_path.stem
                 submodel = surface.get("submodel", "N/A")
 
-                h5_path = f"{base_path}.h5"
-                in_path = f"{base_path}.in"
+                h5_filename = f"{base_name}.h5"
+                in_filename = f"{base_name}.in"
 
                 links = []
-                if (output_dir.parent / h5_path).exists():
-                    links.append(f"[HDF5]({h5_path})")
-                if (output_dir.parent / in_path).exists():
-                    links.append(f"[TXT]({in_path})")
+                if (basin_dir / h5_filename).exists():
+                    links.append(f"[HDF5]({h5_filename})")
+                if (basin_dir / in_filename).exists():
+                    links.append(f"[TXT]({in_filename})")
 
                 link_text = " / ".join(links)
                 md_content += (
-                    f"- {file_path.stem} : {link_text} (Submodel: {submodel})\n"
+                    f"- {base_name} : {link_text} (Submodel: {submodel})\n"
                 )
             md_content += "\n"
 
         if smoothing != "N/A":
             md_content += "### Smoothing Boundaries\n"
             smoothing_filename = Path(smoothing).name
-            md_content += f"- [{smoothing_filename}]({smoothing})\n"
+            md_content += f"- [{smoothing_filename}]({smoothing_filename})\n"
             md_content += "\n"
 
         nz_tz = pytz.timezone("Pacific/Auckland")
@@ -331,18 +336,19 @@ def generate_wiki(
                         md_content += "*Boundaries:*\n"
                         for boundary in old_boundaries:
                             file_path = Path(boundary)
-                            base_path = file_path.parent / file_path.stem
-                            geojson_path = f"{base_path}.geojson"
-                            txt_path = f"{base_path}.txt"
+                            base_name = file_path.stem
+
+                            geojson_filename = f"{base_name}.geojson"
+                            txt_filename = f"{base_name}.txt"
 
                             links = []
-                            if (output_dir.parent / txt_path).exists():
-                                links.append(f"[TXT]({txt_path})")
-                            if (output_dir.parent / geojson_path).exists():
-                                links.append(f"[GeoJSON]({geojson_path})")
+                            if (basin_dir / geojson_filename).exists():
+                                links.append(f"[GeoJSON]({geojson_filename})")
+                            if (basin_dir / txt_filename).exists():
+                                links.append(f"[TXT]({txt_filename})")
 
                             link_text = " / ".join(links)
-                            md_content += f"- {file_path.stem} : {link_text}\n"
+                            md_content += f"- {base_name} : {link_text}\n"
                         md_content += "\n"
 
                     if old_surfaces:
@@ -350,34 +356,32 @@ def generate_wiki(
                         for surface in old_surfaces:
                             surface_path = surface.get("path", "Path not found")
                             file_path = Path(surface_path)
-                            base_path = file_path.parent / file_path.stem
+                            base_name = file_path.stem
                             submodel = surface.get("submodel", "N/A")
 
-                            h5_path = f"{base_path}.h5"
-                            in_path = f"{base_path}.in"
+                            h5_filename = f"{base_name}.h5"
+                            in_filename = f"{base_name}.in"
 
                             links = []
-                            if (output_dir.parent / h5_path).exists():
-                                links.append(f"[HDF5]({h5_path})")
-                            if (output_dir.parent / in_path).exists():
-                                links.append(f"[TXT]({in_path})")
+                            if (basin_dir / h5_filename).exists():
+                                links.append(f"[HDF5]({h5_filename})")
+                            if (basin_dir / in_filename).exists():
+                                links.append(f"[TXT]({in_filename})")
 
                             link_text = " / ".join(links)
-                            md_content += f"- {file_path.stem} : {link_text} (Submodel: {submodel})\n"
+                            md_content += f"- {base_name} : {link_text} (Submodel: {submodel})\n"
                         md_content += "\n"
 
                     if old_smoothing != "N/A":
                         md_content += "*Smoothing Boundaries:*\n"
                         smoothing_filename = Path(old_smoothing).name
-                        md_content += f"- [{smoothing_filename}]({old_smoothing})\n"
+                        md_content += f"- [{smoothing_filename}]({smoothing_filename})\n"
                         md_content += "\n"
 
                 md_content += "\n"
 
         md_content += f"---\n*Page generated on: {timestamp}*\n"
 
-        basin_dir = output_dir / basin_name
-        basin_dir.mkdir(parents=True, exist_ok=True)
         readme_path = basin_dir / "README.md"
 
         with tempfile.NamedTemporaryFile(

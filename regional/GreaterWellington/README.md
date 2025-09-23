@@ -10,34 +10,34 @@
 
 
 ## Images
-![](images/NI_south.png)
+<a href="images/NI_south.png"><img src="images/NI_south.png" width="75%"></a>
 
 *Figure 1 Location*
 
-![](images/GreaterWellington_basin_map.png)
+<a href="images/GreaterWellington_basin_map.png"><img src="images/GreaterWellington_basin_map.png" width="75%"></a>
 
 *Figure 2 Greaterwellington Basin Map*
 
-![](images/greater_wellington_outline.png)
+<a href="images/greater_wellington_outline.png"><img src="images/greater_wellington_outline.png" width="75%"></a>
 
 *Figure 3 Greater Wellington Outline*
 
 
 ## Data
 ### Boundaries
-- GreaterWellington_outline_WGS84_1 : [GeoJSON](regional/GreaterWellington/GreaterWellington_outline_WGS84_1.geojson)
-- GreaterWellington_outline_WGS84_2 : [GeoJSON](regional/GreaterWellington/GreaterWellington_outline_WGS84_2.geojson)
-- GreaterWellington_outline_WGS84_3 : [GeoJSON](regional/GreaterWellington/GreaterWellington_outline_WGS84_3.geojson)
-- GreaterWellington_outline_WGS84_4 : [GeoJSON](regional/GreaterWellington/GreaterWellington_outline_WGS84_4.geojson)
-- GreaterWellington_outline_WGS84_5 : [GeoJSON](regional/GreaterWellington/GreaterWellington_outline_WGS84_5.geojson)
-- GreaterWellington_outline_WGS84_6 : [GeoJSON](regional/GreaterWellington/GreaterWellington_outline_WGS84_6.geojson)
+- GreaterWellington_outline_WGS84_1 : [GeoJSON](GreaterWellington_outline_WGS84_1.geojson)
+- GreaterWellington_outline_WGS84_2 : [GeoJSON](GreaterWellington_outline_WGS84_2.geojson)
+- GreaterWellington_outline_WGS84_3 : [GeoJSON](GreaterWellington_outline_WGS84_3.geojson)
+- GreaterWellington_outline_WGS84_4 : [GeoJSON](GreaterWellington_outline_WGS84_4.geojson)
+- GreaterWellington_outline_WGS84_5 : [GeoJSON](GreaterWellington_outline_WGS84_5.geojson)
+- GreaterWellington_outline_WGS84_6 : [GeoJSON](GreaterWellington_outline_WGS84_6.geojson)
 
 ### Surfaces
-- NZ_DEM_HD : [HDF5](global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
-- GreaterWellington_basement_WGS84 : [HDF5](regional/GreaterWellington/GreaterWellington_basement_WGS84.h5) (Submodel: N/A)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- GreaterWellington_basement_WGS84 : [HDF5](GreaterWellington_basement_WGS84.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [GreaterWellington_smoothing.txt](regional/GreaterWellington/GreaterWellington_smoothing.txt)
+- [GreaterWellington_smoothing.txt](GreaterWellington_smoothing.txt)
 
 ---
-*Page generated on: September 02, 2025, 12:43 NZST/NZDT*
+*Page generated on: September 23, 2025, 15:46 NZST/NZDT*

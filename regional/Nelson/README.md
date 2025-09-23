@@ -11,11 +11,11 @@
 
 
 ## Images
-![](images/SI_north.png)
+<a href="images/SI_north.png"><img src="images/SI_north.png" width="75%"></a>
 
 *Figure 1 Location*
 
-![](images/Nelson_basin_map_v25p5.png)
+<a href="images/Nelson_basin_map_v25p5.png"><img src="images/Nelson_basin_map_v25p5.png" width="75%"></a>
 
 *Figure 2 Nelson Basin Map V25p5*
 
@@ -26,14 +26,14 @@
 
 ## Data
 ### Boundaries
-- Nelson_outline_WGS84 : [GeoJSON](regional/Nelson/Nelson_outline_WGS84.geojson)
+- Nelson_outline_WGS84 : [GeoJSON](Nelson_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD : [HDF5](global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
-- Nelson_basement_WGS84_v25p5 : [HDF5](regional/Nelson/Nelson_basement_WGS84_v25p5.h5) (Submodel: N/A)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- Nelson_basement_WGS84_v25p5 : [HDF5](Nelson_basement_WGS84_v25p5.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [Nelson_smoothing.txt](regional/Nelson/Nelson_smoothing.txt)
+- [Nelson_smoothing.txt](Nelson_smoothing.txt)
 
 ## Older Versions
 
@@ -47,7 +47,7 @@
 | Created | 2019-01       |
 
 **Images:**
-![](images/Nelson_basin_map_v19p1.png)
+<a href="images/Nelson_basin_map_v19p1.png"><img src="images/Nelson_basin_map_v19p1.png" width="75%"></a>
 
 *Figure 1 Location*
 
@@ -57,15 +57,15 @@
 
 **Data:**
 *Boundaries:*
-- Nelson_outline_WGS84 : [GeoJSON](regional/Nelson/Nelson_outline_WGS84.geojson)
+- Nelson_outline_WGS84 : [GeoJSON](Nelson_outline_WGS84.geojson)
 
 *Surfaces:*
-- NZ_DEM_HD : [HDF5](global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
-- Nelson_basement_WGS84_v19p1 : [HDF5](regional/Nelson/Nelson_basement_WGS84_v19p1.h5) (Submodel: N/A)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- Nelson_basement_WGS84_v19p1 : [HDF5](Nelson_basement_WGS84_v19p1.h5) (Submodel: N/A)
 
 *Smoothing Boundaries:*
-- [Nelson_smoothing.txt](regional/Nelson/Nelson_smoothing.txt)
+- [Nelson_smoothing.txt](Nelson_smoothing.txt)
 
 
 ---
-*Page generated on: September 02, 2025, 12:43 NZST/NZDT*
+*Page generated on: September 23, 2025, 15:46 NZST/NZDT*

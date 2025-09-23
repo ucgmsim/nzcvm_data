@@ -10,19 +10,19 @@
 
 
 ## Images
-![](images/SI_se.png)
+<a href="images/SI_se.png"><img src="images/SI_se.png" width="75%"></a>
 
 *Figure 1 Location*
 
-![](images/Balclutha_basin_map.png)
+<a href="images/Balclutha_basin_map.png"><img src="images/Balclutha_basin_map.png" width="75%"></a>
 
 *Figure 2 Balclutha Basin Map*
 
-![](images/green_class.png)
+<a href="images/green_class.png"><img src="images/green_class.png" width="75%"></a>
 
 *Figure 3 Green Class*
 
-![](images/green_rock.png)
+<a href="images/green_rock.png"><img src="images/green_rock.png" width="75%"></a>
 
 *Figure 4 Green Rock*
 
@@ -34,14 +34,14 @@
 
 ## Data
 ### Boundaries
-- Balclutha_outline_WGS84 : [GeoJSON](regional/Balclutha/Balclutha_outline_WGS84.geojson)
+- Balclutha_outline_WGS84 : [GeoJSON](Balclutha_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD : [HDF5](global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
-- Balclutha_basement_WGS84 : [HDF5](regional/Balclutha/Balclutha_basement_WGS84.h5) (Submodel: N/A)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- Balclutha_basement_WGS84 : [HDF5](Balclutha_basement_WGS84.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [Balclutha_smoothing.txt](regional/Balclutha/Balclutha_smoothing.txt)
+- [Balclutha_smoothing.txt](Balclutha_smoothing.txt)
 
 ---
-*Page generated on: September 02, 2025, 12:43 NZST/NZDT*
+*Page generated on: September 23, 2025, 15:46 NZST/NZDT*

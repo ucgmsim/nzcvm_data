@@ -10,11 +10,11 @@
 
 
 ## Images
-![](images/motubay_whangaparoa.png)
+<a href="images/motubay_whangaparoa.png"><img src="images/motubay_whangaparoa.png" width="75%"></a>
 
 *Figure 1 Location*
 
-![](images/Whangaparoa_basin_map.png)
+<a href="images/Whangaparoa_basin_map.png"><img src="images/Whangaparoa_basin_map.png" width="75%"></a>
 
 *Figure 2 Whangaparoa Basin Map*
 
@@ -24,14 +24,14 @@
 
 ## Data
 ### Boundaries
-- Whangaparoa_outline_WGS84 : [GeoJSON](regional/Whangaparoa/Whangaparoa_outline_WGS84.geojson)
+- Whangaparoa_outline_WGS84 : [GeoJSON](Whangaparoa_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD : [HDF5](global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
-- Whangaparoa_basement_WGS84 : [HDF5](regional/Whangaparoa/Whangaparoa_basement_WGS84.h5) (Submodel: N/A)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- Whangaparoa_basement_WGS84 : [HDF5](Whangaparoa_basement_WGS84.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [Whangaparoa_smoothing.txt](regional/Whangaparoa/Whangaparoa_smoothing.txt)
+- [Whangaparoa_smoothing.txt](Whangaparoa_smoothing.txt)
 
 ---
-*Page generated on: September 02, 2025, 12:43 NZST/NZDT*
+*Page generated on: September 23, 2025, 15:46 NZST/NZDT*
