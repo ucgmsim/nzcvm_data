@@ -262,7 +262,7 @@ basin:
       - regional/Nelson/Nelson_outline_WGS84.geojson
     surfaces:
       - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
+        submodel: nongeneric_v1
       - path: regional/Nelson/Nelson_basement_WGS84_v25p5.h5
     smoothing: regional/Nelson/Nelson_smoothing.txt
 
@@ -822,9 +822,9 @@ basin:
       - regional/PalmerstonNorth/PalmerstonNorth_outline_WGS84.geojson
     surfaces:
       - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2_pliocene_enforced
+        submodel: canterbury1d_v2_PN
       - path: regional/PalmerstonNorth/PalmerstonNorth_pliocenetop_WGS84_v25p8.h5
-        submodel: pliocene_submod_v1
+        submodel:  pliocene_submod_v1_PN
       - path: regional/PalmerstonNorth/PalmerstonNorth_basement_WGS84_v25p8.h5
     smoothing: regional/PalmerstonNorth/PalmerstonNorth_smoothing.txt
 
@@ -891,7 +891,7 @@ basin:
 
   - name: WestCoast_v25p5
     type: 1
-    author: Ayhshi Tiwari / Hunter Brotherston
+    author: Ayushi Tiwari / Hunter Brotherston
     wiki_images:
       - images/WestCoast_basin_map.png
     boundaries:
@@ -905,14 +905,14 @@ basin:
 
   - name: Westport_v25p5
     type: 1
-    author: Kaleb Finn / Ayushi Tiwari (ENCN493)
+    author: Ayushi Tiwari / Kaleb Finn (ENCN493)
     wiki_images:
       - images/Westport_basin_map.png
     boundaries:
       - regional/Westport/Westport_outline_WGS84.geojson
     surfaces:
       - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
+        submodel: nongeneric_v1
       - path: regional/Westport/Westport_basement_WGS84.h5
     smoothing: regional/Westport/Westport_smoothing.txt
 
@@ -981,10 +981,21 @@ submodel:
       module: canterbury1d_submod
       data: vm1d/Cant1D_v2_Pliocene_Enforced.fd_modfile
 
+    - name: canterbury1d_v2_PN
+      type: vm1d
+      module: canterbury1d_submod
+      data: vm1d/Cant1D_v2_PN.fd_modfile
+
+    - name: nongeneric_v1
+      type: vm1d
+      module: canterbury1d_submod
+      data: vm1d/Non_generic_v1.fd_modfile
+
     - name: canterbury1d_v3_pliocene_enforced
       type: vm1d
       module: canterbury1d_submod
       data: vm1d/Cant1D_v3_Pliocene_Enforced.fd_modfile
+
 
     - name: ep_tomography_submod_v2010
       type: tomography
@@ -997,6 +1008,11 @@ submodel:
     - name: pliocene_submod_v1
       type: relation
       module: pliocene_submod_v1
+
+    - name: pliocene_submod_v1_PN
+      type: relation
+      module: pliocene_submod_v1_PN
+
 
     - name: miocene_submod_v1
       type: relation
