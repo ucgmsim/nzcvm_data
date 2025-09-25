@@ -10,15 +10,15 @@
 
 
 ## Images
-![](images/NI_mideast.png)
+<a href="images/NI_mideast.png"><img src="images/NI_mideast.png" width="75%"></a>
 
 *Figure 1 Location*
 
-![](images/Gisborne_basin_map.png)
+<a href="images/Gisborne_basin_map.png"><img src="images/Gisborne_basin_map.png" width="75%"></a>
 
 *Figure 2 Gisborne Basin Map*
 
-![](images/grisborne_basement.png)
+<a href="images/grisborne_basement.png"><img src="images/grisborne_basement.png" width="75%"></a>
 
 *Figure 3 Grisborne Basement*
 
@@ -29,14 +29,14 @@
 
 ## Data
 ### Boundaries
-- Gisborne_outline_WGS84 : [GeoJSON](regional/Gisborne/Gisborne_outline_WGS84.geojson)
+- Gisborne_outline_WGS84 : [GeoJSON](Gisborne_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD : [HDF5](global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
-- Gisborne_basement_WGS84 : [HDF5](regional/Gisborne/Gisborne_basement_WGS84.h5) (Submodel: N/A)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- Gisborne_basement_WGS84 : [HDF5](Gisborne_basement_WGS84.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [Gisborne_smoothing.txt](regional/Gisborne/Gisborne_smoothing.txt)
+- [Gisborne_smoothing.txt](Gisborne_smoothing.txt)
 
 ---
-*Page generated on: September 02, 2025, 12:43 NZST/NZDT*
+*Page generated on: September 23, 2025, 15:46 NZST/NZDT*

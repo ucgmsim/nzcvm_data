@@ -10,26 +10,26 @@
 
 
 ## Images
-![](images/SI_north.png)
+<a href="images/SI_north.png"><img src="images/SI_north.png" width="75%"></a>
 
 *Figure 1 Location*
 
-![](images/Murchison_basin_map.png)
+<a href="images/Murchison_basin_map.png"><img src="images/Murchison_basin_map.png" width="75%"></a>
 
 *Figure 2 Murchison Basin Map*
 
-![](images/murchison_outline.png)
+<a href="images/murchison_outline.png"><img src="images/murchison_outline.png" width="75%"></a>
 
 *Figure 3 Murchison Outline*
 
 
 ## Data
 ### Boundaries
-- Murchison_outline_WGS84 : [GeoJSON](regional/Murchison/Murchison_outline_WGS84.geojson)
+- Murchison_outline_WGS84 : [GeoJSON](Murchison_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD : [HDF5](global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
-- Murchison_basement_WGS84 : [HDF5](regional/Murchison/Murchison_basement_WGS84.h5) (Submodel: N/A)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- Murchison_basement_WGS84 : [HDF5](Murchison_basement_WGS84.h5) (Submodel: N/A)
 
 ---
-*Page generated on: September 02, 2025, 12:43 NZST/NZDT*
+*Page generated on: September 23, 2025, 15:46 NZST/NZDT*

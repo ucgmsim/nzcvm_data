@@ -10,11 +10,11 @@
 
 
 ## Images
-![](images/canterbury_region.png)
+<a href="images/canterbury_region.png"><img src="images/canterbury_region.png" width="75%"></a>
 
 *Figure 1 Location*
 
-![](images/BanksPeninsulaVolcanics_basin_map.png)
+<a href="images/BanksPeninsulaVolcanics_basin_map.png"><img src="images/BanksPeninsulaVolcanics_basin_map.png" width="75%"></a>
 
 *Figure 2 Bankspeninsulavolcanics Basin Map*
 
@@ -24,11 +24,11 @@
 
 ## Data
 ### Boundaries
-- BanksPeninsulaVolcanics_outline_WGS84 : [GeoJSON](regional/BanksPeninsulaVolcanics/BanksPeninsulaVolcanics_outline_WGS84.geojson)
+- BanksPeninsulaVolcanics_outline_WGS84 : [GeoJSON](BanksPeninsulaVolcanics_outline_WGS84.geojson)
 
 ### Surfaces
-- BanksPeninsulaVolcanics_basement_WGS84 : [HDF5](regional/BanksPeninsulaVolcanics/BanksPeninsulaVolcanics_basement_WGS84.h5) (Submodel: bpv_submod_v4)
-- BanksPeninsulaVolcanics_Miocene_WGS84 : [HDF5](regional/BanksPeninsulaVolcanics/BanksPeninsulaVolcanics_Miocene_WGS84.h5) (Submodel: N/A)
+- BanksPeninsulaVolcanics_basement_WGS84 : [HDF5](BanksPeninsulaVolcanics_basement_WGS84.h5) (Submodel: bpv_submod_v4)
+- BanksPeninsulaVolcanics_Miocene_WGS84 : [HDF5](BanksPeninsulaVolcanics_Miocene_WGS84.h5) (Submodel: N/A)
 
 ---
-*Page generated on: September 02, 2025, 12:43 NZST/NZDT*
+*Page generated on: September 23, 2025, 15:46 NZST/NZDT*

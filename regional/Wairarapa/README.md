@@ -10,11 +10,11 @@
 
 
 ## Images
-![](images/NI_south.png)
+<a href="images/NI_south.png"><img src="images/NI_south.png" width="75%"></a>
 
 *Figure 1 Location*
 
-![](images/Wairarapa_basin_map.png)
+<a href="images/Wairarapa_basin_map.png"><img src="images/Wairarapa_basin_map.png" width="75%"></a>
 
 *Figure 2 Wairarapa Basin Map*
 
@@ -24,14 +24,14 @@
 
 ## Data
 ### Boundaries
-- Wairarapa_outline_WGS84 : [GeoJSON](regional/Wairarapa/Wairarapa_outline_WGS84.geojson)
+- Wairarapa_outline_WGS84 : [GeoJSON](Wairarapa_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD : [HDF5](global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
-- Wairarapa_basement_WGS84 : [HDF5](regional/Wairarapa/Wairarapa_basement_WGS84.h5) (Submodel: N/A)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- Wairarapa_basement_WGS84 : [HDF5](Wairarapa_basement_WGS84.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [Wairarapa_smoothing.txt](regional/Wairarapa/Wairarapa_smoothing.txt)
+- [Wairarapa_smoothing.txt](Wairarapa_smoothing.txt)
 
 ---
-*Page generated on: September 02, 2025, 12:43 NZST/NZDT*
+*Page generated on: September 23, 2025, 15:46 NZST/NZDT*

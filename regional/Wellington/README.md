@@ -11,15 +11,15 @@
 
 
 ## Images
-![](images/NI_south.png)
+<a href="images/NI_south.png"><img src="images/NI_south.png" width="75%"></a>
 
 *Figure 1 Location*
 
-![](images/Wellington_basin_map.png)
+<a href="images/Wellington_basin_map.png"><img src="images/Wellington_basin_map.png" width="75%"></a>
 
 *Figure 2 Wellington Basin Map*
 
-![](images/wellington_outline.png)
+<a href="images/wellington_outline.png"><img src="images/wellington_outline.png" width="75%"></a>
 
 *Figure 3 Wellington Outline*
 
@@ -31,14 +31,14 @@
 
 ## Data
 ### Boundaries
-- Wellington_outline_WGS84 : [GeoJSON](regional/Wellington/Wellington_outline_WGS84.geojson)
+- Wellington_outline_WGS84 : [GeoJSON](Wellington_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD : [HDF5](global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
-- Wellington_basement_WGS84_v25p5 : [HDF5](regional/Wellington/Wellington_basement_WGS84_v25p5.h5) (Submodel: N/A)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- Wellington_basement_WGS84_v25p5 : [HDF5](Wellington_basement_WGS84_v25p5.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
-- [Wellington_smoothing.txt](regional/Wellington/Wellington_smoothing.txt)
+- [Wellington_smoothing.txt](Wellington_smoothing.txt)
 
 ## Older Versions
 
@@ -53,14 +53,14 @@
 
 **Data:**
 *Boundaries:*
-- Wellington_outline_WGS84 : [GeoJSON](regional/Wellington/Wellington_outline_WGS84.geojson)
+- Wellington_outline_WGS84 : [GeoJSON](Wellington_outline_WGS84.geojson)
 
 *Surfaces:*
-- NZ_DEM_HD : [HDF5](global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
-- Wellington_basement_WGS84_v21p8 : [HDF5](regional/Wellington/Wellington_basement_WGS84_v21p8.h5) (Submodel: N/A)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- Wellington_basement_WGS84_v21p8 : [HDF5](Wellington_basement_WGS84_v21p8.h5) (Submodel: N/A)
 
 *Smoothing Boundaries:*
-- [Wellington_smoothing.txt](regional/Wellington/Wellington_smoothing.txt)
+- [Wellington_smoothing.txt](Wellington_smoothing.txt)
 
 
 ### 19p6
@@ -74,14 +74,14 @@
 
 **Data:**
 *Boundaries:*
-- Wellington_outline_WGS84 : [GeoJSON](regional/Wellington/Wellington_outline_WGS84.geojson)
+- Wellington_outline_WGS84 : [GeoJSON](Wellington_outline_WGS84.geojson)
 
 *Surfaces:*
-- NZ_DEM_HD : [HDF5](global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
-- Wellington_basement_WGS84_v19p6 : [HDF5](regional/Wellington/Wellington_basement_WGS84_v19p6.h5) / [TXT](regional/Wellington/Wellington_basement_WGS84_v19p6.in) (Submodel: N/A)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- Wellington_basement_WGS84_v19p6 : [HDF5](Wellington_basement_WGS84_v19p6.h5) (Submodel: N/A)
 
 *Smoothing Boundaries:*
-- [Wellington_smoothing.txt](regional/Wellington/Wellington_smoothing.txt)
+- [Wellington_smoothing.txt](Wellington_smoothing.txt)
 
 
 ### 19p1
@@ -95,15 +95,15 @@
 
 **Data:**
 *Boundaries:*
-- Wellington_outline_WGS84 : [GeoJSON](regional/Wellington/Wellington_outline_WGS84.geojson)
+- Wellington_outline_WGS84 : [GeoJSON](Wellington_outline_WGS84.geojson)
 
 *Surfaces:*
-- NZ_DEM_HD : [HDF5](global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
-- Wellington_basement_WGS84_v19p1 : [HDF5](regional/Wellington/Wellington_basement_WGS84_v19p1.h5) (Submodel: N/A)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- Wellington_basement_WGS84_v19p1 : [HDF5](Wellington_basement_WGS84_v19p1.h5) (Submodel: N/A)
 
 *Smoothing Boundaries:*
-- [Wellington_smoothing.txt](regional/Wellington/Wellington_smoothing.txt)
+- [Wellington_smoothing.txt](Wellington_smoothing.txt)
 
 
 ---
-*Page generated on: September 02, 2025, 12:43 NZST/NZDT*
+*Page generated on: September 23, 2025, 15:46 NZST/NZDT*

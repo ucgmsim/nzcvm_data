@@ -10,19 +10,19 @@
 
 
 ## Images
-![](images/NI_mideast.png)
+<a href="images/NI_mideast.png"><img src="images/NI_mideast.png" width="75%"></a>
 
 *Figure 1 Location*
 
-![](images/SouthernHawkesBay_basin_map.png)
+<a href="images/SouthernHawkesBay_basin_map.png"><img src="images/SouthernHawkesBay_basin_map.png" width="75%"></a>
 
 *Figure 2 Southernhawkesbay Basin Map*
 
-![](images/southern_hawkes_bay_outline.png)
+<a href="images/southern_hawkes_bay_outline.png"><img src="images/southern_hawkes_bay_outline.png" width="75%"></a>
 
 *Figure 3 Southern Hawkes Bay Outline*
 
-![](images/southern_hawkes_bay_outline_extra.png)
+<a href="images/southern_hawkes_bay_outline_extra.png"><img src="images/southern_hawkes_bay_outline_extra.png" width="75%"></a>
 
 *Figure 4 Southern Hawkes Bay Outline Extra*
 
@@ -35,11 +35,11 @@
 
 ## Data
 ### Boundaries
-- SouthernHawkesBay_outline_WGS84 : [GeoJSON](regional/SouthernHawkesBay/SouthernHawkesBay_outline_WGS84.geojson)
+- SouthernHawkesBay_outline_WGS84 : [GeoJSON](SouthernHawkesBay_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD : [HDF5](global/surface/NZ_DEM_HD.h5) (Submodel: canterbury1d_v2)
-- SouthernHawkesBay_basement_WGS84 : [HDF5](regional/SouthernHawkesBay/SouthernHawkesBay_basement_WGS84.h5) (Submodel: N/A)
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- SouthernHawkesBay_basement_WGS84 : [HDF5](SouthernHawkesBay_basement_WGS84.h5) (Submodel: N/A)
 
 ---
-*Page generated on: September 02, 2025, 12:43 NZST/NZDT*
+*Page generated on: September 23, 2025, 15:46 NZST/NZDT*
