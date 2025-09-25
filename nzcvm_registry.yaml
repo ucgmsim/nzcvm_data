@@ -138,7 +138,7 @@ basin:
 
   - name: NorthCanterbury_v25p8
     type: 1
-    author: Robin Lee
+    author: Robin Lee / Ayushi Tiwari
     wiki_images:
       - images/canterbury_region.png
       - images/NorthCanterbury_basin_map_v25p8.png
@@ -229,7 +229,7 @@ basin:
 
   - name: Hanmer_v25p3
     type: 1
-    author: Ayushi Tiwari / Robin Lee 
+    author: Ayushi Tiwari
     wiki_images:
       - images/cheviot_hanmer_northcanterbury.png
       - images/Hanmer_basin_map_v25p3.png
@@ -273,7 +273,7 @@ basin:
 
 
   - name: Nelson_v25p5
-    type: 2
+    type: 3
     author: Robin Lee
     wiki_images:
       - images/SI_north.png
@@ -853,7 +853,7 @@ basin:
 
 
   - name: Southland_v25p5
-    type: 1
+    type: 2
     author: Archie Goodrick
     wiki_images:
       - images/Southland_basin_map.png
