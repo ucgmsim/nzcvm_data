@@ -98,6 +98,29 @@ basin:
       - path: regional/Canterbury/Canterbury_basement_WGS84.h5
     smoothing: regional/Canterbury/Canterbury_smoothing.txt
 
+  - name: Canterbury_v25p9
+    type: 4
+    author: Robin Lee / Ayushi Tiwari
+    wiki_images:
+      - images/canterbury_region.png
+      - images/Canterbury_basin_map.png
+    notes:
+      - Pre-Quaternary geology
+
+    boundaries:
+      - regional/Canterbury/Canterbury_outline_WGS84.geojson
+    surfaces:
+      - path: surface/CantDEM.h5
+        submodel: canterbury1d_v3_pliocene_enforced
+      - path: regional/Canterbury/Canterbury_Pliocene_46_WGS84_v8p9p18.h5
+        submodel: pliocene_submod_v2
+      - path: regional/Canterbury/Canterbury_Miocene_WGS84.h5
+        submodel: miocene_submod_v2
+      - path: regional/Canterbury/Canterbury_Paleogene_WGS84.h5
+        submodel: paleogene_submod_v2
+      - path: regional/Canterbury/Canterbury_basement_WGS84.h5
+    smoothing: regional/Canterbury/Canterbury_smoothing.txt
+
 
   - name: NorthCanterbury_v19p1
     type: 1
@@ -262,7 +285,7 @@ basin:
       - regional/Nelson/Nelson_outline_WGS84.geojson
     surfaces:
       - path: surface/NZ_DEM_HD.h5
-        submodel: nongeneric_v1
+        submodel: nelson_v1
       - path: regional/Nelson/Nelson_basement_WGS84_v25p5.h5
     smoothing: regional/Nelson/Nelson_smoothing.txt
 
@@ -912,7 +935,7 @@ basin:
       - regional/Westport/Westport_outline_WGS84.geojson
     surfaces:
       - path: surface/NZ_DEM_HD.h5
-        submodel: nongeneric_v1
+        submodel: nelson_v1
       - path: regional/Westport/Westport_basement_WGS84.h5
     smoothing: regional/Westport/Westport_smoothing.txt
 
