@@ -100,7 +100,7 @@ basin:
 
   - name: Canterbury_v25p9
     type: 4
-    author: Robin Lee / Ayushi Tiwari
+    author: Robin Lee
     wiki_images:
       - images/canterbury_region.png
       - images/Canterbury_basin_map.png
