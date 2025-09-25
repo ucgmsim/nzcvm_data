@@ -822,9 +822,9 @@ basin:
       - regional/PalmerstonNorth/PalmerstonNorth_outline_WGS84.geojson
     surfaces:
       - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2_PN
+        submodel: palmerstonnorth_v1
       - path: regional/PalmerstonNorth/PalmerstonNorth_pliocenetop_WGS84_v25p8.h5
-        submodel:  pliocene_submod_v1_PN
+        submodel:  pn_pliocene_submod_v1
       - path: regional/PalmerstonNorth/PalmerstonNorth_basement_WGS84_v25p8.h5
     smoothing: regional/PalmerstonNorth/PalmerstonNorth_smoothing.txt
 
@@ -981,21 +981,20 @@ submodel:
       module: canterbury1d_submod
       data: vm1d/Cant1D_v2_Pliocene_Enforced.fd_modfile
 
-    - name: canterbury1d_v2_PN
-      type: vm1d
-      module: canterbury1d_submod
-      data: vm1d/Cant1D_v2_PN.fd_modfile
-
-    - name: nongeneric_v1
-      type: vm1d
-      module: canterbury1d_submod
-      data: vm1d/Non_generic_v1.fd_modfile
-
     - name: canterbury1d_v3_pliocene_enforced
       type: vm1d
       module: canterbury1d_submod
       data: vm1d/Cant1D_v3_Pliocene_Enforced.fd_modfile
 
+    - name: nelson_v1
+      type: vm1d
+      module: canterbury1d_submod
+      data: vm1d/Nelson_v1.fd_modfile
+
+    - name: palmerstonnorth_v1
+      type: vm1d
+      module: canterbury1d_submod
+      data: vm1d/PalmerstonNorth_v1.fd_modfile
 
     - name: ep_tomography_submod_v2010
       type: tomography
@@ -1009,9 +1008,9 @@ submodel:
       type: relation
       module: pliocene_submod_v1
 
-    - name: pliocene_submod_v1_PN
+    - name: pn_pliocene_submod_v1
       type: relation
-      module: pliocene_submod_v1_PN
+      module: pn_pliocene_submod_v1
 
 
     - name: miocene_submod_v1
