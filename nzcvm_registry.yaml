@@ -979,7 +979,7 @@ basin:
 
   - name: TeAraroa_v25p9
     type: 1
-    author: Ayushi Tiwari
+    author: James Hoskin
     wiki_images:
         - images/TeAraroa_basin_map.png
     boundaries:
@@ -992,7 +992,7 @@ basin:
 
   - name: Rarakau_v25p9
     type: 1
-    author: Ayushi Tiwari
+    author: Toby Bates
     wiki_images:
         - images/Rarakau_basin_map.png
     boundaries:
