@@ -17,11 +17,11 @@
 
 ## Data
 ### Boundaries
-- TeAraroa_outline_WGS84 : [GeoJSON](TeAraroa_outline_WGS84.geojson) / [TXT](TeAraroa_outline_WGS84.txt)
+- TeAraroa_outline_WGS84 : [GeoJSON](TeAraroa_outline_WGS84.geojson)
 
 ### Surfaces
 - NZ_DEM_HD :  (Submodel: canterbury1d_v2)
-- TeAraroa_basement_WGS84 : [HDF5](TeAraroa_basement_WGS84.h5) / [TXT](TeAraroa_basement_WGS84.in) (Submodel: N/A)
+- TeAraroa_basement_WGS84 : [HDF5](TeAraroa_basement_WGS84.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
 - [TeAraroa_smoothing.txt](TeAraroa_smoothing.txt)
