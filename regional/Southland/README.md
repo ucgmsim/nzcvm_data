@@ -4,7 +4,7 @@
 |         |                     |
 |---------|---------------------|
 | Version | 25p5           |
-| Type    | 1        |
+| Type    | 2        |
 | Author  | Archie Goodrick            |
 | Created | 2025-05           |
 
@@ -28,4 +28,4 @@
 - [Southland_smoothing.txt](Southland_smoothing.txt)
 
 ---
-*Page generated on: September 23, 2025, 15:46 NZST/NZDT*
+*Page generated on: September 26, 2025, 13:55 NZST/NZDT*

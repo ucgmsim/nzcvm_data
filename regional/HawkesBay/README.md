@@ -45,4 +45,4 @@
 - [HawkesBay_smoothing.txt](HawkesBay_smoothing.txt)
 
 ---
-*Page generated on: September 23, 2025, 15:46 NZST/NZDT*
+*Page generated on: September 26, 2025, 13:55 NZST/NZDT*

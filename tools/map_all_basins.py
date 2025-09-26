@@ -221,7 +221,7 @@ def generate_basin_map(
     ax.axis("off")
     ax.legend(
         handles=legend_handles,
-        bbox_to_anchor=(1.05, 1),
+        bbox_to_anchor=(0.98, 1),
         loc="upper left",
         fontsize="small",
     )

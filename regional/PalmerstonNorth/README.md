@@ -21,8 +21,8 @@
 - PalmerstonNorth_outline_WGS84 : [GeoJSON](PalmerstonNorth_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2_pliocene_enforced)
-- PalmerstonNorth_pliocenetop_WGS84_v25p8 : [HDF5](PalmerstonNorth_pliocenetop_WGS84_v25p8.h5) (Submodel: pliocene_submod_v1)
+- NZ_DEM_HD :  (Submodel: palmerstonnorth_v1)
+- PalmerstonNorth_pliocenetop_WGS84_v25p8 : [HDF5](PalmerstonNorth_pliocenetop_WGS84_v25p8.h5) (Submodel: pn_pliocene_submod_v1)
 - PalmerstonNorth_basement_WGS84_v25p8 : [HDF5](PalmerstonNorth_basement_WGS84_v25p8.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
@@ -58,4 +58,4 @@
 
 
 ---
-*Page generated on: September 23, 2025, 15:46 NZST/NZDT*
+*Page generated on: September 26, 2025, 13:55 NZST/NZDT*

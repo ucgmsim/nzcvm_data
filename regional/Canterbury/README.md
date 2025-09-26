@@ -3,11 +3,11 @@
 ## Overview
 |         |                     |
 |---------|---------------------|
-| Version | 19p1           |
+| Version | 25p9           |
 | Type    | 4        |
 | Author  | Robin Lee            |
-| Created | 2019-01           |
-| Older Versions | 18p1, 18p2, 18p3 |
+| Created | 2025-09           |
+| Older Versions | 18p1, 18p2, 18p3, 19p1 |
 
 
 ## Images
@@ -28,16 +28,43 @@
 - Canterbury_outline_WGS84 : [GeoJSON](Canterbury_outline_WGS84.geojson)
 
 ### Surfaces
-- CantDEM : [HDF5](CantDEM.h5) (Submodel: canterbury1d_v2_pliocene_enforced)
-- Canterbury_Pliocene_46_WGS84_v8p9p18 : [HDF5](Canterbury_Pliocene_46_WGS84_v8p9p18.h5) (Submodel: pliocene_submod_v1)
-- Canterbury_Miocene_WGS84 : [HDF5](Canterbury_Miocene_WGS84.h5) (Submodel: miocene_submod_v1)
-- Canterbury_Paleogene_WGS84 : [HDF5](Canterbury_Paleogene_WGS84.h5) (Submodel: paleogene_submod_v1)
+- CantDEM : [HDF5](CantDEM.h5) (Submodel: canterbury1d_v3_pliocene_enforced)
+- Canterbury_Pliocene_46_WGS84_v8p9p18 : [HDF5](Canterbury_Pliocene_46_WGS84_v8p9p18.h5) (Submodel: pliocene_submod_v2)
+- Canterbury_Miocene_WGS84 : [HDF5](Canterbury_Miocene_WGS84.h5) (Submodel: miocene_submod_v2)
+- Canterbury_Paleogene_WGS84 : [HDF5](Canterbury_Paleogene_WGS84.h5) (Submodel: paleogene_submod_v2)
 - Canterbury_basement_WGS84 : [HDF5](Canterbury_basement_WGS84.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
 - [Canterbury_smoothing.txt](Canterbury_smoothing.txt)
 
 ## Older Versions
+
+### 19p1
+
+|         |                     |
+|---------|---------------------|
+| Version | 19p1  |
+| Type    | 4 |
+| Author  | Robin Lee |
+| Created | 2019-01       |
+
+**Notes:**
+- Pre-Quaternary geology
+
+**Data:**
+*Boundaries:*
+- Canterbury_outline_WGS84 : [GeoJSON](Canterbury_outline_WGS84.geojson)
+
+*Surfaces:*
+- CantDEM : [HDF5](CantDEM.h5) (Submodel: canterbury1d_v2_pliocene_enforced)
+- Canterbury_Pliocene_46_WGS84_v8p9p18 : [HDF5](Canterbury_Pliocene_46_WGS84_v8p9p18.h5) (Submodel: pliocene_submod_v1)
+- Canterbury_Miocene_WGS84 : [HDF5](Canterbury_Miocene_WGS84.h5) (Submodel: miocene_submod_v1)
+- Canterbury_Paleogene_WGS84 : [HDF5](Canterbury_Paleogene_WGS84.h5) (Submodel: paleogene_submod_v1)
+- Canterbury_basement_WGS84 : [HDF5](Canterbury_basement_WGS84.h5) (Submodel: N/A)
+
+*Smoothing Boundaries:*
+- [Canterbury_smoothing.txt](Canterbury_smoothing.txt)
+
 
 ### 18p3
 
@@ -103,4 +130,4 @@
 
 
 ---
-*Page generated on: September 23, 2025, 15:46 NZST/NZDT*
+*Page generated on: September 26, 2025, 13:55 NZST/NZDT*

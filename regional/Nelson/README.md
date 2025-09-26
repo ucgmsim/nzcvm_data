@@ -4,7 +4,7 @@
 |         |                     |
 |---------|---------------------|
 | Version | 25p5           |
-| Type    | 2        |
+| Type    | 3        |
 | Author  | Robin Lee            |
 | Created | 2025-05           |
 | Older Versions | 19p1 |
@@ -29,7 +29,7 @@
 - Nelson_outline_WGS84 : [GeoJSON](Nelson_outline_WGS84.geojson)
 
 ### Surfaces
-- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- NZ_DEM_HD :  (Submodel: nelson_v1)
 - Nelson_basement_WGS84_v25p5 : [HDF5](Nelson_basement_WGS84_v25p5.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
@@ -68,4 +68,4 @@
 
 
 ---
-*Page generated on: September 23, 2025, 15:46 NZST/NZDT*
+*Page generated on: September 26, 2025, 13:55 NZST/NZDT*

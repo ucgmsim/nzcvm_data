@@ -12,7 +12,7 @@ This page provides an overview of sedimentary basin models integrated into the N
 
 ## Canterbury Region
 - [BanksPeninsulaVolcanics v19p1](BanksPeninsulaVolcanics/README.md)
-- [Canterbury v19p1](Canterbury/README.md)
+- [Canterbury v25p9](Canterbury/README.md)
 - [CastleHill v25p8](CastleHill/README.md)
 - [Cheviot v19p1](Cheviot/README.md)
 - [Hakataramea v20p8](Hakataramea/README.md)
@@ -24,6 +24,7 @@ This page provides an overview of sedimentary basin models integrated into the N
 
 ## Gisborne Region
 - [Gisborne v21p11](Gisborne/README.md)
+- [TeAraroa v25p9](TeAraroa/README.md)
 - [TolagaBay v25p5](TolagaBay/README.md)
 - [Waiapu v25p5](Waiapu/README.md)
 
@@ -37,6 +38,7 @@ This page provides an overview of sedimentary basin models integrated into the N
 
 ## Marlborough Region
 - [Marlborough v19p1](Marlborough/README.md)
+- [QueenCharlotte v25p8](QueenCharlotte/README.md)
 
 ## Otago Region
 - [Alexandra v20p7](Alexandra/README.md)
@@ -49,6 +51,7 @@ This page provides an overview of sedimentary basin models integrated into the N
 - [Wanaka v20p6](Wanaka/README.md)
 
 ## Southland Region
+- [Rarakau v25p9](Rarakau/README.md)
 - [Southland v25p5](Southland/README.md)
 - [TeAnau v25p5](TeAnau/README.md)
 
@@ -56,9 +59,6 @@ This page provides an overview of sedimentary basin models integrated into the N
 - [Collingwood v20p11](Collingwood/README.md)
 - [Murchison v20p7](Murchison/README.md)
 - [Nelson v25p5](Nelson/README.md)
-
-## Uncategorized
-- [QueensCharlotte v25p8](QueensCharlotte/README.md)
 
 ## Waikato Region
 - [WaikatoHauraki v19p7](WaikatoHauraki/README.md)

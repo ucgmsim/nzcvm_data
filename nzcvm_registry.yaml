@@ -977,6 +977,32 @@ basin:
         - path: regional/Whakatane/Whakatane_basement_WGS84_v25p8.h5
     smoothing: regional/Whakatane/Whakatane_smoothing.txt
 
+  - name: TeAraroa_v25p9
+    type: 1
+    author: Ayushi Tiwari
+    wiki_images:
+        - images/TeAraroa_basin_map.png
+    boundaries:
+        - regional/TeAraroa/TeAraroa_outline_WGS84.geojson
+    surfaces:
+      - path : surface/NZ_DEM_HD.h5
+        submodel: canterbury1d_v2
+      - path : regional/TeAraroa/TeAraroa_basement_WGS84.h5
+    smoothing: regional/TeAraroa/TeAraroa_smoothing.txt
+
+  - name: Rarakau_v25p9
+    type: 1
+    author: Ayushi Tiwari
+    wiki_images:
+        - images/Rarakau_basin_map.png
+    boundaries:
+        - regional/Rarakau/Rarakau_outline_WGS84.geojson
+    surfaces:
+        - path : surface/NZ_DEM_HD.h5
+          submodel: canterbury1d_v2
+        - path : regional/Rarakau/Rarakau_basement_WGS84.h5
+    smoothing: regional/Rarakau/Rarakau_smoothing.txt
+
 
 vs30:
   - name: nz_with_offshore
