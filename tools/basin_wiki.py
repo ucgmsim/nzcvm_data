@@ -229,8 +229,6 @@ def generate_wiki(
                 links = []
                 if (basin_dir / geojson_filename).exists():
                     links.append(f"[GeoJSON]({geojson_filename})")
-                if (basin_dir / txt_filename).exists():
-                    links.append(f"[TXT]({txt_filename})")
 
                 link_text = " / ".join(links)
                 md_content += f"- {base_name} : {link_text}\n"
@@ -250,8 +248,6 @@ def generate_wiki(
                 links = []
                 if (basin_dir / h5_filename).exists():
                     links.append(f"[HDF5]({h5_filename})")
-                if (basin_dir / in_filename).exists():
-                    links.append(f"[TXT]({in_filename})")
 
                 link_text = " / ".join(links)
                 md_content += (
