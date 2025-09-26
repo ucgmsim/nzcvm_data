@@ -17,11 +17,11 @@
 
 ## Data
 ### Boundaries
-- Rarakau_outline_WGS84 : [GeoJSON](Rarakau_outline_WGS84.geojson) / [TXT](Rarakau_outline_WGS84.txt)
+- Rarakau_outline_WGS84 : [GeoJSON](Rarakau_outline_WGS84.geojson)
 
 ### Surfaces
 - NZ_DEM_HD :  (Submodel: canterbury1d_v2)
-- Rarakau_basement_WGS84 : [HDF5](Rarakau_basement_WGS84.h5) / [TXT](Rarakau_basement_WGS84.in) (Submodel: N/A)
+- Rarakau_basement_WGS84 : [HDF5](Rarakau_basement_WGS84.h5) (Submodel: N/A)
 
 ### Smoothing Boundaries
 - [Rarakau_smoothing.txt](Rarakau_smoothing.txt)
