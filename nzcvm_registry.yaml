@@ -935,9 +935,23 @@ basin:
       - regional/Westport/Westport_outline_WGS84.geojson
     surfaces:
       - path: surface/NZ_DEM_HD.h5
+        submodel: canterbury1d_v2
+      - path: regional/Westport/Westport_basement_WGS84.h5
+    smoothing: regional/Westport/Westport_smoothing.txt
+
+  - name: Westport_v25p9
+    type: 1
+    author: Ayushi Tiwari / Kaleb Finn (ENCN493)
+    wiki_images:
+      - images/Westport_basin_map.png
+    boundaries:
+      - regional/Westport/Westport_outline_WGS84.geojson
+    surfaces:
+      - path: surface/NZ_DEM_HD.h5
         submodel: nelson_v1
       - path: regional/Westport/Westport_basement_WGS84.h5
     smoothing: regional/Westport/Westport_smoothing.txt
+
 
   - name: QueenCharlotte_v25p8
     type: 1
