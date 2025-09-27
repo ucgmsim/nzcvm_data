@@ -3,11 +3,11 @@
 ## Overview
 |         |                     |
 |---------|---------------------|
-| Version | 25p5           |
+| Version | 25p9           |
 | Type    | 3        |
 | Author  | Robin Lee            |
-| Created | 2025-05           |
-| Older Versions | 19p1 |
+| Created | 2025-09           |
+| Older Versions | 19p1, 25p5 |
 
 
 ## Images
@@ -36,6 +36,31 @@
 - [Nelson_smoothing.txt](Nelson_smoothing.txt)
 
 ## Older Versions
+
+### 25p5
+
+|         |                     |
+|---------|---------------------|
+| Version | 25p5  |
+| Type    | 3 |
+| Author  | Robin Lee |
+| Created | 2025-05       |
+
+**Notes:**
+- Sourced from https://nelson-richmond-geolmap.github.io/RGMap/ (for the geological map of the Nelson-Richmond area)
+- Based on Ghisetti2017
+
+**Data:**
+*Boundaries:*
+- Nelson_outline_WGS84 : [GeoJSON](Nelson_outline_WGS84.geojson)
+
+*Surfaces:*
+- NZ_DEM_HD :  (Submodel: canterbury1d_v2)
+- Nelson_basement_WGS84_v25p5 : [HDF5](Nelson_basement_WGS84_v25p5.h5) (Submodel: N/A)
+
+*Smoothing Boundaries:*
+- [Nelson_smoothing.txt](Nelson_smoothing.txt)
+
 
 ### 19p1
 
@@ -68,4 +93,4 @@
 
 
 ---
-*Page generated on: September 26, 2025, 13:55 NZST/NZDT*
+*Page generated on: September 28, 2025, 00:46 NZST/NZDT*

@@ -285,9 +285,27 @@ basin:
       - regional/Nelson/Nelson_outline_WGS84.geojson
     surfaces:
       - path: surface/NZ_DEM_HD.h5
+        submodel: canterbury1d_v2
+      - path: regional/Nelson/Nelson_basement_WGS84_v25p5.h5
+    smoothing: regional/Nelson/Nelson_smoothing.txt
+
+  - name: Nelson_v25p9
+    type: 3
+    author: Robin Lee
+    wiki_images:
+      - images/SI_north.png
+      - images/Nelson_basin_map_v25p5.png
+    notes:
+      - Sourced from https://nelson-richmond-geolmap.github.io/RGMap/ (for the geological map of the Nelson-Richmond area)
+      - Based on Ghisetti2017
+    boundaries:
+      - regional/Nelson/Nelson_outline_WGS84.geojson
+    surfaces:
+      - path: surface/NZ_DEM_HD.h5
         submodel: nelson_v1
       - path: regional/Nelson/Nelson_basement_WGS84_v25p5.h5
     smoothing: regional/Nelson/Nelson_smoothing.txt
+
 
   - name: Wellington_v19p1
     boundaries:
