@@ -1,79 +1,92 @@
+# Keep tomography section unchanged as it's data-only
 tomography:
   - name: EP2010
-    elev: [ 15, 1, -3, -8, -15, -23, -30, -38, -48, -65, -85, -105, -130, -155, -185, -225, -275, -370, -620, -750 ]
-    path: tomography/EP2010/ep2010.h5
+    elevations: [15, 1, -3, -8, -15, -23, -30, -38, -48, -65, -85, -105, -130, -155, -185, -225, -275, -370, -620, -750]
+    data: tomography/EP2010/ep2010.h5
     author: Eberhart-Phillips et al. (2010)
     title: Establishing a Versatile 3-d seismic Velocity Model for New Zealand
     url: https://10.1785/gssrl.81.6.992
 
   - name: EP2020
-    elev: [ 15, 1, -3, -8, -15, -23, -30, -38, -48, -65, -85, -105, -130, -155, -185, -225, -275, -370, -620, -750 ]
-    path: tomography/EP2020/ep2020.h5
+    elevations: [15, 1, -3, -8, -15, -23, -30, -38, -48, -65, -85, -105, -130, -155, -185, -225, -275, -370, -620, -750]
+    data: tomography/EP2020/ep2020.h5
     author: Eberhart-Phillips et al. (2020)
     title: New Zealand Wide model 2.2 seismic velocity and Qs and Qp models for New Zealand
     url: https://10.5281/zenodo.3779523
 
-
   - name: CHOW2020_EP2020_MIX
-    elev: [ 15.0, 2.25, 2.0, 1.75, 1.5, 1.25, 1.0, 0.75, 0.5, 0.25, 0.0, -0.25, -0.5, -0.75, -1.0, -1.25, -1.5, -1.75, -2.0, -2.25, -2.5, -2.75, -3.0, -3.25, -3.5, -3.75, -4.0, -4.25, -4.5, -4.75, -5.0, -5.25, -5.5, -5.75, -6.0, -6.25, -6.5, -6.75, -7.0, -7.25, -7.5, -7.75, -8.0, -9.0, -10.0, -11.0, -12.0, -13.0, -14.0, -15.0, -16.0, -17.0, -18.0, -19.0, -20.0, -21.0, -22.0, -23.0, -24.0, -25.0, -26.0, -27.0, -28.0, -29.0, -30.0, -31.0, -32.0, -33.0, -34.0, -35.0, -36.0, -37.0, -38.0, -39.0, -40.0, -41.0, -42.0, -43.0, -44.0, -45.0, -46.0, -47.0, -48.0, -49.0, -50.0, -52.0, -56.0, -60.0, -64.0, -68.0, -72.0, -76.0, -80.0, -84.0, -88.0, -92.0, -96.0, -100.0, -104.0, -108.0, -112.0, -116.0, -120.0, -124.0, -128.0, -132.0, -136.0, -140.0, -144.0, -148.0, -152.0, -156.0, -160.0, -164.0, -168.0, -172.0, -176.0, -180.0, -184.0, -188.0, -192.0, -196.0, -200.0, -204.0, -208.0, -212.0, -216.0, -220.0, -224.0, -228.0, -232.0, -236.0, -240.0, -244.0, -248.0, -252.0, -256.0, -260.0, -264.0, -268.0, -272.0, -276.0, -280.0, -284.0, -288.0, -292.0, -296.0, -300.0, -304.0, -308.0, -312.0, -316.0, -320.0, -324.0, -328.0, -332.0, -336.0, -340.0, -344.0, -348.0, -352.0, -356.0, -360.0, -364.0, -368.0, -372.0, -376.0, -380.0, -384.0, -388.0, -392.0, -396.0, -400.0, -620.0, -750.0, ]
-    path: tomography/CHOW2020_EP2020_MIX/chow2020_ep2020_mix.h5
+    elevations: [15.0, 2.25, 2.0, 1.75, 1.5, 1.25, 1.0, 0.75, 0.5, 0.25, 0.0, -0.25, -0.5, -0.75, -1.0, -1.25, -1.5, -1.75, -2.0, -2.25, -2.5, -2.75, -3.0, -3.25, -3.5, -3.75, -4.0, -4.25, -4.5, -4.75, -5.0, -5.25, -5.5, -5.75, -6.0, -6.25, -6.5, -6.75, -7.0, -7.25, -7.5, -7.75, -8.0, -9.0, -10.0, -11.0, -12.0, -13.0, -14.0, -15.0, -16.0, -17.0, -18.0, -19.0, -20.0, -21.0, -22.0, -23.0, -24.0, -25.0, -26.0, -27.0, -28.0, -29.0, -30.0, -31.0, -32.0, -33.0, -34.0, -35.0, -36.0, -37.0, -38.0, -39.0, -40.0, -41.0, -42.0, -43.0, -44.0, -45.0, -46.0, -47.0, -48.0, -49.0, -50.0, -52.0, -56.0, -60.0, -64.0, -68.0, -72.0, -76.0, -80.0, -84.0, -88.0, -92.0, -96.0, -100.0, -104.0, -108.0, -112.0, -116.0, -120.0, -124.0, -128.0, -132.0, -136.0, -140.0, -144.0, -148.0, -152.0, -156.0, -160.0, -164.0, -168.0, -172.0, -176.0, -180.0, -184.0, -188.0, -192.0, -196.0, -200.0, -204.0, -208.0, -212.0, -216.0, -220.0, -224.0, -228.0, -232.0, -236.0, -240.0, -244.0, -248.0, -252.0, -256.0, -260.0, -264.0, -268.0, -272.0, -276.0, -280.0, -284.0, -288.0, -292.0, -296.0, -300.0, -304.0, -308.0, -312.0, -316.0, -320.0, -324.0, -328.0, -332.0, -336.0, -340.0, -344.0, -348.0, -352.0, -356.0, -360.0, -364.0, -368.0, -372.0, -376.0, -380.0, -384.0, -388.0, -392.0, -396.0, -400.0, -620.0, -750.0]
+    data: tomography/CHOW2020_EP2020_MIX/chow2020_ep2020_mix.h5
     author: Chow et al. (2020)
-    url:
+    urls:
       - https://doi.org/10.1093/gji/ggaa381
       - https://core.geo.vuw.ac.nz/d/feae69f61ea54f81bee1
 
   - name: EP2025
-    elev: [ 1, -3, -8, -15, -23, -30, -38, -48, -65, -85, -105, -130, -155, -185, -225, -275, -370, -620, -750 ]
-    path: tomography/EP2025/ep2025.h5
+    elevations: [1, -3, -8, -15, -23, -30, -38, -48, -65, -85, -105, -130, -155, -185, -225, -275, -370, -620, -750]
+    data: tomography/EP2025/ep2025.h5
     author: Eberhart-Phillips et al. (2025)
     title: New Zealand Wide model 2.2 seismic velocity and Qs and Qp models for New Zealand
     url: n/a
 
-basin:
-  - name: Canterbury_v18p1
-    boundaries:
-      - regional/Canterbury/Canterbury_outline_WGS84.geojson
-    surfaces:
-      - path: surface/DEM.h5
-        submodel: canterbury1d_v2
-      - path: regional/Canterbury/Canterbury_Pliocene_WGS84.h5
-        submodel: pliocene_submod_v1
-      - path: regional/Canterbury/Canterbury_Miocene_WGS84.h5
-        submodel: miocene_submod_v1
-      - path: regional/Canterbury/Canterbury_Paleogene_WGS84.h5
-        submodel: paleogene_submod_v1
-      - path: regional/Canterbury/Canterbury_Basement_WGS84.h5
+# Keep vs30 section unchanged
+vs30:
+  - name: nz_with_offshore
+    data: vs30/NZ_Vs30_HD_With_Offshore.h5
+  - name: nz_without_offshore
+    data: vs30/NZ_Vs30.h5
 
+basins:
+  - name: Canterbury_v18p1
+    boundaries: [regional/Canterbury/Canterbury_outline_WGS84.geojson]
+    layers:
+      - surface: surface/DEM.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Canterbury/Canterbury_Pliocene_WGS84.h5
+        submodel: constant
+        parameters: {vp: 2.0, vs: 0.6086, rho: 1.905}
+      - surface: regional/Canterbury/Canterbury_Miocene_WGS84.h5
+        submodel: constant
+        parameters: {vp: 2.5, vs: 0.98355, rho: 2.0931}
+      - surface: regional/Canterbury/Canterbury_Paleogene_WGS84.h5
+        submodel: constant
+        parameters: {vp: 2.7, vs: 1.1511, rho: 2.151}
+      - surface: regional/Canterbury/Canterbury_Basement_WGS84.h5
 
   - name: Canterbury_v18p2
-    boundaries:
-      - regional/Canterbury/Canterbury_outline_WGS84.geojson
-    surfaces:
-      - path: surface/DEM.h5
-        submodel: canterbury1d_v2_pliocene_enforced
-      - path: regional/Canterbury/Canterbury_Pliocene_WGS84.h5
-        submodel: pliocene_submod_v1
-      - path: regional/Canterbury/Canterbury_Miocene_WGS84.h5
-        submodel: miocene_submod_v1
-      - path: regional/Canterbury/Canterbury_Paleogene_WGS84.h5
-        submodel: paleogene_submod_v1
-      - path: regional/Canterbury/Canterbury_Basement_WGS84.h5
-
+    boundaries: [regional/Canterbury/Canterbury_outline_WGS84.geojson]
+    layers:
+      - surface: surface/DEM.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2_Pliocene_Enforced.fd_modfile
+      - surface: regional/Canterbury/Canterbury_Pliocene_WGS84.h5
+        submodel: constant
+        parameters: {vp: 2.0, vs: 0.6086, rho: 1.905}
+      - surface: regional/Canterbury/Canterbury_Miocene_WGS84.h5
+        submodel: constant
+        parameters: {vp: 2.5, vs: 0.98355, rho: 2.0931}
+      - surface: regional/Canterbury/Canterbury_Paleogene_WGS84.h5
+        submodel: constant
+        parameters: {vp: 2.7, vs: 1.1511, rho: 2.151}
+      - surface: regional/Canterbury/Canterbury_Basement_WGS84.h5
 
   - name: Canterbury_v18p3
-    boundaries:
-      - regional/Canterbury/Canterbury_outline_WGS84.geojson
-    surfaces:
-      - path: surface/DEM.h5
-        submodel: canterbury1d_v2_pliocene_enforced
-      - path: regional/Canterbury/Canterbury_Pliocene_46_WGS84_v8p9p18.h5
-        submodel: pliocene_submod_v1
-      - path: regional/Canterbury/Canterbury_Miocene_WGS84.h5
-        submodel: miocene_submod_v1
-      - path: regional/Canterbury/Canterbury_Paleogene_WGS84.h5
-        submodel: paleogene_submod_v1
-      - path: regional/Canterbury/Canterbury_Basement_WGS84.h5
-
+    boundaries: [regional/Canterbury/Canterbury_outline_WGS84.geojson]
+    layers:
+      - surface: surface/DEM.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2_Pliocene_Enforced.fd_modfile
+      - surface: regional/Canterbury/Canterbury_Pliocene_46_WGS84_v8p9p18.h5
+        submodel: constant
+        parameters: {vp: 2.0, vs: 0.6086, rho: 1.905}
+      - surface: regional/Canterbury/Canterbury_Miocene_WGS84.h5
+        submodel: constant
+        parameters: {vp: 2.5, vs: 0.98355, rho: 2.0931}
+      - surface: regional/Canterbury/Canterbury_Paleogene_WGS84.h5
+        submodel: constant
+        parameters: {vp: 2.7, vs: 1.1511, rho: 2.151}
+      - surface: regional/Canterbury/Canterbury_Basement_WGS84.h5
 
   - name: Canterbury_v19p1
     type: 4
@@ -83,20 +96,22 @@ basin:
       - images/Canterbury_basin_map.png
     notes:
       - Pre-Quaternary geology
-
-    boundaries:
-      - regional/Canterbury/Canterbury_outline_WGS84.geojson
-    surfaces:
-      - path: surface/CantDEM.h5
-        submodel: canterbury1d_v2_pliocene_enforced
-      - path: regional/Canterbury/Canterbury_Pliocene_46_WGS84_v8p9p18.h5
-        submodel: pliocene_submod_v1
-      - path: regional/Canterbury/Canterbury_Miocene_WGS84.h5
-        submodel: miocene_submod_v1
-      - path: regional/Canterbury/Canterbury_Paleogene_WGS84.h5
-        submodel: paleogene_submod_v1
-      - path: regional/Canterbury/Canterbury_basement_WGS84.h5
+    boundaries: [regional/Canterbury/Canterbury_outline_WGS84.geojson]
     smoothing: regional/Canterbury/Canterbury_smoothing.txt
+    layers:
+      - surface: surface/CantDEM.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2_Pliocene_Enforced.fd_modfile
+      - surface: regional/Canterbury/Canterbury_Pliocene_46_WGS84_v8p9p18.h5
+        submodel: constant
+        parameters: {vp: 2.0, vs: 0.6086, rho: 1.905}
+      - surface: regional/Canterbury/Canterbury_Miocene_WGS84.h5
+        submodel: constant
+        parameters: {vp: 2.5, vs: 0.98355, rho: 2.0931}
+      - surface: regional/Canterbury/Canterbury_Paleogene_WGS84.h5
+        submodel: constant
+        parameters: {vp: 2.7, vs: 1.1511, rho: 2.151}
+      - surface: regional/Canterbury/Canterbury_basement_WGS84.h5
 
   - name: Canterbury_v25p9
     type: 4
@@ -106,21 +121,22 @@ basin:
       - images/Canterbury_basin_map.png
     notes:
       - Pre-Quaternary geology
-
-    boundaries:
-      - regional/Canterbury/Canterbury_outline_WGS84.geojson
-    surfaces:
-      - path: surface/CantDEM.h5
-        submodel: canterbury1d_v3_pliocene_enforced
-      - path: regional/Canterbury/Canterbury_Pliocene_46_WGS84_v8p9p18.h5
-        submodel: pliocene_submod_v2
-      - path: regional/Canterbury/Canterbury_Miocene_WGS84.h5
-        submodel: miocene_submod_v2
-      - path: regional/Canterbury/Canterbury_Paleogene_WGS84.h5
-        submodel: paleogene_submod_v2
-      - path: regional/Canterbury/Canterbury_basement_WGS84.h5
+    boundaries: [regional/Canterbury/Canterbury_outline_WGS84.geojson]
     smoothing: regional/Canterbury/Canterbury_smoothing.txt
-
+    layers:
+      - surface: surface/CantDEM.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v3_Pliocene_Enforced.fd_modfile
+      - surface: regional/Canterbury/Canterbury_Pliocene_46_WGS84_v8p9p18.h5
+        submodel: constant
+        parameters: {vp: 2.1, vs: 0.677, rho: 1.95}
+      - surface: regional/Canterbury/Canterbury_Miocene_WGS84.h5
+        submodel: constant
+        parameters: {vp: 2.5, vs: 0.984, rho: 2.09}
+      - surface: regional/Canterbury/Canterbury_Paleogene_WGS84.h5
+        submodel: constant
+        parameters: {vp: 2.85, vs: 1.281, rho: 2.19}
+      - surface: regional/Canterbury/Canterbury_basement_WGS84.h5
 
   - name: NorthCanterbury_v19p1
     type: 1
@@ -128,13 +144,12 @@ basin:
     wiki_images:
       - images/canterbury_region.png
       - images/NorthCanterbury_basin_map_v19p1.png
-    boundaries:
-      - regional/NorthCanterbury/NorthCanterbury_outline_WGS84_v19p1.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/NorthCanterbury/NorthCanterbury_basement_WGS84_v19p1.h5
-
+    boundaries: [regional/NorthCanterbury/NorthCanterbury_outline_WGS84_v19p1.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/NorthCanterbury/NorthCanterbury_basement_WGS84_v19p1.h5
 
   - name: NorthCanterbury_v25p8
     type: 1
@@ -142,12 +157,12 @@ basin:
     wiki_images:
       - images/canterbury_region.png
       - images/NorthCanterbury_basin_map_v25p8.png
-    boundaries:
-      - regional/NorthCanterbury/NorthCanterbury_outline_WGS84_v25p8.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/NorthCanterbury/NorthCanterbury_basement_WGS84_v25p8.h5
+    boundaries: [regional/NorthCanterbury/NorthCanterbury_outline_WGS84_v25p8.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/NorthCanterbury/NorthCanterbury_basement_WGS84_v25p8.h5
 
   - name: BanksPeninsulaVolcanics_v19p1
     type: 4
@@ -157,13 +172,16 @@ basin:
       - images/BanksPeninsulaVolcanics_basin_map.png
     notes:
       - Miocene surface is the same as Canterbury
-    boundaries:
-      - regional/BanksPeninsulaVolcanics/BanksPeninsulaVolcanics_outline_WGS84.geojson
-    surfaces:
-      - path: regional/BanksPeninsulaVolcanics/BanksPeninsulaVolcanics_basement_WGS84.h5
-        submodel: bpv_submod_v4
-      - path: regional/BanksPeninsulaVolcanics/BanksPeninsulaVolcanics_Miocene_WGS84.h5
-
+    boundaries: [regional/BanksPeninsulaVolcanics/BanksPeninsulaVolcanics_outline_WGS84.geojson]
+    layers:
+      - surface: regional/BanksPeninsulaVolcanics/BanksPeninsulaVolcanics_basement_WGS84.h5
+        submodel: depth_dependent
+        parameters:
+          shallow: {vp: 3.2, vs: 1.59, rho: 2.265}
+          deep: {vp: 4.0, vs: 2.2818, rho: 2.393}
+          transition_depth: 100
+          use_gtl: true
+      - surface: regional/BanksPeninsulaVolcanics/BanksPeninsulaVolcanics_Miocene_WGS84.h5
 
   - name: Kaikoura_v19p1
     type: 2
@@ -172,14 +190,13 @@ basin:
       - images/kaikoura.png
       - images/Kaikoura_basin_map_v19p1.png
       - images/kaikoura_basement.png
-    boundaries:
-      - regional/Kaikoura/Kaikoura_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Kaikoura/Kaikoura_basement_WGS84.h5
+    boundaries: [regional/Kaikoura/Kaikoura_outline_WGS84.geojson]
     smoothing: regional/Kaikoura/Kaikoura_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Kaikoura/Kaikoura_basement_WGS84.h5
 
   - name: Kaikoura_v25p5
     type: 2
@@ -188,14 +205,13 @@ basin:
       - images/kaikoura.png
       - images/Kaikoura_basin_map_v25p5.png
       - images/kaikoura_basement.png
-    boundaries:
-      - regional/Kaikoura/Kaikoura_outline_WGS84_v25p5.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Kaikoura/Kaikoura_basement_WGS84_v25p5.h5
+    boundaries: [regional/Kaikoura/Kaikoura_outline_WGS84_v25p5.geojson]
     smoothing: regional/Kaikoura/Kaikoura_smoothing_v25p5.txt
-    
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Kaikoura/Kaikoura_basement_WGS84_v25p5.h5
 
   - name: Cheviot_v19p1
     type: 1
@@ -203,14 +219,13 @@ basin:
     wiki_images:
       - images/cheviot_hanmer_northcanterbury.png
       - images/Cheviot_basin_map.png
-    boundaries:
-      - regional/Cheviot/Cheviot_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Cheviot/Cheviot_basement_WGS84.h5
+    boundaries: [regional/Cheviot/Cheviot_outline_WGS84.geojson]
     smoothing: regional/Cheviot/Cheviot_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Cheviot/Cheviot_basement_WGS84.h5
 
   - name: Hanmer_v19p1
     type: 1
@@ -219,13 +234,12 @@ basin:
       - images/cheviot_hanmer_northcanterbury.png
       - images/Hanmer_basin_map_v19p1.png
       - images/hanmer_basement.png
-    boundaries:
-      - regional/Hanmer/Hanmer_outline_WGS84_v19p1.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Hanmer/Hanmer_basement_WGS84_v19p1.h5
-
+    boundaries: [regional/Hanmer/Hanmer_outline_WGS84_v19p1.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Hanmer/Hanmer_basement_WGS84_v19p1.h5
 
   - name: Hanmer_v25p3
     type: 1
@@ -233,12 +247,12 @@ basin:
     wiki_images:
       - images/cheviot_hanmer_northcanterbury.png
       - images/Hanmer_basin_map_v25p3.png
-    boundaries:
-      - regional/Hanmer/Hanmer_outline_WGS84_v25p3.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Hanmer/Hanmer_basement_WGS84_v25p3.h5
+    boundaries: [regional/Hanmer/Hanmer_outline_WGS84_v25p3.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Hanmer/Hanmer_basement_WGS84_v25p3.h5
 
   - name: Marlborough_v19p1
     type: 1
@@ -246,14 +260,13 @@ basin:
     wiki_images:
       - images/SI_north.png
       - images/Marlborough_basin_map.png
-    boundaries:
-      - regional/Marlborough/Marlborough_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Marlborough/Marlborough_basement_WGS84.h5
+    boundaries: [regional/Marlborough/Marlborough_outline_WGS84.geojson]
     smoothing: regional/Marlborough/Marlborough_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Marlborough/Marlborough_basement_WGS84.h5
 
   - name: Nelson_v19p1
     type: 2
@@ -263,14 +276,13 @@ basin:
       - images/Nelson_basin_map_v19p1.png
     notes:
       - Sourced from https://nelson-richmond-geolmap.github.io/RGMap/ (for the geological map of the Nelson-Richmond area)
-    boundaries:
-      - regional/Nelson/Nelson_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Nelson/Nelson_basement_WGS84_v19p1.h5
+    boundaries: [regional/Nelson/Nelson_outline_WGS84.geojson]
     smoothing: regional/Nelson/Nelson_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Nelson/Nelson_basement_WGS84_v19p1.h5
 
   - name: Nelson_v25p5
     type: 3
@@ -281,13 +293,13 @@ basin:
     notes:
       - Sourced from https://nelson-richmond-geolmap.github.io/RGMap/ (for the geological map of the Nelson-Richmond area)
       - Based on Ghisetti2017
-    boundaries:
-      - regional/Nelson/Nelson_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Nelson/Nelson_basement_WGS84_v25p5.h5
+    boundaries: [regional/Nelson/Nelson_outline_WGS84.geojson]
     smoothing: regional/Nelson/Nelson_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Nelson/Nelson_basement_WGS84_v25p5.h5
 
   - name: Nelson_v25p9
     type: 3
@@ -298,34 +310,31 @@ basin:
     notes:
       - Sourced from https://nelson-richmond-geolmap.github.io/RGMap/ (for the geological map of the Nelson-Richmond area)
       - Based on Ghisetti2017
-    boundaries:
-      - regional/Nelson/Nelson_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: nelson_v1
-      - path: regional/Nelson/Nelson_basement_WGS84_v25p5.h5
+    boundaries: [regional/Nelson/Nelson_outline_WGS84.geojson]
     smoothing: regional/Nelson/Nelson_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Nelson_v1.fd_modfile
+      - surface: regional/Nelson/Nelson_basement_WGS84_v25p5.h5
 
   - name: Wellington_v19p1
-    boundaries:
-      - regional/Wellington/Wellington_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Wellington/Wellington_basement_WGS84_v19p1.h5
+    boundaries: [regional/Wellington/Wellington_outline_WGS84.geojson]
     smoothing: regional/Wellington/Wellington_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Wellington/Wellington_basement_WGS84_v19p1.h5
 
-  
   - name: Wellington_v19p6
-    boundaries:
-      - regional/Wellington/Wellington_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path : regional/Wellington/Wellington_basement_WGS84_v19p6.h5
+    boundaries: [regional/Wellington/Wellington_outline_WGS84.geojson]
     smoothing: regional/Wellington/Wellington_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Wellington/Wellington_basement_WGS84_v19p6.h5
 
   - name: Wellington_v21p8
     type: 3
@@ -334,14 +343,13 @@ basin:
       - images/NI_south.png
       - images/Wellington_basin_map.png
       - images/wellington_outline.png
-
-    boundaries:
-      - regional/Wellington/Wellington_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Wellington/Wellington_basement_WGS84_v21p8.h5
+    boundaries: [regional/Wellington/Wellington_outline_WGS84.geojson]
     smoothing: regional/Wellington/Wellington_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Wellington/Wellington_basement_WGS84_v21p8.h5
 
   - name: Wellington_v25p5
     type: 3
@@ -354,15 +362,13 @@ basin:
       - 19.1,19.6 Robin Lee (basement update)
       - 21.8 Matt Hill (basement update)
       - 25.5 Matt Hill (city extent model combined with regional model)
-
-    boundaries:
-      - regional/Wellington/Wellington_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Wellington/Wellington_basement_WGS84_v25p5.h5
-
+    boundaries: [regional/Wellington/Wellington_outline_WGS84.geojson]
     smoothing: regional/Wellington/Wellington_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Wellington/Wellington_basement_WGS84_v25p5.h5
 
   - name: WaikatoHauraki_v19p7
     type: 1
@@ -371,14 +377,13 @@ basin:
       - images/waikato_hauraki_boundary.png
       - images/WaikatoHauraki_basin_map.png
       - images/waikato_hauraki_outline.png
-    boundaries:
-      - regional/WaikatoHauraki/WaikatoHauraki_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/WaikatoHauraki/WaikatoHauraki_basement_WGS84.h5
+    boundaries: [regional/WaikatoHauraki/WaikatoHauraki_outline_WGS84.geojson]
     smoothing: regional/WaikatoHauraki/WaikatoHauraki_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/WaikatoHauraki/WaikatoHauraki_basement_WGS84.h5
 
   - name: Wanaka_v20p6
     type: 1
@@ -387,14 +392,12 @@ basin:
       - images/SI_mid.png
       - images/Wanaka_basin_map.png
       - images/wanaka_boundary.png
-    boundaries:
-      - regional/Wanaka/Wanaka_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Wanaka/Wanaka_basement_WGS84.h5
-
-
+    boundaries: [regional/Wanaka/Wanaka_outline_WGS84.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Wanaka/Wanaka_basement_WGS84.h5
 
   - name: Mackenzie_v20p6
     type: 1
@@ -403,13 +406,12 @@ basin:
       - images/SI_mid.png
       - images/Mackenzie_basin_map.png
       - images/mackenzie_boundary.png
-    boundaries:
-      - regional/Mackenzie/Mackenzie_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Mackenzie/Mackenzie_basement_WGS84.h5
-
+    boundaries: [regional/Mackenzie/Mackenzie_outline_WGS84.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Mackenzie/Mackenzie_basement_WGS84.h5
 
   - name: Wakatipu_v20p7
     type: 1
@@ -417,13 +419,12 @@ basin:
     wiki_images:
       - images/SI_mid.png
       - images/Wakatipu_basin_map.png
-    boundaries:
-      - regional/Wakatipu/Wakatipu_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Wakatipu/Wakatipu_basement_WGS84.h5
-
+    boundaries: [regional/Wakatipu/Wakatipu_outline_WGS84.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Wakatipu/Wakatipu_basement_WGS84.h5
 
   - name: Alexandra_v20p7
     type: 1
@@ -434,13 +435,12 @@ basin:
       - images/alexandra-ranfurly_basins_classification_v2-page-001.jpg
     notes:
       - Alexandra, Ranfurly and NE_Otago share the same basement
-    boundaries:
-      - regional/Alexandra/Alexandra_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Alexandra/Alexandra_basement_WGS84.h5
-
+    boundaries: [regional/Alexandra/Alexandra_outline_WGS84.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Alexandra/Alexandra_basement_WGS84.h5
 
   - name: Ranfurly_v20p7
     type: 1
@@ -451,13 +451,12 @@ basin:
       - images/alexandra-ranfurly_basins_classification_v2-page-001.jpg
     notes:
       - Alexandra, Ranfurly and NE_Otago share the same basement
-    boundaries:
-      - regional/Ranfurly/Ranfurly_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Ranfurly/Ranfurly_basement_WGS84.h5
-
+    boundaries: [regional/Ranfurly/Ranfurly_outline_WGS84.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Ranfurly/Ranfurly_basement_WGS84.h5
 
   - name: NE_Otago_v20p7
     type: 1
@@ -474,11 +473,11 @@ basin:
       - regional/NE_Otago/NE_Otago_outline_WGS84_3.geojson
       - regional/NE_Otago/NE_Otago_outline_WGS84_4.geojson
       - regional/NE_Otago/NE_Otago_outline_WGS84_5.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/NE_Otago/NE_Otago_basement_WGS84.h5
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/NE_Otago/NE_Otago_basement_WGS84.h5
 
   - name: Mosgiel_v20p7
     type: 1
@@ -492,15 +491,12 @@ basin:
       - Green area (in green_rock.png) tentatively regarded as a sedimentary rock (soft rock)
       - Implemented as two separate basins (Mosgiel/Balclutha) joined by the sedimentary rock
       - May need more rigorous classification
-
-    boundaries:
-      - regional/Mosgiel/Mosgiel_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Mosgiel/Mosgiel_basement_WGS84.h5
-
-
+    boundaries: [regional/Mosgiel/Mosgiel_outline_WGS84.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Mosgiel/Mosgiel_basement_WGS84.h5
 
   - name: Balclutha_v20p7
     type: 1
@@ -514,13 +510,13 @@ basin:
       - Green area (in green_rock.png) tentatively regarded as a sedimentary rock (soft rock)
       - Implemented as two separate basins (Mosgiel/Balclutha) joined by the sedimentary rock
       - May need more rigorous classification
-    boundaries:
-      - regional/Balclutha/Balclutha_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Balclutha/Balclutha_basement_WGS84.h5
+    boundaries: [regional/Balclutha/Balclutha_outline_WGS84.geojson]
     smoothing: regional/Balclutha/Balclutha_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Balclutha/Balclutha_basement_WGS84.h5
 
   - name: Dunedin_v20p7
     type: 1
@@ -532,15 +528,13 @@ basin:
     notes:
       - Port Chalmers needs an update.
       - Inlets need to be modelled.
-    boundaries:
-      - regional/Dunedin/Dunedin_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Dunedin/Dunedin_basement_WGS84.h5
+    boundaries: [regional/Dunedin/Dunedin_outline_WGS84.geojson]
     smoothing: regional/Dunedin/Dunedin_smoothing.txt
-
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Dunedin/Dunedin_basement_WGS84.h5
 
   - name: Murchison_v20p7
     type: 1
@@ -549,14 +543,12 @@ basin:
       - images/SI_north.png
       - images/Murchison_basin_map.png
       - images/murchison_outline.png
-    boundaries:
-      - regional/Murchison/Murchison_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Murchison/Murchison_basement_WGS84.h5
-
-
+    boundaries: [regional/Murchison/Murchison_outline_WGS84.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Murchison/Murchison_basement_WGS84.h5
 
   - name: Waitaki_v20p8
     type: 1
@@ -569,14 +561,13 @@ basin:
       - (Comment from the author)
       - Interacts with the boundary of the Canterbury Basin- Need to check boundary depth.
       - Hakataramea and Waitaki share the same basement data.
-    boundaries:
-      - regional/Waitaki/Waitaki_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Waitaki/Waitaki_basement_WGS84.h5
+    boundaries: [regional/Waitaki/Waitaki_outline_WGS84.geojson]
     smoothing: regional/Waitaki/Waitaki_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Waitaki/Waitaki_basement_WGS84.h5
 
   - name: Hakataramea_v20p8
     type: 1
@@ -587,13 +578,12 @@ basin:
       - images/waitaki_hakataramea_outline.jpg
     notes:
       - Hakataramea and Waitaki share the same basement data.
-    boundaries:
-      - regional/Hakataramea/Hakataramea_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Hakataramea/Hakataramea_basement_WGS84.h5
-
+    boundaries: [regional/Hakataramea/Hakataramea_outline_WGS84.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Hakataramea/Hakataramea_basement_WGS84.h5
 
   - name: Karamea_v20p11
     type: 1
@@ -601,14 +591,13 @@ basin:
     wiki_images:
       - images/SI_north.png
       - images/Karamea_basin_map.png
-    boundaries:
-      - regional/Karamea/Karamea_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Karamea/Karamea_basement_WGS84.h5
+    boundaries: [regional/Karamea/Karamea_outline_WGS84.geojson]
     smoothing: regional/Karamea/Karamea_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Karamea/Karamea_basement_WGS84.h5
 
   - name: Collingwood_v20p11
     type: 1
@@ -620,12 +609,12 @@ basin:
       - regional/Collingwood/Collingwood_outline_WGS84_1.geojson
       - regional/Collingwood/Collingwood_outline_WGS84_2.geojson
       - regional/Collingwood/Collingwood_outline_WGS84_3.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Collingwood/Collingwood_basement_WGS84.h5
     smoothing: regional/Collingwood/Collingwood_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Collingwood/Collingwood_basement_WGS84.h5
 
   - name: SpringsJunction_v20p11
     type: 1
@@ -633,13 +622,12 @@ basin:
     wiki_images:
       - images/SI_north.png
       - images/SpringsJunction_basin_map.png
-    boundaries:
-      - regional/SpringsJunction/SpringsJunction_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/SpringsJunction/SpringsJunction_basement_WGS84.h5
-
+    boundaries: [regional/SpringsJunction/SpringsJunction_outline_WGS84.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/SpringsJunction/SpringsJunction_basement_WGS84.h5
 
   - name: HawkesBay_v21p7
     type: 1
@@ -656,11 +644,12 @@ basin:
       - regional/HawkesBay/HawkesBay_outline_WGS84_2.geojson
       - regional/HawkesBay/HawkesBay_outline_WGS84_3.geojson
       - regional/HawkesBay/HawkesBay_outline_WGS84_4.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/HawkesBay/HawkesBay_basement_WGS84.h5
     smoothing: regional/HawkesBay/HawkesBay_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/HawkesBay/HawkesBay_basement_WGS84.h5
 
   - name: Napier_v21p7
     type: 1
@@ -676,11 +665,12 @@ basin:
       - regional/Napier/Napier_outline_WGS84_4.geojson
       - regional/Napier/Napier_outline_WGS84_5.geojson
       - regional/Napier/Napier_outline_WGS84_6.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Napier/Napier_basement_WGS84.h5
     smoothing: regional/Napier/Napier_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Napier/Napier_basement_WGS84.h5
 
   - name: GreaterWellington_v21p7
     type: 1
@@ -696,11 +686,12 @@ basin:
       - regional/GreaterWellington/GreaterWellington_outline_WGS84_4.geojson
       - regional/GreaterWellington/GreaterWellington_outline_WGS84_5.geojson
       - regional/GreaterWellington/GreaterWellington_outline_WGS84_6.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/GreaterWellington/GreaterWellington_basement_WGS84.h5
     smoothing: regional/GreaterWellington/GreaterWellington_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/GreaterWellington/GreaterWellington_basement_WGS84.h5
 
   - name: Porirua_v21p7
     type: 1
@@ -712,11 +703,12 @@ basin:
     boundaries:
       - regional/Porirua/Porirua_outline_WGS84_1.geojson
       - regional/Porirua/Porirua_outline_WGS84_2.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Porirua/Porirua_basement_WGS84.h5
     smoothing: regional/Porirua/Porirua_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Porirua/Porirua_basement_WGS84.h5
 
   - name: Gisborne_v21p11
     type: 1
@@ -728,14 +720,13 @@ basin:
     notes:
       - (Comment from the author)
       - Stop at Moto River, working around the East Cape from Gisborne. Haurere Point should be included in Whakatane
-    boundaries:
-      - regional/Gisborne/Gisborne_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Gisborne/Gisborne_basement_WGS84.h5
+    boundaries: [regional/Gisborne/Gisborne_outline_WGS84.geojson]
     smoothing: regional/Gisborne/Gisborne_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Gisborne/Gisborne_basement_WGS84.h5
 
   - name: SouthernHawkesBay_v21p12
     type: 1
@@ -750,13 +741,12 @@ basin:
       - Will be near the Wairarapa and Manawatu-Whanganui / Taranaki basins, but does not physically touch due to rock.
       - Physically connects to Northern Hawkes Bay in the Ngaruroro River valley. Need to check consistency in the bedrock surfaces at the intersection.
       - Missing some parts in the east coast.
-    boundaries:
-      - regional/SouthernHawkesBay/SouthernHawkesBay_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/SouthernHawkesBay/SouthernHawkesBay_basement_WGS84.h5
-
+    boundaries: [regional/SouthernHawkesBay/SouthernHawkesBay_outline_WGS84.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/SouthernHawkesBay/SouthernHawkesBay_basement_WGS84.h5
 
   - name: Wairarapa_v21p12
     type: 1
@@ -765,15 +755,14 @@ basin:
       - images/NI_south.png
       - images/Wairarapa_basin_map.png
     notes:
-        - (Comment from the author) "Consider adding east coastal basins (e.g. Uruti Point)"
-    boundaries:
-      - regional/Wairarapa/Wairarapa_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Wairarapa/Wairarapa_basement_WGS84.h5
+      - (Comment from the author) "Consider adding east coastal basins (e.g. Uruti Point)"
+    boundaries: [regional/Wairarapa/Wairarapa_outline_WGS84.geojson]
     smoothing: regional/Wairarapa/Wairarapa_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Wairarapa/Wairarapa_basement_WGS84.h5
 
   - name: OmaioBay_v22p3
     type: 1
@@ -787,17 +776,16 @@ basin:
       - Renamed from MotuBay_v22p3
       - Rest of the coastal river valleys on the East Cape (Waiapu River, Hicks Bay, Waihau Bay, Motu River) to be added
       - Tolaga bay/Omaio Bay to be included (pending acceptance) https://github.com/ucgmsim/Velocity-Model/pull/43/files
-
     boundaries:
       - regional/OmaioBay/OmaioBay_outline_WGS84_v22p3_1.geojson
       - regional/OmaioBay/OmaioBay_outline_WGS84_v22p3_2.geojson
       - regional/OmaioBay/OmaioBay_outline_WGS84_v22p3_3.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/OmaioBay/OmaioBay_basement_WGS84_v22p3.h5
     smoothing: regional/OmaioBay/OmaioBay_smoothing_v22p3.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/OmaioBay/OmaioBay_basement_WGS84_v22p3.h5
 
   - name: OmaioBay_v25p5
     type: 1
@@ -807,21 +795,18 @@ basin:
       - images/OmaioBay_basin_map.png
       - images/moturiver_extended_outline.png
       - images/eastcape_coastal_river_valleys.png
-
     boundaries:
       - regional/OmaioBay/OmaioBay_outline_WGS84_1.geojson
       - regional/OmaioBay/OmaioBay_outline_WGS84_2.geojson
       - regional/OmaioBay/OmaioBay_outline_WGS84_3.geojson
       - regional/OmaioBay/OmaioBay_outline_WGS84_4.geojson
       - regional/OmaioBay/OmaioBay_outline_WGS84_5.geojson
-
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/OmaioBay/OmaioBay_basement_WGS84.h5
     smoothing: regional/OmaioBay/OmaioBay_smoothing.txt
-
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/OmaioBay/OmaioBay_basement_WGS84.h5
 
   - name: Whangaparoa_v23p4
     type: 1
@@ -831,73 +816,69 @@ basin:
       - images/Whangaparoa_basin_map.png
     notes:
       - See [OmaioBay](OmaioBay.md) for additional notes
-
-    boundaries:
-      - regional/Whangaparoa/Whangaparoa_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Whangaparoa/Whangaparoa_basement_WGS84.h5
-    smoothing: regional/Whangaparoa/Whangaparoa_smoothing.txt      
-
+    boundaries: [regional/Whangaparoa/Whangaparoa_outline_WGS84.geojson]
+    smoothing: regional/Whangaparoa/Whangaparoa_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Whangaparoa/Whangaparoa_basement_WGS84.h5
 
   - name: PalmerstonNorth_v25p5
     type: 1
     author: Ayushi Tiwari
     wiki_images:
       - images/PalmerstonNorth_basin_map_v25p5.png
-    boundaries:
-        - regional/PalmerstonNorth/PalmerstonNorth_outline_WGS84.geojson
-    surfaces:
-        - path: surface/NZ_DEM_HD.h5
-          submodel: canterbury1d_v2
-        - path: regional/PalmerstonNorth/PalmerstonNorth_basement_WGS84_v25p5.h5
+    boundaries: [regional/PalmerstonNorth/PalmerstonNorth_outline_WGS84.geojson]
     smoothing: regional/PalmerstonNorth/PalmerstonNorth_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/PalmerstonNorth/PalmerstonNorth_basement_WGS84_v25p5.h5
 
   - name: PalmerstonNorth_v25p8
     type: 1
     author: Ayushi Tiwari
     wiki_images:
       - images/PalmerstonNorth_basin_map_v25p8.png
-    boundaries:
-      - regional/PalmerstonNorth/PalmerstonNorth_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: palmerstonnorth_v1
-      - path: regional/PalmerstonNorth/PalmerstonNorth_pliocenetop_WGS84_v25p8.h5
-        submodel:  pn_pliocene_submod_v1
-      - path: regional/PalmerstonNorth/PalmerstonNorth_basement_WGS84_v25p8.h5
+    boundaries: [regional/PalmerstonNorth/PalmerstonNorth_outline_WGS84.geojson]
     smoothing: regional/PalmerstonNorth/PalmerstonNorth_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/PalmerstonNorth_v1.fd_modfile
+      - surface: regional/PalmerstonNorth/PalmerstonNorth_pliocenetop_WGS84_v25p8.h5
+        submodel: constant
+        parameters: {vp: 2.6, vs: 1.1, rho: 2.12}
+      - surface: regional/PalmerstonNorth/PalmerstonNorth_basement_WGS84_v25p8.h5
 
   - name: Southland_v25p5
     type: 2
     author: Archie Goodrick
     wiki_images:
       - images/Southland_basin_map.png
-
     boundaries:
       - regional/Southland/Southland_outline_WGS84_1.geojson
       - regional/Southland/Southland_outline_WGS84_2.geojson
-
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Southland/Southland_basement_WGS84.h5
     smoothing: regional/Southland/Southland_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Southland/Southland_basement_WGS84.h5
 
   - name: TeAnau_v25p5
     type: 1
     author: Jackson Turner / Ayushi Tiwari (ENCN493)
     wiki_images:
       - images/TeAnau_basin_map.png
-    boundaries:
-      - regional/TeAnau/TeAnau_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/TeAnau/TeAnau_basement_WGS84.h5
-
+    boundaries: [regional/TeAnau/TeAnau_outline_WGS84.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/TeAnau/TeAnau_basement_WGS84.h5
 
   - name: TolagaBay_v25p5
     type: 1
@@ -905,220 +886,127 @@ basin:
     wiki_images:
       - images/TolagaBay_basin_map.png
       - images/eastcape_coastal_river_valleys.png
-
-    boundaries:
-      - regional/TolagaBay/TolagaBay_outline_WGS84.geojson
-      
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/TolagaBay/TolagaBay_basement_WGS84.h5
+    boundaries: [regional/TolagaBay/TolagaBay_outline_WGS84.geojson]
     smoothing: regional/TolagaBay/TolagaBay_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/TolagaBay/TolagaBay_basement_WGS84.h5
 
   - name: Waiapu_v25p5
     type: 1
     author: Emma Coumbe
     wiki_images:
       - images/Waiapu_basin_map.png
-
-    boundaries:
-      - regional/Waiapu/Waiapu_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Waiapu/Waiapu_basement_WGS84.h5
+    boundaries: [regional/Waiapu/Waiapu_outline_WGS84.geojson]
     smoothing: regional/Waiapu/Waiapu_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Waiapu/Waiapu_basement_WGS84.h5
 
   - name: WestCoast_v25p5
     type: 1
     author: Ayushi Tiwari / Hunter Brotherston
     wiki_images:
       - images/WestCoast_basin_map.png
-    boundaries:
-      - regional/WestCoast/WestCoast_outline_WGS84.geojson
-    surfaces:
-        - path: surface/NZ_DEM_HD.h5
-          submodel: canterbury1d_v2
-        - path: regional/WestCoast/WestCoast_basement_WGS84.h5
+    boundaries: [regional/WestCoast/WestCoast_outline_WGS84.geojson]
     smoothing: regional/WestCoast/WestCoast_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/WestCoast/WestCoast_basement_WGS84.h5
 
   - name: Westport_v25p5
     type: 1
     author: Ayushi Tiwari / Kaleb Finn (ENCN493)
     wiki_images:
       - images/Westport_basin_map.png
-    boundaries:
-      - regional/Westport/Westport_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path: regional/Westport/Westport_basement_WGS84.h5
+    boundaries: [regional/Westport/Westport_outline_WGS84.geojson]
     smoothing: regional/Westport/Westport_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Westport/Westport_basement_WGS84.h5
 
   - name: Westport_v25p9
     type: 1
     author: Ayushi Tiwari / Kaleb Finn (ENCN493)
     wiki_images:
       - images/Westport_basin_map.png
-    boundaries:
-      - regional/Westport/Westport_outline_WGS84.geojson
-    surfaces:
-      - path: surface/NZ_DEM_HD.h5
-        submodel: nelson_v1
-      - path: regional/Westport/Westport_basement_WGS84.h5
+    boundaries: [regional/Westport/Westport_outline_WGS84.geojson]
     smoothing: regional/Westport/Westport_smoothing.txt
-
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Nelson_v1.fd_modfile
+      - surface: regional/Westport/Westport_basement_WGS84.h5
 
   - name: QueenCharlotte_v25p8
     type: 1
     author: Ayushi Tiwari
     wiki_images:
-        - images/QueenCharlotte_basin_map.png
-    boundaries:
-        - regional/QueenCharlotte/QueenCharlotte_outline_WGS84.geojson
-    surfaces:
-        - path: surface/NZ_DEM_HD.h5
-          submodel: canterbury1d_v2
-        - path: regional/QueenCharlotte/QueenCharlotte_basement_WGS84_v25p8.h5
+      - images/QueenCharlotte_basin_map.png
+    boundaries: [regional/QueenCharlotte/QueenCharlotte_outline_WGS84.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/QueenCharlotte/QueenCharlotte_basement_WGS84_v25p8.h5
 
   - name: CastleHill_v25p8
     type: 1
     author: Ayushi Tiwari
     wiki_images:
-        - images/CastleHill_basin_map.png
-    boundaries:
-        - regional/CastleHill/CastleHill_outline_WGS84.geojson
-    surfaces:
-        - path: surface/NZ_DEM_HD.h5
-          submodel: canterbury1d_v2
-        - path: regional/CastleHill/CastleHill_basement_WGS84.h5
-
+      - images/CastleHill_basin_map.png
+    boundaries: [regional/CastleHill/CastleHill_outline_WGS84.geojson]
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/CastleHill/CastleHill_basement_WGS84.h5
 
   - name: Whakatane_v25p8
     type: 1
     author: Ayushi Tiwari
     wiki_images:
-        - images/Whakatane_basin_map.png
-    boundaries:
-        - regional/Whakatane/Whakatane_outline_WGS84.geojson
-    surfaces:
-        - path: surface/NZ_DEM_HD.h5
-          submodel: canterbury1d_v2
-        - path: regional/Whakatane/Whakatane_basement_WGS84_v25p8.h5
+      - images/Whakatane_basin_map.png
+    boundaries: [regional/Whakatane/Whakatane_outline_WGS84.geojson]
     smoothing: regional/Whakatane/Whakatane_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Whakatane/Whakatane_basement_WGS84_v25p8.h5
 
   - name: TeAraroa_v25p9
     type: 1
     author: James Hoskin
     wiki_images:
-        - images/TeAraroa_basin_map.png
-    boundaries:
-        - regional/TeAraroa/TeAraroa_outline_WGS84.geojson
-    surfaces:
-      - path : surface/NZ_DEM_HD.h5
-        submodel: canterbury1d_v2
-      - path : regional/TeAraroa/TeAraroa_basement_WGS84.h5
+      - images/TeAraroa_basin_map.png
+    boundaries: [regional/TeAraroa/TeAraroa_outline_WGS84.geojson]
     smoothing: regional/TeAraroa/TeAraroa_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/TeAraroa/TeAraroa_basement_WGS84.h5
 
   - name: Rarakau_v25p9
     type: 1
     author: Toby Bates
     wiki_images:
-        - images/Rarakau_basin_map.png
-    boundaries:
-        - regional/Rarakau/Rarakau_outline_WGS84.geojson
-    surfaces:
-        - path : surface/NZ_DEM_HD.h5
-          submodel: canterbury1d_v2
-        - path : regional/Rarakau/Rarakau_basement_WGS84.h5
+      - images/Rarakau_basin_map.png
+    boundaries: [regional/Rarakau/Rarakau_outline_WGS84.geojson]
     smoothing: regional/Rarakau/Rarakau_smoothing.txt
+    layers:
+      - surface: surface/NZ_DEM_HD.h5
+        submodel: vm1d
+        data: vm1d/Cant1D_v2.fd_modfile
+      - surface: regional/Rarakau/Rarakau_basement_WGS84.h5
 
 
-vs30:
-  - name: nz_with_offshore
-    path: vs30/NZ_Vs30_HD_With_Offshore.h5
-  - name: nz_without_offshore
-    path: vs30/NZ_Vs30.h5
-
-
-submodel:
-    - name: nan_submod
-      type: null
-
-    - name: canterbury1d_v1
-      type: vm1d
-      module: canterbury1d_submod
-      data: vm1d/Cant1D_v1.fd_modfile
-
-    - name: canterbury1d_v2
-      type: vm1d
-      module: canterbury1d_submod
-      data: vm1d/Cant1D_v2.fd_modfile
-
-    - name: canterbury1d_v2_pliocene_enforced
-      type: vm1d
-      module: canterbury1d_submod
-      data: vm1d/Cant1D_v2_Pliocene_Enforced.fd_modfile
-
-    - name: canterbury1d_v3_pliocene_enforced
-      type: vm1d
-      module: canterbury1d_submod
-      data: vm1d/Cant1D_v3_Pliocene_Enforced.fd_modfile
-
-    - name: nelson_v1
-      type: vm1d
-      module: canterbury1d_submod
-      data: vm1d/Nelson_v1.fd_modfile
-
-    - name: palmerstonnorth_v1
-      type: vm1d
-      module: canterbury1d_submod
-      data: vm1d/PalmerstonNorth_v1.fd_modfile
-
-    - name: ep_tomography_submod_v2010
-      type: tomography
-      module: ep_tomography_submod_v2010
-
-    - name: bpv_submod_v4
-      type: relation
-      module: bpv_submod_v4
-
-    - name: pliocene_submod_v1
-      type: relation
-      module: pliocene_submod_v1
-
-    - name: pn_pliocene_submod_v1
-      type: relation
-      module: pn_pliocene_submod_v1
-
-
-    - name: miocene_submod_v1
-      type: relation
-      module: miocene_submod_v1
-
-    - name: paleogene_submod_v1
-      type: relation
-      module: paleogene_submod_v1
-
-    - name: pliocene_submod_v2
-      type: relation
-      module: pliocene_submod_v2
-
-    - name: miocene_submod_v2
-      type: relation
-      module: miocene_submod_v2
-
-    - name: paleogene_submod_v2
-      type: relation
-      module: paleogene_submod_v2
-
-    - name: perturbation_v20p6
-      type: perturbation
-
-    - name: perturbation_v20p10
-      type: perturbation
-
-    - name: perturbation_v20p11
-      type: perturbation
