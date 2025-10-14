@@ -75,11 +75,11 @@ def load_hdf5_data(
         A dictionary mapping each file path to a tuple containing the
         latitude, longitude, and elevation arrays.
     """
-    return {
-        path: (f["latitude"][:], f["longitude"][:], f["elevation"][:])
-        for path in file_paths
-        for f in [h5py.File(path, "r")]
-    }
+    data = {}
+    for path in file_paths:
+        with h5py.File(path, "r") as f:
+            data[path] = (f["latitude"][:], f["longitude"][:], f["elevation"][:])
+    return data
 
 
 def filter_data(
