@@ -103,7 +103,7 @@ def load_stacked_slices(
     scalar: str = "vp",
     lat_range: Optional[tuple[float, float]] = None,
     lon_range: Optional[tuple[float, float]] = None,
-) -> tuple[dict[str], np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[list[str], np.ndarray, np.ndarray, np.ndarray]:
     """Load and stack tomography slices from an HDF5 file.
 
     Reads data for specified elevation layers from an HDF5 file, optionally
@@ -379,19 +379,23 @@ class TomoApp(QMainWindow):
         visible_elevations = [
             float(cb.text().split()[0]) for cb in checkboxes if cb.isChecked()
         ]
-        print(visible_elevations)
+        if self.debug:
+            print(visible_elevations)
         if visible_elevations:
             top = max(visible_elevations)  #
             for d, a in self.point_actors:
                 is_visible = d == top
                 a.SetVisibility(is_visible)
                 if is_visible:
-                    print(f"👁️ Top visible elevation: {top} km")
+                    if self.debug:
+                        print(f"👁️ Top visible elevation: {top} km")
                     pdata = a.GetMapper().GetInputAsDataSet()
                     if "values" in pdata.point_data:
-                        print("📊 Scalar values:", pdata["values"])
+                        if self.debug:
+                            print("📊 Scalar values:", pdata["values"])
                     else:
-                        print("⚠️ 'values' not found in point data")
+                        if self.debug:
+                            print("⚠️ 'values' not found in point data")
 
     def set_visibility(self, actor: pv.Actor, state: int) -> None:
         """Set the visibility of a layer and update point overlays.
@@ -518,7 +522,7 @@ def launch_viewer(
     points_by_elevation = None
     if txt:
         df = read_ep_txt(txt)
-        df_filtered = df[df["elevation"].isin([float(d) for d in elevations])]
+        df_filtered = df[np.any(np.isclose(df['elevation'].values[:, None], [float(d) for d in elevations], atol=1e-3), axis=1)]
         if debug:
             print(df_filtered.head())
         points_by_elevation = {
@@ -550,7 +554,7 @@ def launch_viewer(
     # Ensure clean shutdown
     app_qt.lastWindowClosed.connect(app_qt.quit)
 
-    sys.exit(app_qt.exec_())
+    sys.exit(app_qt.exec())
 
 
 if __name__ == "__main__":

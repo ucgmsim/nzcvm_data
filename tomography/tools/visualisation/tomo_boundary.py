@@ -55,7 +55,13 @@ def extract_single_boundary_geojson(
     with h5py.File(hdf5_file_path, "r") as f:
         # Use the first available group to extract lat/lon
         first_group_name = next(iter(f.keys()))
-        group = f[first_group_name]
+        group = None
+        for key in f.keys():
+            if 'latitudes' in f[key] and 'longitudes' in f[key]:
+                group = f[key]
+                break
+        if group is None:
+            raise RuntimeError("No group with 'latitudes' and 'longitudes' found in HDF5 file.")
 
         lats = group["latitudes"][:]
         lons = group["longitudes"][:]
@@ -78,7 +84,7 @@ def extract_single_boundary_geojson(
         if hull.geom_type != "Polygon":
             raise RuntimeError("Convex hull did not produce a polygon.")
 
-        coords = [(x, y) for x, y in hull.exterior.coords]
+        coords = [list(p) for p in hull.exterior.coords]
         polygon = geojson.Polygon([coords])
         feature = geojson.Feature(geometry=polygon, properties={})
         feature_collection = geojson.FeatureCollection([feature])
