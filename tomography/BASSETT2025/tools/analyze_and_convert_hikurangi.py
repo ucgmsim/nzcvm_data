@@ -593,7 +593,9 @@ def write_hikurangi_hdf5(
     vp_stack: np.ndarray,
     vs_stack: np.ndarray,
     rho_stack: np.ndarray,
-    compression_level: int = 4
+    compression_level: int = 4,
+    use_shuffle: bool = False,
+    coord_dtype: str = "float32"
 ) -> None:
     """
     Write Hikurangi tomography data to HDF5 in EP2020-compatible format with compression.
@@ -617,14 +619,43 @@ def write_hikurangi_hdf5(
     compression_level : int
         Gzip compression level (0-9). Default 4 is good balance.
         0=no compression, 9=max compression (slower).
+    use_shuffle : bool
+        Enable HDF5 shuffle filter. Default False.
+        Shuffle works best for dense data (90-100% coverage).
+        For sparse data with many fill values (like Hikurangi 46.5%), 
+        shuffle can make compression worse.
+    coord_dtype : str
+        Data type for coordinates ('float32' or 'float64'). Default 'float32'.
+        float32: Sufficient precision, smaller files for sparse data
+        float64: Better with shuffle for dense data
+        
+    Notes
+    -----
+    Recommended settings based on data characteristics:
+    
+    For SPARSE data (Hikurangi: 46.5% coverage, lots of -999.0 fill):
+        use_shuffle=False, coord_dtype='float32'
+        Result: ~154 MB, 8.5x compression
+        
+    For DENSE data (EP2020: 100% coverage):
+        use_shuffle=True, coord_dtype='float64'
+        Result: ~106 MB, 7.4x compression
     """
     print("\n" + "="*70)
     print("WRITING HDF5")
     print("="*70)
     
-    # Create coordinate meshgrid (keep as float64 for best compression with shuffle)
+    # Determine dtype for coordinates
+    if coord_dtype == "float64":
+        coord_np_dtype = np.float64
+    elif coord_dtype == "float32":
+        coord_np_dtype = np.float32
+    else:
+        raise ValueError(f"coord_dtype must be 'float32' or 'float64', got {coord_dtype}")
+    
+    # Create coordinate meshgrid with specified dtype
     lon_grid, lat_grid = np.meshgrid(lons, lats)
-    coords = np.stack([lat_grid, lon_grid], axis=-1)  # float64
+    coords = np.stack([lat_grid, lon_grid], axis=-1).astype(coord_np_dtype)
     
     # Replace NaN with -999.0 flag
     vp_stack = vp_stack.copy()
@@ -637,12 +668,15 @@ def write_hikurangi_hdf5(
     
     print(f"\nWriting to: {output_path}")
     print(f"Grid: {len(lats)} lat × {len(lons)} lon × {len(depth_list)} depth")
-    print(f"Compression: gzip level {compression_level} + shuffle filter")
+    print(f"Compression: gzip level {compression_level}")
+    print(f"Shuffle filter: {'enabled' if use_shuffle else 'disabled'}")
+    print(f"Coordinate dtype: {coord_dtype}")
     
     # Calculate expected file size
     points_per_level = len(lats) * len(lons)
     data_size_mb = (points_per_level * 3 * 4 * len(depth_list)) / (1024**2)  # 3 vars, 4 bytes each
-    coords_size_mb = (points_per_level * 2 * 8 * len(depth_list)) / (1024**2)  # coords, 2 values, 8 bytes
+    coord_bytes = 8 if coord_dtype == "float64" else 4
+    coords_size_mb = (points_per_level * 2 * coord_bytes * len(depth_list)) / (1024**2)
     print(f"Uncompressed size estimate: {(data_size_mb + coords_size_mb):.1f} MB")
     
     # Determine optimal chunk size
@@ -654,45 +688,44 @@ def write_hikurangi_hdf5(
             grp_name = f"{depth:.0f}" if depth == int(depth) else f"{depth:.1f}"
             grp = f.create_group(grp_name)
             
-            # Store lat/lon as float64 with compression and shuffle
-            grp.create_dataset("latitudes", data=lats, 
-                             dtype=np.float64,
+            # Store lat/lon with specified dtype and shuffle setting
+            grp.create_dataset("latitudes", data=lats.astype(coord_np_dtype), 
+                             dtype=coord_np_dtype,
                              compression="gzip", 
                              compression_opts=compression_level,
-                             shuffle=True)
-            grp.create_dataset("longitudes", data=lons, 
-                             dtype=np.float64,
+                             shuffle=use_shuffle)
+            grp.create_dataset("longitudes", data=lons.astype(coord_np_dtype), 
+                             dtype=coord_np_dtype,
                              compression="gzip", 
                              compression_opts=compression_level,
-                             shuffle=True)
+                             shuffle=use_shuffle)
             
-            # Coords as float64 with compression, shuffle, and optimized chunking
-            # Regular grids compress EXTREMELY well with shuffle filter
+            # Coords with specified dtype and shuffle setting
             grp.create_dataset("coords", data=coords, 
-                             dtype=np.float64,
+                             dtype=coord_np_dtype,
                              compression="gzip", 
                              compression_opts=compression_level,
-                             shuffle=True,
+                             shuffle=use_shuffle,
                              chunks=coords_chunk_size)
             
-            # Data arrays with compression, shuffle, and optimized chunking
+            # Data arrays with specified shuffle setting
             grp.create_dataset("vp", data=vp_stack[iz], 
                              dtype=np.float32,
                              compression="gzip", 
                              compression_opts=compression_level,
-                             shuffle=True,
+                             shuffle=use_shuffle,
                              chunks=chunk_size)
             grp.create_dataset("vs", data=vs_stack[iz], 
                              dtype=np.float32,
                              compression="gzip", 
                              compression_opts=compression_level,
-                             shuffle=True,
+                             shuffle=use_shuffle,
                              chunks=chunk_size)
             grp.create_dataset("rho", data=rho_stack[iz], 
                              dtype=np.float32,
                              compression="gzip", 
                              compression_opts=compression_level,
-                             shuffle=True,
+                             shuffle=use_shuffle,
                              chunks=chunk_size)
             
             if (iz + 1) % 20 == 0 or iz == 0 or iz == len(depth_list) - 1:
@@ -755,14 +788,56 @@ def main():
     """
     Main execution function.
     """
+    # =====================================================================
+    # CONFIGURATION SECTION
+    # =====================================================================
+    
     # File paths - ADJUST THESE
     hikurangi_txt = Path("Hikurangi_3D_model.txt")
     ep2020_h5 = Path("ep2020.h5")  # Optional, for comparison
     output_h5 = Path("hikurangi_uniform.h5")
     
+    # =====================================================================
+    # COMPRESSION SETTINGS - ADJUST BASED ON YOUR DATA
+    # =====================================================================
+    
+    # Compression level (0-9, default 4)
+    compression_level = 4
+    
+    # Shuffle filter (True/False)
+    # - For SPARSE data (like Hikurangi 46.5% coverage): use_shuffle = False
+    # - For DENSE data (like EP2020 100% coverage): use_shuffle = True
+    use_shuffle = False  # ← RECOMMENDED for Hikurangi
+    
+    # Coordinate data type ('float32' or 'float64')
+    # - For SPARSE data with shuffle=False: coord_dtype = 'float32'
+    # - For DENSE data with shuffle=True: coord_dtype = 'float64'
+    coord_dtype = 'float32'  # ← RECOMMENDED for Hikurangi
+    
+    # =====================================================================
+    # EXPLANATION:
+    # =====================================================================
+    # Hikurangi has 46.5% coverage (53.5% are -999.0 fill values)
+    # 
+    # Test results:
+    #   use_shuffle=False, coord_dtype='float32' → 154 MB (8.5x) ✓ BEST
+    #   use_shuffle=True,  coord_dtype='float64' → 167 MB (11.0x) ✗ WORSE
+    # 
+    # Why? Long runs of identical -999.0 values compress better WITHOUT
+    # shuffle. Shuffle breaks up the perfect 4-byte patterns, reducing
+    # compression efficiency for sparse data with many fill values.
+    # 
+    # For dense data (EP2020 with 100% coverage), shuffle=True with 
+    # float64 coords works better (106 MB vs 157 MB).
+    # =====================================================================
+    
     print("="*70)
     print("HIKURANGI TOMOGRAPHY CONVERSION")
     print("="*70)
+    print(f"\n📝 Compression settings:")
+    print(f"   Level: {compression_level}")
+    print(f"   Shuffle filter: {'enabled' if use_shuffle else 'disabled'}")
+    print(f"   Coordinate dtype: {coord_dtype}")
     
     # Step 1: Read Hikurangi data
     df = read_hikurangi_txt(hikurangi_txt)
@@ -827,7 +902,10 @@ def main():
         target_grid["depths"],
         vp_stack,
         vs_stack,
-        rho_stack
+        rho_stack,
+        compression_level=compression_level,
+        use_shuffle=use_shuffle,
+        coord_dtype=coord_dtype
     )
     
     print("\n" + "="*70)
