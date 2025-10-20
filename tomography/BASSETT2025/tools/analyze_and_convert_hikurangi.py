@@ -48,6 +48,12 @@ def read_hikurangi_txt(txt_path: str | Path) -> pd.DataFrame:
         engine="python"
     )
     
+    # Create elevation = -depth (elevation: positive = above sea level)
+    if "depth" not in df.columns:
+        raise ValueError("Input file missing expected 'depth' column")
+    df["elevation"] = -df["depth"]
+    print("   Note: created column 'elevation' = -depth (km). Elevation >0 = above sea level.")
+
     print(f"   Total points: {len(df):,}")
     return df
 
@@ -199,8 +205,9 @@ def analyze_grid_structure(df: pd.DataFrame) -> dict:
     # 1. Check orientation (via model_x, model_y)
     unique_model_x = np.unique(df["model_x"])
     unique_model_y = np.unique(df["model_y"])
-    unique_depths = np.unique(df["depth"])
-    
+    # use elevation (km) instead of original depth
+    unique_elevations = np.unique(df["elevation"])
+
     print(f"\n1. ORIENTATION & COORDINATE SYSTEM:")
     print(f"   Model X range: {unique_model_x.min():.1f} to {unique_model_x.max():.1f} km")
     print(f"   Model Y range: {unique_model_y.min():.1f} to {unique_model_y.max():.1f} km")
@@ -249,34 +256,35 @@ def analyze_grid_structure(df: pd.DataFrame) -> dict:
     print(f"   Latitude: {df['lat'].min():.3f}°S to {df['lat'].max():.3f}°S")
     print(f"   Span: {lon_max-lon_min:.3f}° lon × {df['lat'].max()-df['lat'].min():.3f}° lat")
     
-    # 3. Depth levels
-    print(f"\n3. DEPTH LEVELS:")
-    print(f"   Number of depth levels: {len(unique_depths)}")
-    print(f"   Depth range: {unique_depths.min():.2f} to {unique_depths.max():.2f} km")
-    if len(unique_depths) > 1:
-        dz = np.diff(unique_depths)
+    # 3. Elevation levels (previously 'depth levels' in file)
+    print(f"\n3. ELEVATION LEVELS (km):")
+    print(f"   Number of elevation levels: {len(unique_elevations)}")
+    print(f"   Elevation range: {unique_elevations.min():.2f} to {unique_elevations.max():.2f} km "
+          f"(positive = above sea level)")
+    if len(unique_elevations) > 1:
+        dz = np.diff(unique_elevations)
         dz_regular = np.allclose(dz, dz[0], rtol=1e-3)
-        print(f"   Depth spacing regular: {dz_regular}")
+        print(f"   Elevation spacing regular: {dz_regular}")
         if dz_regular:
-            print(f"   Depth spacing: {dz[0]:.3f} km")
+            print(f"   Elevation spacing: {dz[0]:.3f} km")
         else:
-            print(f"   Depth spacing: min={dz.min():.3f}, max={dz.max():.3f}, mean={dz.mean():.3f} km")
-    
-    # Sample depths to show
-    if len(unique_depths) <= 20:
-        print(f"   All depths: {unique_depths}")
+            print(f"   Elevation spacing: min={dz.min():.3f}, max={dz.max():.3f}, mean={dz.mean():.3f} km")
+
+    # Sample elevations to show
+    if len(unique_elevations) <= 20:
+        print(f"   All elevations: {unique_elevations}")
     else:
-        print(f"   First 10 depths: {unique_depths[:10]}")
-        print(f"   Last 10 depths: {unique_depths[-10:]}")
-    
-    # 4. Points per depth level
-    points_per_depth = df.groupby("depth").size()
-    print(f"\n4. POINTS PER DEPTH LEVEL:")
-    print(f"   Min points: {points_per_depth.min():,}")
-    print(f"   Max points: {points_per_depth.max():,}")
-    print(f"   Mean points: {points_per_depth.mean():,.0f}")
-    print(f"   Consistent: {points_per_depth.nunique() == 1}")
-    
+        print(f"   First 10 elevations: {unique_elevations[:10]}")
+        print(f"   Last 10 elevations: {unique_elevations[-10:]}")
+
+    # 4. Points per elevation level
+    points_per_elev = df.groupby("elevation").size()
+    print(f"\n4. POINTS PER ELEVATION LEVEL:")
+    print(f"   Min points: {points_per_elev.min():,}")
+    print(f"   Max points: {points_per_elev.max():,}")
+    print(f"   Mean points: {points_per_elev.mean():,.0f}")
+    print(f"   Consistent: {points_per_elev.nunique() == 1}")
+
     # 5. Check for rotation angle
     print(f"\n5. ROTATION ANALYSIS:")
     # Calculate angle between model coords and geographic coords
@@ -328,10 +336,11 @@ def analyze_grid_structure(df: pd.DataFrame) -> dict:
     return {
         "model_x": unique_model_x,
         "model_y": unique_model_y,
-        "depths": unique_depths,
+        # return elevations (km). downstream code expects key 'depths', keep name but semantics = elevation
+        "depths": unique_elevations,
         "lon_range": final_lon_range,
         "lat_range": (df['lat'].min(), df['lat'].max()),
-        "points_per_depth": points_per_depth.values[0] if points_per_depth.nunique() == 1 else None,
+        "points_per_depth": points_per_elev.values[0] if points_per_elev.nunique() == 1 else None,
         "crosses_dateline": crosses_dateline
     }
 
@@ -523,6 +532,7 @@ def interpolate_hikurangi_to_grid(
     
     lat = target_grid["lat"]
     lon = target_grid["lon"]
+    # target_grid['depths'] are elevations (km)
     depths = target_grid["depths"]
     
     nlat, nlon, ndepth = len(lat), len(lon), len(depths)
@@ -533,20 +543,20 @@ def interpolate_hikurangi_to_grid(
     
     lon_grid, lat_grid = np.meshgrid(lon, lat)
     
-    print(f"\nInterpolating {len(depths)} depth levels...")
-    for iz, d in enumerate(depths):
+    print(f"\nInterpolating {len(depths)} elevation levels...")
+    for iz, elev in enumerate(depths):
         if (iz + 1) % 10 == 0 or iz == 0 or iz == len(depths) - 1:
-            print(f"   Level {iz+1}/{len(depths)}: depth = {d:.2f} km")
-        
-        # Get data at this depth
-        df_d = df[np.isclose(df["depth"], d, atol=1e-3)]
-        
+            print(f"   Level {iz+1}/{len(depths)}: elevation = {elev:.2f} km")
+
+        # Get data at this elevation (use tolerance)
+        df_d = df[np.isclose(df["elevation"], elev, atol=1e-3)]
+
         if df_d.empty:
-            print(f"      ⚠️  No data at depth={d:.2f} km")
+            print(f"      ⚠️  No data at elevation={elev:.2f} km")
             continue
         
         if len(df_d) < 4:
-            print(f"      ⚠️  Insufficient points ({len(df_d)}) at depth={d:.2f} km")
+            print(f"      ⚠️  Insufficient points ({len(df_d)}) at elevation={elev:.2f} km")
             continue
         
         # Prepare data
@@ -589,7 +599,7 @@ def write_hikurangi_hdf5(
     output_path: str | Path,
     lats: np.ndarray,
     lons: np.ndarray,
-    depth_list: np.ndarray,
+    depth_list: np.ndarray,  # NOTE: this is elevations (km), kept param name for backward compatibility
     vp_stack: np.ndarray,
     vs_stack: np.ndarray,
     rho_stack: np.ndarray,
@@ -609,7 +619,7 @@ def write_hikurangi_hdf5(
     lons : np.ndarray
         Longitude values (nlon,).
     depth_list : np.ndarray
-        Depths in km (nz,).
+        Elevations in km (nz,). Positive = above sea level.  (Kept param name 'depth_list' for API compatibility.)
     vp_stack : np.ndarray
         P-wave velocity in km/s (nz, nlat, nlon).
     vs_stack : np.ndarray
@@ -684,8 +694,9 @@ def write_hikurangi_hdf5(
     coords_chunk_size = (min(88, len(lats)), min(50, len(lons)), 1)
     
     with h5py.File(output_path, "w") as f:
-        for iz, depth in enumerate(depth_list):
-            grp_name = f"{depth:.0f}" if depth == int(depth) else f"{depth:.1f}"
+        for iz, elevation in enumerate(depth_list):
+            # group name uses elevation (can be negative or positive)
+            grp_name = f"{elevation:.2f}"
             grp = f.create_group(grp_name)
             
             # Store lat/lon with specified dtype and shuffle setting
@@ -756,18 +767,18 @@ def create_comparison_plot(df: pd.DataFrame, output_path: str = "hikurangi_cover
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
     
     # Plot 1: All points at surface level
-    surface_data = df[df["depth"] == df["depth"].min()]
-    axes[0].scatter(surface_data["lon"], surface_data["lat"], 
+    surface_data = df[df["elevation"] == df["elevation"].min()]
+    axes[0].scatter(surface_data["lon"], surface_data["lat"],
                     s=1, alpha=0.5, c='red')
     axes[0].set_xlabel("Longitude (°E)")
     axes[0].set_ylabel("Latitude (°S)")
-    axes[0].set_title(f"Hikurangi Data Coverage (depth={surface_data['depth'].iloc[0]:.1f} km)")
+    axes[0].set_title(f"Hikurangi Data Coverage (elevation={surface_data['elevation'].iloc[0]:.1f} km)")
     axes[0].grid(True, alpha=0.3)
     
     # Plot 2: Constrained vs unconstrained
-    constrained = df[(df["depth"] == df["depth"].min()) & (df["constraint"] == 1)]
-    unconstrained = df[(df["depth"] == df["depth"].min()) & (df["constraint"] == 0)]
-    
+    constrained = df[(df["elevation"] == df["elevation"].min()) & (df["constraint"] == 1)]
+    unconstrained = df[(df["elevation"] == df["elevation"].min()) & (df["constraint"] == 0)]
+
     axes[1].scatter(unconstrained["lon"], unconstrained["lat"], 
                    s=1, alpha=0.3, c='lightgray', label='Unconstrained')
     axes[1].scatter(constrained["lon"], constrained["lat"], 
