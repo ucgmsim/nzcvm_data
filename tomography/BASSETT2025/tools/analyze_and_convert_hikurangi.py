@@ -767,19 +767,19 @@ def create_comparison_plot(df: pd.DataFrame, output_path: str = "hikurangi_cover
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
     
     # Plot 1: All points at surface level
-    surface_data = df[df["elevation"] == df["elevation"].min()]
+    surface_data = df[df["depth"] == df["depth"].min()]
     axes[0].scatter(surface_data["lon"], surface_data["lat"],
                     s=1, alpha=0.5, c='red')
     axes[0].set_xlabel("Longitude (°E)")
     axes[0].set_ylabel("Latitude (°S)")
-    axes[0].set_title(f"Hikurangi Data Coverage (elevation={surface_data['elevation'].iloc[0]:.1f} km)")
+    axes[0].set_title(f"Hikurangi Data Coverage (depth={surface_data['depth'].iloc[0]:.1f} km)")
     axes[0].grid(True, alpha=0.3)
     
     # Plot 2: Constrained vs unconstrained
-    constrained = df[(df["elevation"] == df["elevation"].min()) & (df["constraint"] == 1)]
-    unconstrained = df[(df["elevation"] == df["elevation"].min()) & (df["constraint"] == 0)]
+    constrained = df[(df["depth"] == df["depth"].min()) & (df["constraint"] == 1)]
+    unconstrained = df[(df["depth"] == df["depth"].min()) & (df["constraint"] == 0)]
 
-    axes[1].scatter(unconstrained["lon"], unconstrained["lat"], 
+    axes[1].scatter(unconstrained["lon"], unconstrained["lat"],
                    s=1, alpha=0.3, c='lightgray', label='Unconstrained')
     axes[1].scatter(constrained["lon"], constrained["lat"], 
                    s=1, alpha=0.5, c='red', label='Constrained')
