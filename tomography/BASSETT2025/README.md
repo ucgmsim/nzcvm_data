@@ -1,19 +1,13 @@
-# BASSETT2025 Hikurangi Tomography Data
-
-## Overview
-
-This directory contains the Hikurangi 3D tomography model from Bassett et al. (2025), converted to NZCVM-compatible HDF5 format.
-
-## Data Processing Output
-
-The following output shows the analysis and conversion process:
-
-```
-(py312) seb56@mantle:/mnt/mantle_data/seb56/tomo_conversion/Bassett$ python analyze_and_convert_hikurangi2.py 
 ======================================================================
 HIKURANGI TOMOGRAPHY CONVERSION
 ======================================================================
+
+📝 Compression settings:
+   Level: 4
+   Shuffle filter: disabled
+   Coordinate dtype: float32
 📥 Reading Hikurangi data...
+   Note: created column 'elevation' = -depth (km). Elevation >0 = above sea level.
    Total points: 33,289,947
 
 ======================================================================
@@ -60,11 +54,7 @@ DATA QUALITY CHECKS:
    New Vp range: 0.350 to 9.000 km/s
    New Vs range: 0.150 to 5.350 km/s
    New Rho range: 1.001 to 3.170 g/cm³
-```
 
-## Grid Structure Analysis
-
-```
 ======================================================================
 GRID STRUCTURE ANALYSIS
 ======================================================================
@@ -86,15 +76,15 @@ GRID STRUCTURE ANALYSIS
    Latitude: -45.037°S to -34.357°S
    Span: 12.847° lon × 10.680° lat
 
-3. DEPTH LEVELS:
-   Number of depth levels: 207
-   Depth range: -3.00 to 100.00 km
-   Depth spacing regular: True
-   Depth spacing: 0.500 km
-   First 10 depths: [-3.  -2.5 -2.  -1.5 -1.  -0.5  0.   0.5  1.   1.5]
-   Last 10 depths: [ 95.5  96.   96.5  97.   97.5  98.   98.5  99.   99.5 100. ]
+3. ELEVATION LEVELS (km):
+   Number of elevation levels: 207
+   Elevation range: -100.00 to 3.00 km (positive = above sea level)
+   Elevation spacing regular: True
+   Elevation spacing: 0.500 km
+   First 10 elevations: [-100.   -99.5  -99.   -98.5  -98.   -97.5  -97.   -96.5  -96.   -95.5]
+   Last 10 elevations: [-1.5 -1.  -0.5 -0.   0.5  1.   1.5  2.   2.5  3. ]
 
-4. POINTS PER DEPTH LEVEL:
+4. POINTS PER ELEVATION LEVEL:
    Min points: 160,821
    Max points: 160,821
    Mean points: 160,821
@@ -112,11 +102,10 @@ GRID STRUCTURE ANALYSIS
 7. DATA CONSTRAINT:
    Constrained points (flag=1): 3,220,637 (9.7%)
    Unconstrained points (flag=0): 30,069,310 (90.3%)
-```
 
-## Target Grid Configuration
+🔄 Adjusting longitude values in dataframe...
+   ✅ Longitudes adjusted to 0-360 range for interpolation
 
-```
 ======================================================================
 EP2020 REFERENCE GRID
 ======================================================================
@@ -140,117 +129,109 @@ Using EP2020 grid spacing for compatibility:
    0.0188° × 0.0107°
 
 Target grid dimensions: 1001 × 689 × 207
+LLDOZED/g' {} +
 Target points per level: 689,689
 Target total points: 142,765,623
 
 Converting longitudes back to -180 to 180 range...
    Longitude range: -179.981°E to 180.000°E
-```
 
-## Interpolation Results
+📊 Creating coverage visualization...
+   Saved to hikurangi_coverage.png
 
-```
+======================================================================
+INTERPOLATION OPTIONS
+======================================================================
+
+You can interpolate using:
+   1. All points (default)
+   2. Only constrained points (constraint=1)
+
 ======================================================================
 INTERPOLATION
 ======================================================================
 
-Interpolating 207 depth levels...
-   Level 1/207: depth = -3.00 km
+Interpolating 207 elevation levels...
+   Level 1/207: elevation = -100.00 km
       Coverage: 46.5%
-   Level 10/207: depth = 1.50 km
+   Level 10/207: elevation = -95.50 km
       Coverage: 46.5%
-   Level 20/207: depth = 6.50 km
+   Level 20/207: elevation = -90.50 km
       Coverage: 46.5%
-   Level 30/207: depth = 11.50 km
+   Level 30/207: elevation = -85.50 km
       Coverage: 46.5%
-   Level 40/207: depth = 16.50 km
+   Level 40/207: elevation = -80.50 km
       Coverage: 46.5%
-   Level 50/207: depth = 21.50 km
+   Level 50/207: elevation = -75.50 km
       Coverage: 46.5%
-   Level 60/207: depth = 26.50 km
+   Level 60/207: elevation = -70.50 km
       Coverage: 46.5%
-   Level 70/207: depth = 31.50 km
+   Level 70/207: elevation = -65.50 km
       Coverage: 46.5%
-   Level 80/207: depth = 36.50 km
+   Level 80/207: elevation = -60.50 km
       Coverage: 46.5%
-   Level 90/207: depth = 41.50 km
+   Level 90/207: elevation = -55.50 km
       Coverage: 46.5%
-   Level 100/207: depth = 46.50 km
+   Level 100/207: elevation = -50.50 km
       Coverage: 46.5%
-   Level 110/207: depth = 51.50 km
+   Level 110/207: elevation = -45.50 km
       Coverage: 46.5%
-   Level 120/207: depth = 56.50 km
+   Level 120/207: elevation = -40.50 km
       Coverage: 46.5%
-   Level 130/207: depth = 61.50 km
+   Level 130/207: elevation = -35.50 km
       Coverage: 46.5%
-   Level 140/207: depth = 66.50 km
+   Level 140/207: elevation = -30.50 km
       Coverage: 46.5%
-   Level 150/207: depth = 71.50 km
+   Level 150/207: elevation = -25.50 km
       Coverage: 46.5%
-   Level 160/207: depth = 76.50 km
+   Level 160/207: elevation = -20.50 km
       Coverage: 46.5%
-   Level 170/207: depth = 81.50 km
+   Level 170/207: elevation = -15.50 km
       Coverage: 46.5%
-   Level 180/207: depth = 86.50 km
+   Level 180/207: elevation = -10.50 km
       Coverage: 46.5%
-   Level 190/207: depth = 91.50 km
+   Level 190/207: elevation = -5.50 km
       Coverage: 46.5%
-   Level 200/207: depth = 96.50 km
+   Level 200/207: elevation = -0.50 km
       Coverage: 46.5%
-   Level 207/207: depth = 100.00 km
+   Level 207/207: elevation = 3.00 km
       Coverage: 46.5%
 
 Interpolation complete:
    Vp coverage: 46.5%
    Vs coverage: 46.5%
    Rho coverage: 46.5%
-```
 
-## Output Files
-
-```
 ======================================================================
 WRITING HDF5
 ======================================================================
 
 Writing to: hikurangi_uniform.h5
 Grid: 1001 lat × 689 lon × 207 depth
-   Written group '-3'
-   Written group '6.5'
-   Written group '16.5'
-   Written group '26.5'
-   Written group '36.5'
-   Written group '46.5'
-   Written group '56.5'
-   Written group '66.5'
-   Written group '76.5'
-   Written group '86.5'
-   Written group '96.5'
-   Written group '100'
+Compression: gzip level 4
+Shuffle filter: disabled
+Coordinate dtype: float32
+Uncompressed size estimate: 2723.0 MB
+   Written group '-100.00'
+   Written group '-90.50'
+   Written group '-80.50'
+   Written group '-70.50'
+   Written group '-60.50'
+   Written group '-50.50'
+   Written group '-40.50'
+   Written group '-30.50'
+   Written group '-20.50'
+   Written group '-10.50'
+   Written group '-0.50'
+   Written group '3.00'
 
-✅ Successfully saved Hikurangi HDF5 to hikurangi_uniform.h5   
-   Actual file size: 153.7 MB
-   Compression ratio: 8.5x
+✅ Successfully saved Hikurangi HDF5 to hikurangi_uniform.h5
+   Actual file size: 315.8 MB
+   Compression ratio: 8.6x
 
+======================================================================
+CONVERSION COMPLETE!
+======================================================================
 
-```
-
-## Processing Summary
-
-### Key Processing Steps:
-1. **Unit Detection**: Automatic detection and conversion of density from kg/m³ to g/cm³
-2. **Grid Analysis**: Analysis of irregular tomography grid structure and rotation
-3. **Dateline Handling**: Proper handling of data crossing the 180° meridian
-4. **Interpolation**: Conversion to regular geographic grid compatible with EP2020
-5. **HDF5 Output**: Export in NZCVM-compatible format with gzip compression (level 4) and float32 precision
-
-### Final Grid Specifications:
-- **Dimensions**: 1001 × 689 × 207 (lat × lon × depth)
-- **Geographic Coverage**: 179.98°W to 180.00°E, 45.04°S to 34.36°S
-- **Depth Range**: -3.0 to 100.0 km (0.5 km spacing)
-- **Data Coverage**: 46.5% of grid points contain interpolated values
-- **Coordinate System**: Geographic (WGS84)
-
-## Citation
-
-Bassett, D., Henrys, S., Tozer, B., van Avendonk, H., Gase, A., Bangs, N., et al. (2025). Crustal structure of the Hikurangi subduction zone revealed by four decades of Onshore-Offshore seismic data: Implications for the dimensions and slip behavior of the seismogenic zone. *Journal of Geophysical Research: Solid Earth*, 130, e2024JB030268. https://doi.org/10.1029/2024JB030268
+Output file: hikurangi_uniform.h5
+Visualization: hikurangi_coverage.png
