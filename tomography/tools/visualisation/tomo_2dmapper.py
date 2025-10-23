@@ -187,6 +187,72 @@ def get_all_elevations(h5_path: Path) -> List[str]:
         print(f"❌ Error reading keys from HDF5 file: {h5_path}")
         raise e
 
+def detect_elevations_from_csv(
+    csv_path: Path,
+    depth_col: Union[str, int],
+    depth_is_elevation: bool = False,
+    skip_rows: int = 0,
+    separator: str = ',',
+    chunksize: int = 100000,
+) -> List[str]:
+    """
+    Detect unique elevation values from CSV file.
+    Returns sorted list of elevation strings (highest first).
+    """
+    print(f"🔍 Detecting elevations from CSV file: {csv_path.name}...")
+    
+    try:
+        # Read header
+        header_df = pd.read_csv(csv_path, nrows=0, skiprows=skip_rows, sep=separator)
+        
+        # Determine column name
+        if isinstance(depth_col, int):
+            if depth_col >= len(header_df.columns):
+                raise ValueError(f"Column index {depth_col} is out of bounds")
+            col_name = header_df.columns[depth_col]
+        else:
+            col_name = depth_col
+        
+        # Read depth/elevation column in chunks
+        unique_values = set()
+        iterator = pd.read_csv(
+            csv_path,
+            chunksize=chunksize,
+            usecols=[col_name],
+            skiprows=skip_rows + 1,
+            sep=separator,
+            header=None,
+            names=header_df.columns,
+            low_memory=True,
+        )
+        
+        for chunk in iterator:
+            # Convert to numeric
+            chunk[col_name] = pd.to_numeric(chunk[col_name], errors='coerce')
+            chunk.dropna(subset=[col_name], inplace=True)
+            
+            # Convert to elevation (positive up)
+            if depth_is_elevation:
+                elevations = chunk[col_name].values
+            else:
+                elevations = -chunk[col_name].values
+            
+            # Add unique rounded values (to nearest 0.01)
+            unique_values.update(np.round(elevations, 2))
+        
+        # Sort and format as strings
+        sorted_elevations = sorted(list(unique_values), reverse=True)
+        elevation_strings = [str(e).replace('.', '_') if e < 0 else str(e) for e in sorted_elevations]
+        
+        print(f"   Found {len(elevation_strings)} unique elevations: {sorted_elevations[:10]}{'...' if len(sorted_elevations) > 10 else ''}")
+        
+        return elevation_strings
+        
+    except Exception as e:
+        print(f"❌ Error detecting elevations from CSV: {e}")
+        raise e
+
+
 def calculate_global_ln_ratio_limits(
     h5_path1: Path, h5_path2: Path, scalar: str, elevations: List[str]
 ) -> Tuple[float, float]:
@@ -349,10 +415,17 @@ def load_csv_data_for_elevation(
 
 
     for name, identifier in col_map.items():
+        col_label = {
+            'lon': 'Longitude',
+            'lat': 'Latitude', 
+            'depth_or_elev': 'Depth/Elevation',
+            'scalar': 'Scalar Value'
+        }[name]
         if isinstance(identifier, int):
             if identifier >= len(header_df.columns):
                  raise ValueError(f"Column index {identifier} is out of bounds for CSV file (has {len(header_df.columns)} columns).")
             col_name = header_df.columns[identifier]
+            print(f"      {col_label:20s} (--{name.replace('_', '-'):15s} {identifier}): found column '{col_name}'")
             required_cols_indices.append(identifier)
             required_cols_names.append(col_name)
             use_cols.append(col_name) # Use name for reading chunks
@@ -360,13 +433,33 @@ def load_csv_data_for_elevation(
         elif isinstance(identifier, str):
             if identifier not in header_df.columns:
                  raise ValueError(f"Column name '{identifier}' not found in CSV file header: {list(header_df.columns)}")
+            print(f"      {col_label:20s} (--{name.replace('_', '-'):15s} '{identifier}'): found in CSV")
             required_cols_names.append(identifier)
             use_cols.append(identifier)
             rename_map[identifier] = name
         else:
              raise TypeError(f"Invalid column identifier type: {type(identifier)}")
 
-    print(f"   Using CSV columns: {required_cols_names}")
+    print(f"   📋 CSV Parsing Debug Info:")
+    print(f"      Separator: '{separator}' (use --sep to change)")
+    
+    # Try to read first data row to show how it's being parsed
+    try:
+        first_row_df = pd.read_csv(csv_path, nrows=1, skiprows=skip_rows, sep=separator)
+        if not first_row_df.empty:
+            print(f"      First row parsed as: {first_row_df.columns.tolist()}")
+            print(f"      First row values: {first_row_df.iloc[0].tolist()}")
+    except:
+        pass  # If we can't read first row, just continue
+    
+    print(f"   📊 Column Mapping:")
+    for name, identifier in col_map.items():
+        col_label = {
+            'lon': 'Longitude',
+            'lat': 'Latitude', 
+            'depth_or_elev': 'Depth/Elevation',
+            'scalar': 'Scalar Value'
+        }[name]
 
 
     filtered_chunks = []
@@ -402,10 +495,10 @@ def load_csv_data_for_elevation(
             else: # CSV has depth (positive down)
                 chunk['elevation_km'] = -chunk['depth_or_elev']
 
-            # Filter by elevation range
+            # Filter by elevation range (use .copy() to avoid SettingWithCopyWarning)
             chunk_filtered = chunk[
                 (chunk['elevation_km'] >= min_elev_km) & (chunk['elevation_km'] <= max_elev_km)
-            ]
+            ].copy()
 
             if not chunk_filtered.empty:
                  # --- Convert lon/lat/scalar columns, coerce errors ---
@@ -484,21 +577,33 @@ def create_map_plot(
     csv_overlay_data: Optional[pd.DataFrame] = None,
     base_filename: str = "",
     compared_filename: str = "",
+    csv_only: bool = False,
+    no_outline_marker: bool = False,
 ):
-    """Create a single map plot with optional CSV overlay, ensuring extent covers both datasets."""
+    """Create a single map plot with optional CSV overlay, ensuring extent covers both datasets.
+    
+    If csv_only=True, only CSV scatter points are plotted without HDF5 background.
+    """
     lon_grid, lat_grid = np.meshgrid(lon, lat) # Create 2D grids for HDF5 data
 
     if use_cartopy and HAS_CARTOPY:
         # --- Combine HDF5 and CSV coordinates BEFORE choosing projection ---
-        all_lons_combined = lon_grid.ravel()
-        all_lats_combined = lat_grid.ravel()
-        
-        if csv_overlay_data is not None and not csv_overlay_data.empty:
-            csv_lons = csv_overlay_data['lon'].values
-            csv_lats = csv_overlay_data['lat'].values
-            # Combine all coordinates for projection decision
-            all_lons_combined = np.concatenate([all_lons_combined, csv_lons])
-            all_lats_combined = np.concatenate([all_lats_combined, csv_lats])
+        # In csv-only mode, prioritize CSV data for projection/extent decision
+        if csv_only and csv_overlay_data is not None and not csv_overlay_data.empty:
+            # Use only CSV data for projection decision in csv-only mode
+            all_lons_combined = csv_overlay_data['lon'].values
+            all_lats_combined = csv_overlay_data['lat'].values
+        else:
+            # Normal mode: combine HDF5 and CSV data
+            all_lons_combined = lon_grid.ravel()
+            all_lats_combined = lat_grid.ravel()
+            
+            if csv_overlay_data is not None and not csv_overlay_data.empty:
+                csv_lons = csv_overlay_data['lon'].values
+                csv_lats = csv_overlay_data['lat'].values
+                # Combine all coordinates for projection decision
+                all_lons_combined = np.concatenate([all_lons_combined, csv_lons])
+                all_lats_combined = np.concatenate([all_lats_combined, csv_lats])
         
         # Choose projection based on COMBINED dataset
         ax_crs, data_crs, extent, extent_crs = choose_projection_and_extent(all_lats_combined, all_lons_combined)
@@ -525,13 +630,19 @@ def create_map_plot(
         ax.add_feature(cfeature.OCEAN, facecolor="aliceblue", zorder=0)
 
         # --- HDF5 Data (Pcolormesh) ---
-        valid_data_mask = ~np.isnan(data)
-        im = ax.pcolormesh(
-            lon_plot_h5, lat_grid, np.where(valid_data_mask, data, np.nan),
-            transform=plot_crs_h5,
-            cmap=cmap, vmin=vmin, vmax=vmax,
-            shading="auto", zorder=1
-        )
+        if not csv_only:
+            valid_data_mask = ~np.isnan(data)
+            im = ax.pcolormesh(
+                lon_plot_h5, lat_grid, np.where(valid_data_mask, data, np.nan),
+                transform=plot_crs_h5,
+                cmap=cmap, vmin=vmin, vmax=vmax,
+                shading="auto", zorder=1
+            )
+        else:
+            # For csv_only mode, create a dummy mappable for colorbar
+            import matplotlib.cm as cm
+            norm = plt.Normalize(vmin=vmin, vmax=vmax)
+            im = cm.ScalarMappable(norm=norm, cmap=cmap)
 
 
         # --- CSV Overlay Data (Scatter) ---
@@ -549,10 +660,18 @@ def create_map_plot(
 
             csv_vals_clipped = np.clip(csv_overlay_data['scalar'].values, vmin, vmax)
 
+            # Set marker properties based on no_outline_marker flag
+            if no_outline_marker:
+                edge_color = 'none'
+                edge_width = 0
+            else:
+                edge_color = 'black'
+                edge_width = 0.25
+
             scatter = ax.scatter(
                 csv_lons_plot, csv_lats, c=csv_vals_clipped,
                 cmap=cmap, vmin=vmin, vmax=vmax,
-                s=5, edgecolor='black', linewidth=0.25, alpha=0.7,
+                s=5, edgecolor=edge_color, linewidth=edge_width, alpha=0.7,
                 transform=csv_crs_transform,
                 zorder=2
             )
@@ -602,18 +721,33 @@ def create_map_plot(
              min_lat_final = min(min_lat_final, csv_overlay_data['lat'].min())
              max_lat_final = max(max_lat_final, csv_overlay_data['lat'].max())
 
-        valid_data_mask = ~np.isnan(data)
-        im = ax.pcolormesh(
-            lon_grid, lat_grid, np.where(valid_data_mask, data, np.nan),
-            cmap=cmap, vmin=vmin, vmax=vmax, shading="auto"
-        )
+        if not csv_only:
+            valid_data_mask = ~np.isnan(data)
+            im = ax.pcolormesh(
+                lon_grid, lat_grid, np.where(valid_data_mask, data, np.nan),
+                cmap=cmap, vmin=vmin, vmax=vmax, shading="auto"
+            )
+        else:
+            # For csv_only mode, create a dummy mappable for colorbar
+            import matplotlib.cm as cm
+            norm = plt.Normalize(vmin=vmin, vmax=vmax)
+            im = cm.ScalarMappable(norm=norm, cmap=cmap)
 
         if csv_overlay_data is not None and not csv_overlay_data.empty:
             csv_vals_clipped = np.clip(csv_overlay_data['scalar'].values, vmin, vmax)
+            
+            # Set marker properties based on no_outline_marker flag
+            if no_outline_marker:
+                edge_color = 'none'
+                edge_width = 0
+            else:
+                edge_color = 'black'
+                edge_width = 0.25
+            
             scatter = ax.scatter(
                 csv_overlay_data['lon'], csv_overlay_data['lat'], c=csv_vals_clipped,
                 cmap=cmap, vmin=vmin, vmax=vmax,
-                s=5, edgecolor='black', linewidth=0.25, alpha=0.7
+                s=5, edgecolor=edge_color, linewidth=edge_width, alpha=0.7
             )
 
         ax.set_xlim(min_lon_final, max_lon_final)
@@ -636,6 +770,8 @@ def create_map_plot(
     n_csv = len(csv_overlay_data) if csv_overlay_data is not None and not csv_overlay_data.empty else 0
     if is_ratio:
         title = f"Ln Ratio of {scalar.upper()} at {elev_float_str} km elevation"
+    elif csv_only:
+        title = f"{scalar.upper()} from CSV data at {elev_float_str} km elevation ({n_csv} points)"
     elif csv_overlay_data is not None:
         title = f"{scalar.upper()} (km/s) at {elev_float_str} km elevation (with {n_csv} CSV points overlay)"
     else:
@@ -655,9 +791,10 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__
     )
-    parser.add_argument("h5file1", type=Path, help="Path to the primary (base) HDF5 tomography file.")
+    parser.add_argument("h5file1", type=Path, nargs='?', help="Path to the primary (base) HDF5 tomography file (optional when using --csv-only).")
     parser.add_argument("--compared", type=Path, help="Path to the second HDF5 file for ratio comparison.")
-    parser.add_argument("--csv-data", type=Path, help="Path to the CSV file containing point data.")
+    parser.add_argument("--with-csv", type=Path, dest="csv_data", help="Path to CSV file to overlay on HDF5 data.")
+    parser.add_argument("--csv-only", type=Path, dest="csv_only_file", help="Path to CSV file to plot without HDF5 background (HDF5 file not required).")
     parser.add_argument("--lon-col", help="Column name or index for longitude in the CSV file.")
     parser.add_argument("--lat-col", help="Column name or index for latitude in the CSV file.")
     parser.add_argument("--depth-col", help="Column name or index for depth/elevation in the CSV file.")
@@ -677,21 +814,39 @@ def main():
     parser.add_argument("--cmap", type=str, help="Matplotlib colormap name.")
     parser.add_argument("--elevations", type=str, nargs="+",
                         help="Specific elevations (km) to plot from the HDF5 file.")
+    parser.add_argument("--auto-elevations", action="store_true",
+                        help="Automatically detect elevations from CSV data (for --csv-only mode).")
     parser.add_argument("--output-dir", type=Path, help="Output directory for saved plots.")
     parser.add_argument("--no-cartopy", action="store_true", help="Disable cartopy.")
+    parser.add_argument("--no-outline-marker", action="store_true", help="Remove black outline from CSV scatter points (use when data is very dense).")
     parser.add_argument("--dpi", type=int, default=150, help="DPI for saved figures (default: 150).")
 
     args = parser.parse_args()
 
+    # --- Validate h5file1 requirement ---
+    csv_only_mode = args.csv_only_file is not None
+    
+    # Check for conflicting CSV options first
+    if args.csv_data and args.csv_only_file:
+        raise SystemExit("❌ Cannot use both --with-csv and --csv-only. Choose one.")
+    
+    if args.h5file1 is None and not csv_only_mode:
+        raise SystemExit("❌ HDF5 file (h5file1) is required unless using --csv-only mode.")
+    
+    if args.h5file1 is not None and not args.h5file1.exists():
+        raise SystemExit(f"❌ HDF5 file not found: {args.h5file1}")
+
     # --- Mode Detection and Validation ---
     is_ratio_mode = args.compared is not None
     is_overlay_mode = args.csv_data is not None
+    
+    # Handle --csv-only: it sets csv_data internally and enables csv-only mode
+    if csv_only_mode:
+        args.csv_data = args.csv_only_file
+        is_overlay_mode = True  # Treat as overlay mode internally
 
     if is_ratio_mode and is_overlay_mode:
-        raise SystemExit("❌ Cannot use --compared and --csv-data simultaneously. Choose one mode.")
-
-    if not args.h5file1.exists():
-        raise SystemExit(f"❌ HDF5 file not found: {args.h5file1}")
+        raise SystemExit("❌ Cannot use --compared with --with-csv or --csv-only simultaneously. Choose one mode.")
 
     if is_ratio_mode:
         if not args.compared.exists():
@@ -709,10 +864,13 @@ def main():
             raise SystemExit(f"❌ CSV data file not found: {args.csv_data}")
         required_csv_cols = [args.lon_col, args.lat_col, args.depth_col, args.scalar_col]
         if any(c is None for c in required_csv_cols):
-             raise SystemExit("❌ For CSV overlay (--csv-data), you must specify --lon-col, --lat-col, --depth-col, and --scalar-col.")
-        print("📍 CSV Overlay Mode Enabled (Loading CSV slice per plot)")
+             raise SystemExit("❌ For CSV overlay (--with-csv or --csv-only), you must specify --lon-col, --lat-col, --depth-col, and --scalar-col.")
+        if csv_only_mode:
+            print("📍 CSV-Only Mode Enabled (plotting CSV data without HDF5 background)")
+        else:
+            print("📍 CSV Overlay Mode Enabled (overlaying CSV on HDF5 data)")
         default_cmap = "RdYlBu_r"
-        output_suffix = "_overlay"
+        output_suffix = "_csv_only" if csv_only_mode else "_overlay"
 
         # Parse column specs
         def parse_col_spec(spec):
@@ -735,24 +893,47 @@ def main():
     if args.output_dir:
         out_dir = args.output_dir
     else:
-        out_dir = args.h5file1.parent / f"tomo_maps{output_suffix}"
+        if args.h5file1 is not None:
+            out_dir = args.h5file1.parent / f"tomo_maps{output_suffix}"
+        else:
+            # csv-only mode without h5 file
+            out_dir = Path.cwd() / f"tomo_maps{output_suffix}"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # --- Determine HDF5 Elevations to Plot ---
-    if args.elevations:
-        elevations_to_plot = args.elevations
-        available_elevations = get_all_elevations(args.h5file1)
-        valid_user_elevations = [e for e in elevations_to_plot if e in available_elevations]
-        invalid_user_elevations = [e for e in elevations_to_plot if e not in available_elevations]
-        if invalid_user_elevations:
-            print(f"⚠️ Warning: Specified elevations not found in {args.h5file1.name}: {invalid_user_elevations}")
-        if not valid_user_elevations:
-             raise SystemExit(f"❌ None of the specified HDF5 elevations were found in {args.h5file1.name}.")
-        elevations_to_plot = valid_user_elevations
-        if is_ratio_mode:
-            elevations_to_plot = [e for e in elevations_to_plot if e in common_elevations]
+    if csv_only_mode and args.h5file1 is None:
+        # CSV-only mode without HDF5
+        if args.auto_elevations:
+            # Auto-detect elevations from CSV
+            elevations_to_plot = detect_elevations_from_csv(
+                args.csv_data,
+                args.depth_col,
+                args.depth_is_elevation,
+                args.skip_rows,
+                args.sep
+            )
             if not elevations_to_plot:
-                raise SystemExit("❌ None of the specified elevations are common to both files.")
+                raise SystemExit("❌ No elevations found in CSV file.")
+        elif args.elevations:
+            # User specified elevations
+            elevations_to_plot = args.elevations
+        else:
+            raise SystemExit("❌ When using --csv-only without an HDF5 file, you must specify --elevations or use --auto-elevations.")
+    elif args.elevations:
+        elevations_to_plot = args.elevations
+        if args.h5file1 is not None:
+            available_elevations = get_all_elevations(args.h5file1)
+            valid_user_elevations = [e for e in elevations_to_plot if e in available_elevations]
+            invalid_user_elevations = [e for e in elevations_to_plot if e not in available_elevations]
+            if invalid_user_elevations:
+                print(f"⚠️ Warning: Specified elevations not found in {args.h5file1.name}: {invalid_user_elevations}")
+            if not valid_user_elevations:
+                 raise SystemExit(f"❌ None of the specified HDF5 elevations were found in {args.h5file1.name}.")
+            elevations_to_plot = valid_user_elevations
+            if is_ratio_mode:
+                elevations_to_plot = [e for e in elevations_to_plot if e in common_elevations]
+                if not elevations_to_plot:
+                    raise SystemExit("❌ None of the specified elevations are common to both files.")
 
     elif is_ratio_mode:
         elevations_to_plot = common_elevations
@@ -770,6 +951,23 @@ def main():
         plot_vmin, plot_vmax = calculate_global_ln_ratio_limits(args.h5file1, args.compared, args.scalar, elevations_to_plot)
         if args.vmin is not None or args.vmax is not None:
              print("   Note: User-specified --vmin/--vmax are ignored for ratio plots. Using calculated symmetric range.")
+    elif csv_only_mode and args.h5file1 is None:
+        # CSV-only mode without HDF5: use provided limits or defaults
+        if args.vmin is not None and args.vmax is not None:
+            plot_vmin, plot_vmax = args.vmin, args.vmax
+            print(f"📊 Using user-specified {args.scalar} limits: {plot_vmin:.3f} .. {plot_vmax:.3f}")
+        else:
+            # Use typical defaults for seismic velocities
+            if args.scalar == 'vs':
+                plot_vmin, plot_vmax = 0.0, 5.0
+            elif args.scalar == 'vp':
+                plot_vmin, plot_vmax = 0.0, 9.0
+            elif args.scalar == 'rho':
+                plot_vmin, plot_vmax = 1.0, 4.0
+            else:
+                plot_vmin, plot_vmax = 0.0, 10.0
+            print(f"📊 Using default {args.scalar} limits: {plot_vmin:.3f} .. {plot_vmax:.3f}")
+            print(f"   (Specify --vmin and --vmax to override)")
     else:
         plot_vmin, plot_vmax = determine_global_limits(args.h5file1, args.scalar, args.vmin, args.vmax)
 
@@ -783,35 +981,43 @@ def main():
         csv_data_slice = None
 
         try:
-            # --- Load HDF5 Data ---
-            lat1, lon1, data1 = load_hdf5_slice(args.h5file1, elev, args.scalar)
-
-            if is_ratio_mode:
-                lat2, lon2, data2 = load_hdf5_slice(args.compared, elev, args.scalar)
-                with np.errstate(divide='ignore', invalid='ignore'):
-                    valid_mask = (data1 > 0) & (data2 > 0) & ~np.isnan(data1) & ~np.isnan(data2)
-                    ratio_data = np.full(data1.shape, np.nan)
-                    ratio_data[valid_mask] = np.log(data2[valid_mask] / data1[valid_mask])
-                plot_data = ratio_data
-                lat, lon = lat1, lon1
-
-            else:
+            # --- Load HDF5 Data (skip if csv-only mode) ---
+            if csv_only_mode and args.h5file1 is None:
+                # CSV-only mode: create dummy lat/lon arrays, will use CSV extent
+                lat1 = np.array([0.0])
+                lon1 = np.array([0.0])
+                data1 = np.array([[np.nan]])
                 plot_data = data1
                 lat, lon = lat1, lon1
+            else:
+                lat1, lon1, data1 = load_hdf5_slice(args.h5file1, elev, args.scalar)
 
-                # --- Load CSV Data (if overlay mode) ---
-                if is_overlay_mode:
-                     try:
-                        target_elev_float = float(elev.replace('_','.'))
-                        csv_data_slice = load_csv_data_for_elevation(
-                            args.csv_data, target_elev_float,
-                            args.lon_col, args.lat_col, args.depth_col, args.scalar_col,
-                            args.depth_is_elevation, args.depth_tolerance,
-                            args.skip_rows, args.sep
-                        )
-                     except Exception as csv_e:
-                         print(f"   ❌ Error loading CSV data for elevation {elev}: {csv_e}")
-                         csv_data_slice = None
+                if is_ratio_mode:
+                    lat2, lon2, data2 = load_hdf5_slice(args.compared, elev, args.scalar)
+                    with np.errstate(divide='ignore', invalid='ignore'):
+                        valid_mask = (data1 > 0) & (data2 > 0) & ~np.isnan(data1) & ~np.isnan(data2)
+                        ratio_data = np.full(data1.shape, np.nan)
+                        ratio_data[valid_mask] = np.log(data2[valid_mask] / data1[valid_mask])
+                    plot_data = ratio_data
+                    lat, lon = lat1, lon1
+
+                else:
+                    plot_data = data1
+                    lat, lon = lat1, lon1
+
+            # --- Load CSV Data (if overlay or csv-only mode) ---
+            if is_overlay_mode or csv_only_mode:
+                 try:
+                    target_elev_float = float(elev.replace('_','.'))
+                    csv_data_slice = load_csv_data_for_elevation(
+                        args.csv_data, target_elev_float,
+                        args.lon_col, args.lat_col, args.depth_col, args.scalar_col,
+                        args.depth_is_elevation, args.depth_tolerance,
+                        args.skip_rows, args.sep
+                    )
+                 except Exception as csv_e:
+                     print(f"   ❌ Error loading CSV data for elevation {elev}: {csv_e}")
+                     csv_data_slice = None
 
 
             # --- Create Plot ---
@@ -820,14 +1026,18 @@ def main():
                 vmin=plot_vmin, vmax=plot_vmax, cmap=cmap, use_cartopy=use_cartopy,
                 is_ratio=is_ratio_mode,
                 csv_overlay_data=csv_data_slice,
-                base_filename=args.h5file1.name,
-                compared_filename=args.compared.name if args.compared else ""
+                base_filename=args.h5file1.name if args.h5file1 else "csv_data",
+                compared_filename=args.compared.name if args.compared else "",
+                csv_only=csv_only_mode,
+                no_outline_marker=args.no_outline_marker
             )
 
             # --- Save Plot ---
             elev_str_fname = elev.replace("_",".")
             if is_ratio_mode:
                  outfile = out_dir / f"ln_ratio_{args.scalar}_elev{elev_str_fname}.png"
+            elif csv_only_mode:
+                 outfile = out_dir / f"csv_only_{args.scalar}_elev{elev_str_fname}.png"
             elif is_overlay_mode:
                  outfile = out_dir / f"overlay_{args.scalar}_elev{elev_str_fname}.png"
             else:
