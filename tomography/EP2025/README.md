@@ -1,5 +1,5 @@
 ```angular2html
-(venv) (ringo311) seb56@c015kr:~/nzcvm_data/tomography/EP2017$ python ../EP2020/tools/interpolate_to_uniform_nzcvm_grid.py ~/tomo_conversion/EP2017/vlnzw2p1dnxyzltln.tbl.txt ../EP2010/ep2010.h5 ./ep2017_ver2.h5 --extend-lon 5 --fill-value nan
+(venv) (ringo311) seb56@c015kr:~/nzcvm_data/tomography/EP2025$ python ../EP2020/tools/interpolate_to_uniform_nzcvm_grid.py ~/tomo_conversion/EP2025/vlnzw3p1dnxyzltln.tbl_mod.txt ../EP2010/ep2010.h5 ./ep2025_ver2.h5 --extend-lon 5 --fill-value nan
 ======================================================================
 Eberhart-Phillips TOMOGRAPHY INTERPOLATION (IMPROVED)
 ======================================================================
@@ -17,7 +17,7 @@ Eberhart-Phillips TOMOGRAPHY INTERPOLATION (IMPROVED)
 
    Reading EP-style TXT...
    Found 25 depth levels in input data
-   Longitude range: -179.99deg to 179.96deg
+   Longitude range: -179.99deg to 180.00deg
    Latitude range: -56.95deg to -26.51deg
 
    Loading NZCVM grid...
@@ -50,7 +50,7 @@ Eberhart-Phillips TOMOGRAPHY INTERPOLATION (IMPROVED)
       RHO: 248,725 / 37,345,000 (0.67%)
 
    Writing HDF5 with compression:
-   Output: ep2017_ver2.h5
+   Output: ep2025_ver2.h5
    Grid: 1400 lat x 1067 lon x 25 depth
    Compression: gzip level 4 + shuffle filter
    Uncompressed size estimate: 997.2 MB (0.97 GB)
@@ -61,10 +61,10 @@ Eberhart-Phillips TOMOGRAPHY INTERPOLATION (IMPROVED)
    Written group '-8' (20/25)
    Written group '15' (25/25)
 
-   Successfully saved EP-style HDF5 to ep2017_ver2.h5
-   Actual file size: 127.8 MB (0.12 GB)
-   Compression ratio: 7.8x
-   Space saved: 869.4 MB (0.85 GB)
+   Successfully saved EP-style HDF5 to ep2025_ver2.h5
+   Actual file size: 121.7 MB (0.12 GB)
+   Compression ratio: 8.2x
+   Space saved: 875.5 MB (0.85 GB)
 
 ======================================================================
 CONVERSION COMPLETE!
@@ -76,4 +76,3 @@ CONVERSION COMPLETE!
    - Check coverage statistics above for data quality assessment
 
 ```
-

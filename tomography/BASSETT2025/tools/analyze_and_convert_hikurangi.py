@@ -1,11 +1,15 @@
 """
-Analyze and convert Hikurangi tomography data to NZCVM-compatible HDF5 format.
+Analyze and convert Hikurangi tomography data to EP2020-compatible HDF5 format.
 
-This script:
-1. Analyzes the spatial structure and resolution of Hikurangi data
-2. Compares with EP2020 reference grid
-3. Interpolates to an appropriate regular grid
-4. Saves in HDF5 format consistent with EP2020
+This version interpolates Hikurangi data onto the SAME GRID as EP2020 for compatibility
+and easy model blending. The Hikurangi data fills an UPRIGHT RECTANGULAR region aligned
+with lat/lon coordinates within the EP2020 grid.
+
+Key features:
+- Uses EP2020 grid spacing and coordinates
+- Regular upright lon/lat grid (no rotation)
+- Rectangular bounding box (upright coverage area)
+- Direct compatibility with EP2020 for model blending
 """
 
 from pathlib import Path
@@ -39,7 +43,6 @@ def read_hikurangi_txt(txt_path: str | Path) -> pd.DataFrame:
         "lon", "lat", "vp", "vs", "vp_o_vs", "rho", "constraint"
     ]
     
-    # Read with chunking for large file
     df = pd.read_csv(
         txt_path,
         sep=r"\s+",
@@ -48,882 +51,440 @@ def read_hikurangi_txt(txt_path: str | Path) -> pd.DataFrame:
         engine="python"
     )
     
-    # Create elevation = -depth (elevation: positive = above sea level)
-    if "depth" not in df.columns:
-        raise ValueError("Input file missing expected 'depth' column")
     df["elevation"] = -df["depth"]
-    print("   Note: created column 'elevation' = -depth (km). Elevation >0 = above sea level.")
-
     print(f"   Total points: {len(df):,}")
+    
+    # Handle dateline crossing
+    lon_span = df["lon"].max() - df["lon"].min()
+    if lon_span > 180:
+        print(f"   ⚠️  Detected dateline crossing (converting to 0-360 range)")
+        df.loc[df['lon'] < 0, 'lon'] += 360
+    
     return df
 
 
-def detect_units(df: pd.DataFrame) -> dict:
+def load_ep2020_grid(ep2020_path: str | Path) -> dict:
     """
-    Detect and verify units of velocity and density data.
+    Load the grid structure from EP2020 HDF5 file.
     
     Parameters
     ----------
-    df : pd.DataFrame
-        Input DataFrame.
-    
-    Returns
-    -------
-    dict
-        Dictionary with unit detection results and conversion factors if needed.
-    """
-    print("\n" + "="*70)
-    print("UNIT DETECTION AND VERIFICATION")
-    print("="*70)
-    
-    # Get statistics excluding zeros and extreme outliers
-    vp_nonzero = df[df['vp'] > 0.01]['vp']
-    vs_nonzero = df[df['vs'] > 0.01]['vs']
-    rho_nonzero = df[df['rho'] > 0.1]['rho']
-    
-    vp_min, vp_max, vp_median = vp_nonzero.min(), vp_nonzero.max(), vp_nonzero.median()
-    vs_min, vs_max, vs_median = vs_nonzero.min(), vs_nonzero.max(), vs_nonzero.median()
-    rho_min, rho_max, rho_median = rho_nonzero.min(), rho_nonzero.max(), rho_nonzero.median()
-    
-    print(f"\nRaw value ranges (excluding near-zero values):")
-    print(f"   Vp:  min={vp_min:.3f}, max={vp_max:.3f}, median={vp_median:.3f}")
-    print(f"   Vs:  min={vs_min:.3f}, max={vs_max:.3f}, median={vs_median:.3f}")
-    print(f"   Rho: min={rho_min:.3f}, max={rho_max:.3f}, median={rho_median:.3f}")
-    
-    # Expected ranges for different unit systems
-    # Velocities
-    vp_range_kms = (1.4, 9.0)      # km/s: typical crustal range
-    vp_range_ms = (1400, 9000)     # m/s
-    vs_range_kms = (0.5, 5.5)      # km/s
-    vs_range_ms = (500, 5500)      # m/s
-    
-    # Density
-    rho_range_gcc = (1.5, 3.6)     # g/cm³: typical crustal range
-    rho_range_kgm3 = (1500, 3600)  # kg/m³
-    
-    # Detect units
-    results = {
-        'vp_likely_kms': vp_range_kms[0] <= vp_median <= vp_range_kms[1],
-        'vp_likely_ms': vp_range_ms[0] <= vp_median <= vp_range_ms[1],
-        'vs_likely_kms': vs_range_kms[0] <= vs_median <= vs_range_kms[1],
-        'vs_likely_ms': vs_range_ms[0] <= vs_median <= vs_range_ms[1],
-        'rho_likely_gcc': rho_range_gcc[0] <= rho_median <= rho_range_gcc[1],
-        'rho_likely_kgm3': rho_range_kgm3[0] <= rho_median <= rho_range_kgm3[1],
-        'vp_conversion': 1.0,
-        'vs_conversion': 1.0,
-        'rho_conversion': 1.0,
-        'needs_conversion': False
-    }
-    
-    print(f"\n" + "="*70)
-    print("UNIT DETECTION RESULTS:")
-    print("="*70)
-    
-    # Velocity unit detection
-    print(f"\nVELOCITY UNITS:")
-    if results['vp_likely_kms'] and results['vs_likely_kms']:
-        print(f"   ✅ Vp and Vs appear to be in km/s")
-        print(f"      (Vp median {vp_median:.2f} km/s, Vs median {vs_median:.2f} km/s)")
-    elif results['vp_likely_ms'] and results['vs_likely_ms']:
-        print(f"   ⚠️  Vp and Vs appear to be in m/s (NOT km/s!)")
-        print(f"      (Vp median {vp_median:.0f} m/s, Vs median {vs_median:.0f} m/s)")
-        print(f"   🔄 Will convert to km/s by dividing by 1000")
-        results['vp_conversion'] = 0.001
-        results['vs_conversion'] = 0.001
-        results['needs_conversion'] = True
-    else:
-        print(f"   ❌ WARNING: Velocity units are UNCLEAR or UNUSUAL!")
-        print(f"      Vp median: {vp_median:.3f}")
-        print(f"      Vs median: {vs_median:.3f}")
-        print(f"      Expected km/s: Vp ~2-7, Vs ~1-4")
-        print(f"      Expected m/s: Vp ~2000-7000, Vs ~1000-4000")
-        print(f"   ⚠️  MANUAL VERIFICATION REQUIRED!")
-    
-    # Density unit detection
-    print(f"\nDENSITY UNITS:")
-    if results['rho_likely_gcc']:
-        print(f"   ✅ Density appears to be in g/cm³")
-        print(f"      (median {rho_median:.2f} g/cm³)")
-    elif results['rho_likely_kgm3']:
-        print(f"   ⚠️  Density appears to be in kg/m³ (NOT g/cm³!)")
-        print(f"      (median {rho_median:.0f} kg/m³)")
-        print(f"   🔄 Will convert to g/cm³ by dividing by 1000")
-        results['rho_conversion'] = 0.001
-        results['needs_conversion'] = True
-    else:
-        print(f"   ❌ WARNING: Density units are UNCLEAR or UNUSUAL!")
-        print(f"      Median: {rho_median:.3f}")
-        print(f"      Expected g/cm³: ~2.0-3.0")
-        print(f"      Expected kg/m³: ~2000-3000")
-        print(f"   ⚠️  MANUAL VERIFICATION REQUIRED!")
-    
-    # Check for suspicious low values that might be water or flag values
-    print(f"\nDATA QUALITY CHECKS:")
-    very_low_vp = (df['vp'] < 1.0).sum()
-    very_low_vs = (df['vs'] < 0.3).sum()
-    print(f"   Very low Vp (<1.0): {very_low_vp:,} points ({100*very_low_vp/len(df):.1f}%)")
-    print(f"   Very low Vs (<0.3): {very_low_vs:,} points ({100*very_low_vs/len(df):.1f}%)")
-    
-    if very_low_vp > len(df) * 0.01:  # More than 1% of points
-        print(f"   ℹ️  Note: Many low velocity values detected.")
-        print(f"      These might be:")
-        print(f"      - Water layer (Vp~1.5 km/s, Vs~0)")
-        print(f"      - Very soft sediments")
-        print(f"      - Flag/placeholder values")
-        print(f"      - Incorrect units")
-    
-    print(f"\n" + "="*70)
-    
-    if results['needs_conversion']:
-        print(f"⚠️  CONVERSION WILL BE APPLIED:")
-        print(f"   Vp: multiply by {results['vp_conversion']}")
-        print(f"   Vs: multiply by {results['vs_conversion']}")
-        print(f"   Rho: multiply by {results['rho_conversion']}")
-        print(f"="*70)
-    
-    return results
-
-
-def analyze_grid_structure(df: pd.DataFrame) -> dict:
-    """
-    Analyze the grid structure of the Hikurangi data.
-    
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Input DataFrame.
-    
-    Returns
-    -------
-    dict
-        Dictionary containing grid analysis results.
-    """
-    print("\n" + "="*70)
-    print("GRID STRUCTURE ANALYSIS")
-    print("="*70)
-    
-    # 1. Check orientation (via model_x, model_y)
-    unique_model_x = np.unique(df["model_x"])
-    unique_model_y = np.unique(df["model_y"])
-    # use elevation (km) instead of original depth
-    unique_elevations = np.unique(df["elevation"])
-
-    print(f"\n1. ORIENTATION & COORDINATE SYSTEM:")
-    print(f"   Model X range: {unique_model_x.min():.1f} to {unique_model_x.max():.1f} km")
-    print(f"   Model Y range: {unique_model_y.min():.1f} to {unique_model_y.max():.1f} km")
-    print(f"   Number of unique X values: {len(unique_model_x)}")
-    print(f"   Number of unique Y values: {len(unique_model_y)}")
-    
-    # Check if grid is regular
-    if len(unique_model_x) > 1:
-        dx = np.diff(unique_model_x)
-        dx_regular = np.allclose(dx, dx[0], rtol=1e-3)
-        print(f"   X spacing regular: {dx_regular}")
-        if dx_regular:
-            print(f"   X spacing: {dx[0]:.3f} km")
-        else:
-            print(f"   X spacing: min={dx.min():.3f}, max={dx.max():.3f}, mean={dx.mean():.3f} km")
-    
-    if len(unique_model_y) > 1:
-        dy = np.diff(unique_model_y)
-        dy_regular = np.allclose(dy, dy[0], rtol=1e-3)
-        print(f"   Y spacing regular: {dy_regular}")
-        if dy_regular:
-            print(f"   Y spacing: {dy[0]:.3f} km")
-        else:
-            print(f"   Y spacing: min={dy.min():.3f}, max={dy.max():.3f}, mean={dy.mean():.3f} km")
-    
-    # 2. Domain in lat/lon (handle dateline crossing)
-    print(f"\n2. GEOGRAPHIC DOMAIN:")
-    lon_min_raw, lon_max_raw = df['lon'].min(), df['lon'].max()
-    
-    # Check if data crosses the dateline (180° meridian)
-    lon_span_raw = lon_max_raw - lon_min_raw
-    crosses_dateline = lon_span_raw > 180
-    
-    if crosses_dateline:
-        # Convert negative longitudes to 0-360 range
-        lon_adjusted = df['lon'].copy()
-        lon_adjusted[lon_adjusted < 0] += 360
-        lon_min, lon_max = lon_adjusted.min(), lon_adjusted.max()
-        print(f"   ⚠️  Data crosses 180° dateline!")
-        print(f"   Raw longitude: {lon_min_raw:.3f}°E to {lon_max_raw:.3f}°E (spans {lon_span_raw:.1f}°)")
-        print(f"   Adjusted to: {lon_min:.3f}°E to {lon_max:.3f}°E (0-360 range)")
-    else:
-        lon_min, lon_max = lon_min_raw, lon_max_raw
-        print(f"   Longitude: {lon_min:.3f}°E to {lon_max:.3f}°E")
-    
-    print(f"   Latitude: {df['lat'].min():.3f}°S to {df['lat'].max():.3f}°S")
-    print(f"   Span: {lon_max-lon_min:.3f}° lon × {df['lat'].max()-df['lat'].min():.3f}° lat")
-    
-    # 3. Elevation levels (previously 'depth levels' in file)
-    print(f"\n3. ELEVATION LEVELS (km):")
-    print(f"   Number of elevation levels: {len(unique_elevations)}")
-    print(f"   Elevation range: {unique_elevations.min():.2f} to {unique_elevations.max():.2f} km "
-          f"(positive = above sea level)")
-    if len(unique_elevations) > 1:
-        dz = np.diff(unique_elevations)
-        dz_regular = np.allclose(dz, dz[0], rtol=1e-3)
-        print(f"   Elevation spacing regular: {dz_regular}")
-        if dz_regular:
-            print(f"   Elevation spacing: {dz[0]:.3f} km")
-        else:
-            print(f"   Elevation spacing: min={dz.min():.3f}, max={dz.max():.3f}, mean={dz.mean():.3f} km")
-
-    # Sample elevations to show
-    if len(unique_elevations) <= 20:
-        print(f"   All elevations: {unique_elevations}")
-    else:
-        print(f"   First 10 elevations: {unique_elevations[:10]}")
-        print(f"   Last 10 elevations: {unique_elevations[-10:]}")
-
-    # 4. Points per elevation level
-    points_per_elev = df.groupby("elevation").size()
-    print(f"\n4. POINTS PER ELEVATION LEVEL:")
-    print(f"   Min points: {points_per_elev.min():,}")
-    print(f"   Max points: {points_per_elev.max():,}")
-    print(f"   Mean points: {points_per_elev.mean():,.0f}")
-    print(f"   Consistent: {points_per_elev.nunique() == 1}")
-
-    # 5. Check for rotation angle
-    print(f"\n5. ROTATION ANALYSIS:")
-    # Calculate angle between model coords and geographic coords
-    # Sample a few points to check
-    sample = df.sample(min(1000, len(df)), random_state=42)
-    
-    # Convert lat/lon differences to approximate km (rough estimate)
-    mean_lat = sample["lat"].mean()
-    km_per_deg_lat = 111.0
-    km_per_deg_lon = 111.0 * np.cos(np.radians(mean_lat))
-    
-    # Calculate vectors in both coordinate systems
-    if len(sample) > 1:
-        # Take differences between consecutive points
-        sample_sorted = sample.sort_values(["model_y", "model_x"])
-        dx_model = sample_sorted["model_x"].diff().dropna()
-        dy_model = sample_sorted["model_y"].diff().dropna()
-        dlon = sample_sorted["lon"].diff().dropna() * km_per_deg_lon
-        dlat = sample_sorted["lat"].diff().dropna() * km_per_deg_lat
-        
-        # Find points with significant model_x displacement
-        sig_points = (np.abs(dx_model) > 0.1) & (np.abs(dy_model) < 0.1)
-        if sig_points.any():
-            angles = np.arctan2(dlat[sig_points].values, dlon[sig_points].values) - \
-                     np.arctan2(dy_model[sig_points].values, dx_model[sig_points].values)
-            mean_angle = np.degrees(np.angle(np.exp(1j * angles).mean()))
-            print(f"   Estimated rotation: {mean_angle:.1f}° (approximate)")
-        else:
-            print(f"   Cannot estimate rotation from sample")
-    
-    # 6. Velocity and density summary (unit conversion already applied if needed)
-    print(f"\n6. PARAMETER SUMMARY:")
-    print(f"   Vp: {df['vp'].min():.3f} to {df['vp'].max():.3f} km/s")
-    print(f"   Vs: {df['vs'].min():.3f} to {df['vs'].max():.3f} km/s")
-    print(f"   Vp/Vs: {df['vp_o_vs'].min():.3f} to {df['vp_o_vs'].max():.3f}")
-    print(f"   Density: {df['rho'].min():.3f} to {df['rho'].max():.3f} g/cm³")
-    
-    # Constraint flag statistics
-    print(f"\n7. DATA CONSTRAINT:")
-    print(f"   Constrained points (flag=1): {(df['constraint']==1).sum():,} ({100*(df['constraint']==1).mean():.1f}%)")
-    print(f"   Unconstrained points (flag=0): {(df['constraint']==0).sum():,} ({100*(df['constraint']==0).mean():.1f}%)")
-    
-    # Determine final longitude range to use
-    if crosses_dateline:
-        final_lon_range = (lon_min, lon_max)  # Adjusted 0-360 range
-    else:
-        final_lon_range = (lon_min_raw, lon_max_raw)
-    
-    return {
-        "model_x": unique_model_x,
-        "model_y": unique_model_y,
-        # return elevations (km). downstream code expects key 'depths', keep name but semantics = elevation
-        "depths": unique_elevations,
-        "lon_range": final_lon_range,
-        "lat_range": (df['lat'].min(), df['lat'].max()),
-        "points_per_depth": points_per_elev.values[0] if points_per_elev.nunique() == 1 else None,
-        "crosses_dateline": crosses_dateline
-    }
-
-
-def load_ep2020_grid_info(h5_path: str | Path) -> dict:
-    """
-    Load EP2020 grid information for comparison.
-    
-    Parameters
-    ----------
-    h5_path : str or Path
+    ep2020_path : str or Path
         Path to EP2020 HDF5 file.
     
     Returns
     -------
     dict
-        Dictionary with EP2020 grid info.
+        Dictionary containing EP2020 grid information.
     """
     print("\n" + "="*70)
-    print("EP2020 REFERENCE GRID")
+    print("LOADING EP2020 GRID STRUCTURE")
     print("="*70)
     
-    with h5py.File(h5_path, "r") as f:
-        # Get first group to extract grid
+    with h5py.File(ep2020_path, 'r') as f:
+        # Get first group to read coordinate arrays
         first_group = list(f.keys())[0]
-        grp = f[first_group]
+        lats = f[first_group]['latitudes'][:]
+        lons = f[first_group]['longitudes'][:]
         
-        lat = grp["latitudes"][:]
-        lon = grp["longitudes"][:]
-        depths = sorted([float(k) for k in f.keys()])
+        # Get all elevation levels
+        elevations = []
+        for key in f.keys():
+            try:
+                # Handle both integer and decimal group names
+                if '_' in key:
+                    # Format like "-100_50" for -100.5
+                    parts = key.split('_')
+                    elev = float(parts[0]) + float(parts[1])/100 * (1 if float(parts[0]) >= 0 else -1)
+                else:
+                    elev = float(key)
+                elevations.append(elev)
+            except ValueError:
+                continue
         
-        print(f"\nGrid dimensions: {len(lat)} × {len(lon)} × {len(depths)}")
-        print(f"Latitude: {lat.min():.3f}°S to {lat.max():.3f}°S")
-        print(f"Longitude: {lon.min():.3f}°E to {lon.max():.3f}°E")
-        print(f"Depths: {len(depths)} levels from {min(depths):.0f} to {max(depths):.0f} km")
-        
-        dlat = np.diff(lat)
-        dlon = np.diff(lon)
-        print(f"Latitude spacing: {dlat.mean():.4f}° ({dlat.mean()*111:.2f} km)")
-        print(f"Longitude spacing: {dlon.mean():.4f}° ({dlon.mean()*111*np.cos(np.radians(lat.mean())):.2f} km)")
-        
-        return {
-            "lat": lat,
-            "lon": lon,
-            "depths": np.array(depths),
-            "dlat": dlat.mean(),
-            "dlon": dlon.mean()
-        }
-
-
-def determine_target_grid(hik_info: dict, ep_info: dict = None, use_ep_spacing: bool = True) -> dict:
-    """
-    Determine appropriate target grid for Hikurangi data.
+        elevations = np.sort(elevations)
     
-    Parameters
-    ----------
-    hik_info : dict
-        Hikurangi grid information.
-    ep_info : dict, optional
-        EP2020 grid information for reference.
-    use_ep_spacing : bool
-        If True and ep_info is provided, use EP2020 grid spacing for compatibility.
-    
-    Returns
-    -------
-    dict
-        Target grid specification.
-    """
-    print("\n" + "="*70)
-    print("TARGET GRID DETERMINATION")
-    print("="*70)
-    
-    lon_min, lon_max = hik_info["lon_range"]
-    lat_min, lat_max = hik_info["lat_range"]
-    
-    # Estimate current resolution
-    model_x = hik_info["model_x"]
-    model_y = hik_info["model_y"]
-    
-    if len(model_x) > 1 and len(model_y) > 1:
-        dx_km = np.median(np.diff(model_x))
-        dy_km = np.median(np.diff(model_y))
-        mean_lat = (lat_min + lat_max) / 2
-        
-        # Convert to degrees (approximate)
-        dlat_deg = dy_km / 111.0
-        dlon_deg = dx_km / (111.0 * np.cos(np.radians(mean_lat)))
-        
-        print(f"\nOriginal grid spacing:")
-        print(f"   Model space: {dx_km:.3f} km × {dy_km:.3f} km")
-        print(f"   Geographic: ~{dlon_deg:.4f}° × {dlat_deg:.4f}°")
-        
-        # Determine target spacing
-        if use_ep_spacing and ep_info is not None:
-            # Use EP2020 spacing for compatibility
-            target_dlat = abs(ep_info["dlat"])  # Use absolute value
-            target_dlon = abs(ep_info["dlon"])
-            print(f"\nUsing EP2020 grid spacing for compatibility:")
-            print(f"   {target_dlon:.4f}° × {target_dlat:.4f}°")
-        else:
-            # Use Hikurangi's native resolution
-            target_dlat = dlat_deg
-            target_dlon = dlon_deg
-            print(f"\nUsing Hikurangi native resolution:")
-            print(f"   {target_dlon:.4f}° × {target_dlat:.4f}°")
-    else:
-        # Default spacing if can't determine from data
-        if ep_info is not None:
-            target_dlat = abs(ep_info["dlat"])
-            target_dlon = abs(ep_info["dlon"])
-        else:
-            target_dlat = 0.01  # ~1.1 km
-            target_dlon = 0.01  # ~0.8-1.0 km depending on latitude
-        print(f"\nUsing default grid spacing: {target_dlon:.4f}° × {target_dlat:.4f}°")
-    
-    # Generate grid with proper handling
-    # Add small buffer
-    lon_buffer = target_dlon * 2
-    lat_buffer = target_dlat * 2
-    
-    # Create latitude array (always works normally)
-    target_lat = np.arange(lat_min - lat_buffer, lat_max + lat_buffer + target_dlat/2, target_dlat)
-    
-    # Create longitude array (handle potential dateline crossing)
-    if lon_min < 0 and lon_max > 180:  # Crosses dateline in adjusted coords
-        # This shouldn't happen with adjusted coords, but handle it
-        target_lon = np.arange(lon_min - lon_buffer, lon_max + lon_buffer + target_dlon/2, target_dlon)
-    else:
-        target_lon = np.arange(lon_min - lon_buffer, lon_max + lon_buffer + target_dlon/2, target_dlon)
-    
-    target_depths = hik_info["depths"]
-    
-    print(f"\nTarget grid dimensions: {len(target_lat)} × {len(target_lon)} × {len(target_depths)}")
-    print(f"Target points per level: {len(target_lat) * len(target_lon):,}")
-    print(f"Target total points: {len(target_lat) * len(target_lon) * len(target_depths):,}")
-    
-    # Convert longitudes back to -180 to 180 range if needed
-    if (target_lon > 180).any():
-        print(f"\nConverting longitudes back to -180 to 180 range...")
-        target_lon_wrapped = target_lon.copy()
-        target_lon_wrapped[target_lon_wrapped > 180] -= 360
-        print(f"   Longitude range: {target_lon_wrapped.min():.3f}°E to {target_lon_wrapped.max():.3f}°E")
-        use_wrapped = True
-    else:
-        target_lon_wrapped = target_lon
-        use_wrapped = False
+    print(f"\n   Grid dimensions: {len(lats)} lat × {len(lons)} lon")
+    print(f"   Latitude range: {lats.min():.3f}° to {lats.max():.3f}°")
+    print(f"   Longitude range: {lons.min():.3f}° to {lons.max():.3f}°")
+    print(f"   Lat spacing: {np.median(np.diff(lats)):.5f}°")
+    print(f"   Lon spacing: {np.median(np.diff(lons)):.5f}°")
+    print(f"   Total grid points: {len(lats) * len(lons):,}")
+    print(f"   Elevation levels: {len(elevations)}")
     
     return {
-        "lat": target_lat,
-        "lon": target_lon_wrapped,
-        "lon_original": target_lon,  # Keep for reference
-        "depths": target_depths,
-        "dlat": target_dlat,
-        "dlon": target_dlon,
-        "crosses_dateline": use_wrapped
+        "lat": lats,
+        "lon": lons,
+        "elevations": elevations,
+        "nlat": len(lats),
+        "nlon": len(lons)
     }
 
 
-def interpolate_hikurangi_to_grid(
+def find_hikurangi_coverage_on_ep2020_grid(
     df: pd.DataFrame,
-    target_grid: dict,
-    use_constrained_only: bool = False
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    ep2020_grid: dict
+) -> dict:
     """
-    Interpolate Hikurangi data to regular grid.
+    Determine grid for Hikurangi data using EP2020 spacing but extended coverage.
     
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Input Hikurangi data.
-    target_grid : dict
-        Target grid specification.
-    use_constrained_only : bool
-        If True, only use constrained points (constraint=1) for interpolation.
-    
-    Returns
-    -------
-    tuple
-        (vp_stack, vs_stack, rho_stack) as 3D arrays (nz, nlat, nlon).
-    """
-    print("\n" + "="*70)
-    print("INTERPOLATION")
-    print("="*70)
-    
-    if use_constrained_only:
-        print("\nUsing only constrained points (constraint=1)")
-        df = df[df["constraint"] == 1].copy()
-        print(f"Points remaining: {len(df):,}")
-    
-    lat = target_grid["lat"]
-    lon = target_grid["lon"]
-    # target_grid['depths'] are elevations (km)
-    depths = target_grid["depths"]
-    
-    nlat, nlon, ndepth = len(lat), len(lon), len(depths)
-    
-    vp_stack = np.full((ndepth, nlat, nlon), np.nan, dtype=np.float32)
-    vs_stack = np.full((ndepth, nlat, nlon), np.nan, dtype=np.float32)
-    rho_stack = np.full((ndepth, nlat, nlon), np.nan, dtype=np.float32)
-    
-    lon_grid, lat_grid = np.meshgrid(lon, lat)
-    
-    print(f"\nInterpolating {len(depths)} elevation levels...")
-    for iz, elev in enumerate(depths):
-        if (iz + 1) % 10 == 0 or iz == 0 or iz == len(depths) - 1:
-            print(f"   Level {iz+1}/{len(depths)}: elevation = {elev:.2f} km")
-
-        # Get data at this elevation (use tolerance)
-        df_d = df[np.isclose(df["elevation"], elev, atol=1e-3)]
-
-        if df_d.empty:
-            print(f"      ⚠️  No data at elevation={elev:.2f} km")
-            continue
-        
-        if len(df_d) < 4:
-            print(f"      ⚠️  Insufficient points ({len(df_d)}) at elevation={elev:.2f} km")
-            continue
-        
-        # Prepare data
-        points = df_d[["lon", "lat"]].values
-        vp_vals = df_d["vp"].values
-        vs_vals = df_d["vs"].values
-        rho_vals = df_d["rho"].values
-        
-        # Interpolate
-        try:
-            vp_interp = griddata(points, vp_vals, (lon_grid, lat_grid), 
-                               method="linear", fill_value=np.nan)
-            vs_interp = griddata(points, vs_vals, (lon_grid, lat_grid), 
-                               method="linear", fill_value=np.nan)
-            rho_interp = griddata(points, rho_vals, (lon_grid, lat_grid), 
-                                method="linear", fill_value=np.nan)
-            
-            vp_stack[iz] = vp_interp
-            vs_stack[iz] = vs_interp
-            rho_stack[iz] = rho_interp
-            
-            # Report coverage
-            coverage = 100 * (~np.isnan(vp_interp)).sum() / vp_interp.size
-            if (iz + 1) % 10 == 0 or iz == 0 or iz == len(depths) - 1:
-                print(f"      Coverage: {coverage:.1f}%")
-        
-        except Exception as e:
-            print(f"      ❌ Error: {e}")
-    
-    # Summary statistics
-    print(f"\nInterpolation complete:")
-    print(f"   Vp coverage: {100*(~np.isnan(vp_stack)).sum()/vp_stack.size:.1f}%")
-    print(f"   Vs coverage: {100*(~np.isnan(vs_stack)).sum()/vs_stack.size:.1f}%")
-    print(f"   Rho coverage: {100*(~np.isnan(rho_stack)).sum()/rho_stack.size:.1f}%")
-    
-    return vp_stack, vs_stack, rho_stack
-
-
-def write_hikurangi_hdf5(
-    output_path: str | Path,
-    lats: np.ndarray,
-    lons: np.ndarray,
-    depth_list: np.ndarray,  # NOTE: this is elevations (km), kept param name for backward compatibility
-    vp_stack: np.ndarray,
-    vs_stack: np.ndarray,
-    rho_stack: np.ndarray,
-    compression_level: int = 4,
-    use_shuffle: bool = False,
-    coord_dtype: str = "float32"
-) -> None:
-    """
-    Write Hikurangi tomography data to HDF5 in EP2020-compatible format with compression.
-    
-    Parameters
-    ----------
-    output_path : str or Path
-        Output HDF5 file path.
-    lats : np.ndarray
-        Latitude values (nlat,).
-    lons : np.ndarray
-        Longitude values (nlon,).
-    depth_list : np.ndarray
-        Elevations in km (nz,). Positive = above sea level.  (Kept param name 'depth_list' for API compatibility.)
-    vp_stack : np.ndarray
-        P-wave velocity in km/s (nz, nlat, nlon).
-    vs_stack : np.ndarray
-        S-wave velocity in km/s (nz, nlat, nlon).
-    rho_stack : np.ndarray
-        Density in g/cm³ (nz, nlat, nlon).
-    compression_level : int
-        Gzip compression level (0-9). Default 4 is good balance.
-        0=no compression, 9=max compression (slower).
-    use_shuffle : bool
-        Enable HDF5 shuffle filter. Default False.
-        Shuffle works best for dense data (90-100% coverage).
-        For sparse data with many fill values (like Hikurangi 46.5%), 
-        shuffle can make compression worse.
-    coord_dtype : str
-        Data type for coordinates ('float32' or 'float64'). Default 'float32'.
-        float32: Sufficient precision, smaller files for sparse data
-        float64: Better with shuffle for dense data
-        
-    Notes
-    -----
-    Recommended settings based on data characteristics:
-    
-    For SPARSE data (Hikurangi: 46.5% coverage, lots of -999.0 fill):
-        use_shuffle=False, coord_dtype='float32'
-        Result: ~154 MB, 8.5x compression
-        
-    For DENSE data (EP2020: 100% coverage):
-        use_shuffle=True, coord_dtype='float64'
-        Result: ~106 MB, 7.4x compression
-    """
-    print("\n" + "="*70)
-    print("WRITING HDF5")
-    print("="*70)
-    
-    # Determine dtype for coordinates
-    if coord_dtype == "float64":
-        coord_np_dtype = np.float64
-    elif coord_dtype == "float32":
-        coord_np_dtype = np.float32
-    else:
-        raise ValueError(f"coord_dtype must be 'float32' or 'float64', got {coord_dtype}")
-    
-    # Create coordinate meshgrid with specified dtype
-    lon_grid, lat_grid = np.meshgrid(lons, lats)
-    coords = np.stack([lat_grid, lon_grid], axis=-1).astype(coord_np_dtype)
-    
-    # Replace NaN with -999.0 flag
-    vp_stack = vp_stack.copy()
-    vs_stack = vs_stack.copy()
-    rho_stack = rho_stack.copy()
-    
-    vp_stack[np.isnan(vp_stack)] = -999.0
-    vs_stack[np.isnan(vs_stack)] = -999.0
-    rho_stack[np.isnan(rho_stack)] = -999.0
-    
-    print(f"\nWriting to: {output_path}")
-    print(f"Grid: {len(lats)} lat × {len(lons)} lon × {len(depth_list)} depth")
-    print(f"Compression: gzip level {compression_level}")
-    print(f"Shuffle filter: {'enabled' if use_shuffle else 'disabled'}")
-    print(f"Coordinate dtype: {coord_dtype}")
-    
-    # Calculate expected file size
-    points_per_level = len(lats) * len(lons)
-    data_size_mb = (points_per_level * 3 * 4 * len(depth_list)) / (1024**2)  # 3 vars, 4 bytes each
-    coord_bytes = 8 if coord_dtype == "float64" else 4
-    coords_size_mb = (points_per_level * 2 * coord_bytes * len(depth_list)) / (1024**2)
-    print(f"Uncompressed size estimate: {(data_size_mb + coords_size_mb):.1f} MB")
-    
-    # Determine optimal chunk size
-    chunk_size = min(256, len(lats)), min(256, len(lons))
-    coords_chunk_size = (min(88, len(lats)), min(50, len(lons)), 1)
-    
-    with h5py.File(output_path, "w") as f:
-        for iz, elevation in enumerate(depth_list):
-            # group name uses elevation (can be negative or positive)
-            grp_name = f"{elevation:.2f}"
-            grp = f.create_group(grp_name)
-            
-            # Store lat/lon with specified dtype and shuffle setting
-            grp.create_dataset("latitudes", data=lats.astype(coord_np_dtype), 
-                             dtype=coord_np_dtype,
-                             compression="gzip", 
-                             compression_opts=compression_level,
-                             shuffle=use_shuffle)
-            grp.create_dataset("longitudes", data=lons.astype(coord_np_dtype), 
-                             dtype=coord_np_dtype,
-                             compression="gzip", 
-                             compression_opts=compression_level,
-                             shuffle=use_shuffle)
-            
-            # Coords with specified dtype and shuffle setting
-            grp.create_dataset("coords", data=coords, 
-                             dtype=coord_np_dtype,
-                             compression="gzip", 
-                             compression_opts=compression_level,
-                             shuffle=use_shuffle,
-                             chunks=coords_chunk_size)
-            
-            # Data arrays with specified shuffle setting
-            grp.create_dataset("vp", data=vp_stack[iz], 
-                             dtype=np.float32,
-                             compression="gzip", 
-                             compression_opts=compression_level,
-                             shuffle=use_shuffle,
-                             chunks=chunk_size)
-            grp.create_dataset("vs", data=vs_stack[iz], 
-                             dtype=np.float32,
-                             compression="gzip", 
-                             compression_opts=compression_level,
-                             shuffle=use_shuffle,
-                             chunks=chunk_size)
-            grp.create_dataset("rho", data=rho_stack[iz], 
-                             dtype=np.float32,
-                             compression="gzip", 
-                             compression_opts=compression_level,
-                             shuffle=use_shuffle,
-                             chunks=chunk_size)
-            
-            if (iz + 1) % 20 == 0 or iz == 0 or iz == len(depth_list) - 1:
-                print(f"   Written group '{grp_name}'")
-    
-    # Report actual file size
-    actual_size_mb = Path(output_path).stat().st_size / (1024**2)
-    compression_ratio = (data_size_mb + coords_size_mb) / actual_size_mb if actual_size_mb > 0 else 0
-    
-    print(f"\n✅ Successfully saved Hikurangi HDF5 to {output_path}")
-    print(f"   Actual file size: {actual_size_mb:.1f} MB")
-    print(f"   Compression ratio: {compression_ratio:.1f}x")
-
-
-def create_comparison_plot(df: pd.DataFrame, output_path: str = "hikurangi_coverage.png"):
-    """
-    Create a visualization of the Hikurangi data coverage.
+    Uses EP2020's grid spacing but extends beyond EP2020 boundaries to capture
+    all Hikurangi data (especially beyond 180° meridian).
     
     Parameters
     ----------
     df : pd.DataFrame
         Hikurangi data.
-    output_path : str
-        Output file path for the plot.
+    ep2020_grid : dict
+        EP2020 grid specification (for spacing).
+    
+    Returns
+    -------
+    dict
+        Extended grid information.
     """
-    print(f"\n📊 Creating coverage visualization...")
+    print("\n" + "="*70)
+    print("DETERMINING EXTENDED GRID FOR HIKURANGI")
+    print("="*70)
     
-    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    # Hikurangi data extent
+    hik_lon_min, hik_lon_max = df["lon"].min(), df["lon"].max()
+    hik_lat_min, hik_lat_max = df["lat"].min(), df["lat"].max()
     
-    # Plot 1: All points at surface level
-    surface_data = df[df["depth"] == df["depth"].min()]
-    axes[0].scatter(surface_data["lon"], surface_data["lat"],
-                    s=1, alpha=0.5, c='red')
-    axes[0].set_xlabel("Longitude (°E)")
-    axes[0].set_ylabel("Latitude (°S)")
-    axes[0].set_title(f"Hikurangi Data Coverage (depth={surface_data['depth'].iloc[0]:.1f} km)")
-    axes[0].grid(True, alpha=0.3)
+    print(f"\nHikurangi full extent:")
+    print(f"   Longitude: {hik_lon_min:.3f}° to {hik_lon_max:.3f}°")
+    print(f"   Latitude:  {hik_lat_min:.3f}° to {hik_lat_max:.3f}°")
     
-    # Plot 2: Constrained vs unconstrained
-    constrained = df[(df["depth"] == df["depth"].min()) & (df["constraint"] == 1)]
-    unconstrained = df[(df["depth"] == df["depth"].min()) & (df["constraint"] == 0)]
+    # Get EP2020 grid spacing
+    ep_lats = ep2020_grid["lat"]
+    ep_lons = ep2020_grid["lon"]
+    
+    # Calculate spacing (may be negative for latitude)
+    dlat = np.median(np.diff(ep_lats))
+    dlon = np.median(np.diff(ep_lons))
+    
+    print(f"\nEP2020 grid spacing:")
+    print(f"   dlat = {dlat:.5f}°, dlon = {dlon:.5f}°")
+    
+    # Add buffer
+    buffer = 0.02
+    
+    # For LATITUDE: Find EP2020 points that bracket Hikurangi
+    # EP2020: -48 to -33 (descending, so use reversed search)
+    # Hikurangi: -45.037 to -34.357
+    
+    # Find indices in EP2020 that bracket Hikurangi extent
+    # Since ep_lats goes -48, -47.99, ..., -33 (descending)
+    # We need points where ep_lats <= -34.357 and ep_lats >= -45.037
+    
+    lat_mask = (ep_lats <= hik_lat_max + buffer) & (ep_lats >= hik_lat_min - buffer)
+    lat_indices = np.where(lat_mask)[0]
+    
+    if len(lat_indices) > 0:
+        lat_start_idx = lat_indices[0]
+        lat_end_idx = lat_indices[-1]
+        extended_lats = ep_lats[lat_start_idx:lat_end_idx+1]
+    else:
+        # Shouldn't happen but fallback
+        extended_lats = ep_lats
+    
+    # For LONGITUDE: Find EP2020 points and extend beyond if needed
+    # EP2020: 165 to 180
+    # Hikurangi: 169.299 to 182.146 (extends beyond 180!)
+    
+    lon_mask = ep_lons >= hik_lon_min - buffer
+    lon_indices = np.where(lon_mask)[0]
+    
+    if len(lon_indices) > 0:
+        lon_start_idx = lon_indices[0]
+        lon_start = ep_lons[lon_start_idx]
+        
+        # How many steps do we need to reach hik_lon_max?
+        n_lon_steps = int(np.ceil((hik_lon_max + buffer - lon_start) / dlon)) + 1
+        extended_lons = lon_start + np.arange(n_lon_steps) * dlon
+    else:
+        extended_lons = ep_lons
+    
+    print(f"\nExtended grid (using EP2020 spacing):")
+    print(f"   Latitude: {len(extended_lats)} points from {extended_lats[0]:.3f}° to {extended_lats[-1]:.3f}°")
+    print(f"   Longitude: {len(extended_lons)} points from {extended_lons[0]:.3f}° to {extended_lons[-1]:.3f}°")
+    print(f"   Grid size: {len(extended_lats)} × {len(extended_lons)} = {len(extended_lats)*len(extended_lons):,} points")
+    
+    if extended_lons[-1] > 180.0:
+        print(f"   ✓ Extends beyond 180° meridian (EP2020 boundary) to {extended_lons[-1]:.3f}°")
+    
+    return {
+        "lat": extended_lats,
+        "lon": extended_lons,
+        "nlat": len(extended_lats),
+        "nlon": len(extended_lons),
+        "ep2020_compatible_spacing": True
+    }
 
-    axes[1].scatter(unconstrained["lon"], unconstrained["lat"],
-                   s=1, alpha=0.3, c='lightgray', label='Unconstrained')
-    axes[1].scatter(constrained["lon"], constrained["lat"], 
-                   s=1, alpha=0.5, c='red', label='Constrained')
-    axes[1].set_xlabel("Longitude (°E)")
-    axes[1].set_ylabel("Latitude (°S)")
-    axes[1].set_title("Data Constraint Status")
-    axes[1].legend()
-    axes[1].grid(True, alpha=0.3)
+
+def interpolate_hikurangi_to_extended_grid(
+    df: pd.DataFrame,
+    extended_grid: dict
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Interpolate Hikurangi data onto extended grid, then apply rectangular mask AFTER.
     
-    plt.tight_layout()
-    plt.savefig(output_path, dpi=150, bbox_inches='tight')
-    print(f"   Saved to {output_path}")
-    plt.close()
+    This avoids edge artifacts by interpolating first, then masking.
+    
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Hikurangi data.
+    extended_grid : dict
+        Extended grid specification.
+    
+    Returns
+    -------
+    tuple
+        (vp_stack, vs_stack, rho_stack, elevations).
+    """
+    print("\n" + "="*70)
+    print("INTERPOLATION TO EXTENDED GRID")
+    print("="*70)
+    
+    # Get Hikurangi elevation levels
+    hik_elevations = np.unique(df["elevation"])
+    
+    lats = extended_grid["lat"]
+    lons = extended_grid["lon"]
+    nlon, nlat, nz = len(lons), len(lats), len(hik_elevations)
+    
+    # Initialize arrays
+    vp_stack = np.full((nz, nlat, nlon), np.nan, dtype=np.float32)
+    vs_stack = np.full((nz, nlat, nlon), np.nan, dtype=np.float32)
+    rho_stack = np.full((nz, nlat, nlon), np.nan, dtype=np.float32)
+    
+    # Create meshgrid
+    lon_grid, lat_grid = np.meshgrid(lons, lats)
+    grid_points = np.column_stack([lon_grid.ravel(), lat_grid.ravel()])
+    
+    print(f"\nInterpolating {nz} elevation levels...")
+    print(f"   Grid: {nlat} × {nlon} points")
+    
+    for iz, elev in enumerate(hik_elevations):
+        if (iz + 1) % 20 == 0 or iz == 0 or iz == nz - 1:
+            print(f"   Level {iz+1}/{nz}: elevation = {elev:.2f} km")
+        
+        # Get data at this elevation
+        df_d = df[np.isclose(df["elevation"], elev, atol=1e-3)]
+        
+        if df_d.empty or len(df_d) < 4:
+            continue
+        
+        # Data points
+        data_points = df_d[["lon", "lat"]].values
+        vp_vals = df_d["vp"].values
+        vs_vals = df_d["vs"].values
+        rho_vals = df_d["rho"].values
+        
+        try:
+            # STEP 1: Interpolate to full grid (no masking yet)
+            vp_flat = griddata(data_points, vp_vals, grid_points,
+                             method="linear", fill_value=np.nan)
+            vs_flat = griddata(data_points, vs_vals, grid_points,
+                             method="linear", fill_value=np.nan)
+            rho_flat = griddata(data_points, rho_vals, grid_points,
+                              method="linear", fill_value=np.nan)
+            
+            # STEP 2: Apply rectangular mask AFTER interpolation
+            # This avoids edge artifacts from premature clipping
+            data_lon_min, data_lon_max = data_points[:, 0].min(), data_points[:, 0].max()
+            data_lat_min, data_lat_max = data_points[:, 1].min(), data_points[:, 1].max()
+            
+            grid_lons = grid_points[:, 0]
+            grid_lats = grid_points[:, 1]
+            
+            inside_box = ((grid_lons >= data_lon_min) & (grid_lons <= data_lon_max) &
+                         (grid_lats >= data_lat_min) & (grid_lats <= data_lat_max))
+            
+            vp_flat[~inside_box] = np.nan
+            vs_flat[~inside_box] = np.nan
+            rho_flat[~inside_box] = np.nan
+            
+            # Reshape to 2D grid
+            vp_stack[iz] = vp_flat.reshape((nlat, nlon))
+            vs_stack[iz] = vs_flat.reshape((nlat, nlon))
+            rho_stack[iz] = rho_flat.reshape((nlat, nlon))
+            
+            if (iz + 1) % 20 == 0 or iz == 0 or iz == nz - 1:
+                coverage = 100 * (~np.isnan(vp_flat)).sum() / len(vp_flat)
+                print(f"      Coverage: {coverage:.1f}%")
+        
+        except Exception as e:
+            print(f"      ❌ Error: {e}")
+    
+    # Summary
+    total_coverage = 100 * (~np.isnan(vp_stack)).sum() / vp_stack.size
+    print(f"\nInterpolation complete:")
+    print(f"   Overall coverage: {total_coverage:.2f}%")
+    
+    return vp_stack, vs_stack, rho_stack, hik_elevations
+
+
+def write_extended_hdf5(
+    output_path: str | Path,
+    extended_grid: dict,
+    elevations: np.ndarray,
+    vp_stack: np.ndarray,
+    vs_stack: np.ndarray,
+    rho_stack: np.ndarray,
+    compression_level: int = 4,
+    use_shuffle: bool = False,
+    coord_dtype: str = 'float32'
+):
+    """
+    Write Hikurangi data in extended HDF5 format.
+    
+    Uses EP2020 spacing but extends beyond 180° to capture all data.
+    
+    Parameters
+    ----------
+    output_path : str or Path
+        Output HDF5 file path.
+    extended_grid : dict
+        Extended grid specification.
+    elevations : np.ndarray
+        Elevation levels.
+    vp_stack : np.ndarray
+        3D array of Vp values.
+    vs_stack : np.ndarray
+        3D array of Vs values.
+    rho_stack : np.ndarray
+        3D array of density values.
+    compression_level : int
+        GZIP compression level.
+    use_shuffle : bool
+        Enable shuffle filter (keep False for sparse data).
+    coord_dtype : str
+        Coordinate data type.
+    """
+    print("\n" + "="*70)
+    print("WRITING EXTENDED HDF5 FILE")
+    print("="*70)
+    
+    lats = extended_grid["lat"]
+    lons = extended_grid["lon"]
+    nlat, nlon = len(lats), len(lons)
+    nz = len(elevations)
+    
+    print(f"\n   Extended grid: {nlat} × {nlon}")
+    print(f"   Lat range: {lats.min():.3f}° to {lats.max():.3f}°")
+    print(f"   Lon range: {lons.min():.3f}° to {lons.max():.3f}°")
+    print(f"   EP2020-compatible spacing: ✓")
+    if lons.max() > 180.0:
+        print(f"   Extends beyond 180° meridian: ✓")
+    
+    # Replace NaN with -999.0
+    vp_out = np.where(np.isnan(vp_stack), -999.0, vp_stack)
+    vs_out = np.where(np.isnan(vs_stack), -999.0, vs_stack)
+    rho_out = np.where(np.isnan(rho_stack), -999.0, rho_stack)
+    
+    # Calculate actual coverage
+    coverage_pct = 100 * (vp_stack != -999.0).sum() / vp_stack.size
+    print(f"   Data coverage: {coverage_pct:.1f}% (rest is fill values)")
+    
+    # Chunking
+    chunk_size = (min(50, nlat), min(50, nlon))
+    coords_chunk_lat = (min(1000, nlat),)
+    coords_chunk_lon = (min(1000, nlon),)
+    
+    with h5py.File(output_path, "w") as f:
+        for iz, elev in enumerate(elevations):
+            elev_rounded = round(elev, 2)
+            
+            if abs(elev_rounded - round(elev_rounded)) < 1e-6:
+                grp_name = str(int(round(elev_rounded)))
+            else:
+                grp_name = f"{elev_rounded:.2f}".replace('.', '_').replace('-_', '-')
+            
+            grp = f.create_group(grp_name)
+            
+            # Store coordinates
+            grp.create_dataset("latitudes", data=lats.astype(coord_dtype),
+                             compression="gzip", compression_opts=compression_level,
+                             shuffle=use_shuffle, chunks=coords_chunk_lat)
+            grp.create_dataset("longitudes", data=lons.astype(coord_dtype),
+                             compression="gzip", compression_opts=compression_level,
+                             shuffle=use_shuffle, chunks=coords_chunk_lon)
+            
+            # Store data
+            grp.create_dataset("vp", data=vp_out[iz], dtype=np.float32,
+                             compression="gzip", compression_opts=compression_level,
+                             shuffle=use_shuffle, chunks=chunk_size)
+            grp.create_dataset("vs", data=vs_out[iz], dtype=np.float32,
+                             compression="gzip", compression_opts=compression_level,
+                             shuffle=use_shuffle, chunks=chunk_size)
+            grp.create_dataset("rho", data=rho_out[iz], dtype=np.float32,
+                             compression="gzip", compression_opts=compression_level,
+                             shuffle=use_shuffle, chunks=chunk_size)
+            
+            if (iz + 1) % 20 == 0 or iz == 0 or iz == nz - 1:
+                print(f"   Written group '{grp_name}'")
+    
+    actual_size_mb = Path(output_path).stat().st_size / (1024**2)
+    print(f"\n✅ Successfully saved to {output_path}")
+    print(f"   File size: {actual_size_mb:.1f} MB")
+    print(f"   Note: shuffle=False optimizes compression for sparse data")
 
 
 def main():
     """
     Main execution function.
     """
-    # =====================================================================
-    # CONFIGURATION SECTION
-    # =====================================================================
+    print("="*70)
+    print("HIKURANGI → EP2020-COMPATIBLE EXTENDED GRID")
+    print("="*70)
     
-    # File paths - ADJUST THESE
+    # Configuration
     hikurangi_txt = Path("Hikurangi_3D_model.txt")
-    ep2020_h5 = Path("ep2020.h5")  # Optional, for comparison
-    output_h5 = Path("hikurangi_uniform.h5")
+    ep2020_h5 = Path("../EP2020/ep2020.h5")  # For grid spacing reference
+    output_h5 = Path("hikurangi_ep2020grid.h5")
     
-    # =====================================================================
-    # COMPRESSION SETTINGS - ADJUST BASED ON YOUR DATA
-    # =====================================================================
-    
-    # Compression level (0-9, default 4)
+    # Compression settings (optimized for sparse data)
     compression_level = 4
+    use_shuffle = False  # CRITICAL: False for sparse data with many -999.0 values
+    coord_dtype = 'float32'
     
-    # Shuffle filter (True/False)
-    # - For SPARSE data (like Hikurangi 46.5% coverage): use_shuffle = False
-    # - For DENSE data (like EP2020 100% coverage): use_shuffle = True
-    use_shuffle = False  # ← RECOMMENDED for Hikurangi
-    
-    # Coordinate data type ('float32' or 'float64')
-    # - For SPARSE data with shuffle=False: coord_dtype = 'float32'
-    # - For DENSE data with shuffle=True: coord_dtype = 'float64'
-    coord_dtype = 'float32'  # ← RECOMMENDED for Hikurangi
-    
-    # =====================================================================
-    # EXPLANATION:
-    # =====================================================================
-    # Hikurangi has 46.5% coverage (53.5% are -999.0 fill values)
-    # 
-    # Test results:
-    #   use_shuffle=False, coord_dtype='float32' → 154 MB (8.5x) ✓ BEST
-    #   use_shuffle=True,  coord_dtype='float64' → 167 MB (11.0x) ✗ WORSE
-    # 
-    # Why? Long runs of identical -999.0 values compress better WITHOUT
-    # shuffle. Shuffle breaks up the perfect 4-byte patterns, reducing
-    # compression efficiency for sparse data with many fill values.
-    # 
-    # For dense data (EP2020 with 100% coverage), shuffle=True with 
-    # float64 coords works better (106 MB vs 157 MB).
-    # =====================================================================
-    
-    print("="*70)
-    print("HIKURANGI TOMOGRAPHY CONVERSION")
-    print("="*70)
-    print(f"\n📝 Compression settings:")
-    print(f"   Level: {compression_level}")
-    print(f"   Shuffle filter: {'enabled' if use_shuffle else 'disabled'}")
-    print(f"   Coordinate dtype: {coord_dtype}")
+    print(f"\n📝 Settings:")
+    print(f"   Hikurangi input: {hikurangi_txt}")
+    print(f"   EP2020 reference: {ep2020_h5} (for grid spacing)")
+    print(f"   Output: {output_h5}")
+    print(f"   Compression: level={compression_level}, shuffle={use_shuffle}")
     
     # Step 1: Read Hikurangi data
     df = read_hikurangi_txt(hikurangi_txt)
     
-    # Step 2: Detect and verify units
-    unit_info = detect_units(df)
+    # Step 2: Load EP2020 grid (for spacing reference)
+    ep2020_grid = load_ep2020_grid(ep2020_h5)
     
-    # Apply unit conversions if needed
-    if unit_info['needs_conversion']:
-        print(f"\n🔄 Applying unit conversions...")
-        df['vp'] = df['vp'] * unit_info['vp_conversion']
-        df['vs'] = df['vs'] * unit_info['vs_conversion']
-        df['rho'] = df['rho'] * unit_info['rho_conversion']
-        print(f"   ✅ Conversions applied")
-        print(f"   New Vp range: {df['vp'].min():.3f} to {df['vp'].max():.3f} km/s")
-        print(f"   New Vs range: {df['vs'].min():.3f} to {df['vs'].max():.3f} km/s")
-        print(f"   New Rho range: {df['rho'].min():.3f} to {df['rho'].max():.3f} g/cm³")
+    # Step 3: Create extended grid using EP2020 spacing
+    extended_grid = find_hikurangi_coverage_on_ep2020_grid(df, ep2020_grid)
     
-    # Step 3: Analyze grid structure
-    hik_info = analyze_grid_structure(df)
-    
-    # If data crosses dateline, adjust longitudes in dataframe
-    if hik_info.get("crosses_dateline", False):
-        print(f"\n🔄 Adjusting longitude values in dataframe...")
-        df.loc[df['lon'] < 0, 'lon'] += 360
-        print(f"   ✅ Longitudes adjusted to 0-360 range for interpolation")
-    
-    # Step 4: Load EP2020 for comparison (if available)
-    ep_info = None
-    if ep2020_h5.exists():
-        ep_info = load_ep2020_grid_info(ep2020_h5)
-    else:
-        print(f"\n⚠️  EP2020 file not found at {ep2020_h5}")
-        print("   Proceeding without comparison...")
-    
-    # Step 5: Determine target grid (use EP2020 spacing for compatibility)
-    target_grid = determine_target_grid(hik_info, ep_info, use_ep_spacing=True)
-    
-    # Step 6: Create visualization
-    create_comparison_plot(df, "hikurangi_coverage.png")
-    
-    # Step 7: Interpolate to regular grid
-    print("\n" + "="*70)
-    print("INTERPOLATION OPTIONS")
-    print("="*70)
-    print("\nYou can interpolate using:")
-    print("   1. All points (default)")
-    print("   2. Only constrained points (constraint=1)")
-    
-    # For now, use all points
-    use_constrained_only = False
-    
-    vp_stack, vs_stack, rho_stack = interpolate_hikurangi_to_grid(
-        df, target_grid, use_constrained_only
+    # Step 4: Interpolate (with masking AFTER interpolation)
+    vp_stack, vs_stack, rho_stack, elevations = interpolate_hikurangi_to_extended_grid(
+        df, extended_grid
     )
     
-    # Step 8: Write HDF5
-    write_hikurangi_hdf5(
-        output_h5,
-        target_grid["lat"],
-        target_grid["lon"],
-        target_grid["depths"],
-        vp_stack,
-        vs_stack,
-        rho_stack,
-        compression_level=compression_level,
-        use_shuffle=use_shuffle,
-        coord_dtype=coord_dtype
+    # Step 5: Write HDF5
+    write_extended_hdf5(
+        output_h5, extended_grid, elevations,
+        vp_stack, vs_stack, rho_stack,
+        compression_level, use_shuffle, coord_dtype
     )
     
     print("\n" + "="*70)
     print("CONVERSION COMPLETE!")
     print("="*70)
-    print(f"\nOutput file: {output_h5}")
-    print(f"Visualization: hikurangi_coverage.png")
+    print(f"\n✅ EP2020-compatible spacing")
+    print(f"✅ Extends beyond 180° meridian (captures all Hikurangi data)")
+    print(f"✅ Upright rectangular coverage")
+    print(f"✅ Masking applied AFTER interpolation (no edge artifacts)")
+    print(f"✅ Optimized compression for sparse data")
 
 
 if __name__ == "__main__":

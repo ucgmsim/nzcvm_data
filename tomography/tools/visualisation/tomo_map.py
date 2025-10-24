@@ -128,8 +128,45 @@ def choose_projection_and_extent(lats: np.ndarray, lons: np.ndarray) -> Tuple[ob
 # ----------------------------
 # HDF5 utilities
 # ----------------------------
-def load_hdf5_slice(h5_path: Path, elevation_key: str, scalar: str = "vp") -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Load a single elevation slice; mask known fill values."""
+def read_fill_value_metadata(h5_path: Path) -> Tuple[float, bool]:
+    """
+    Read fill value metadata from HDF5 file if available.
+    
+    Returns
+    -------
+    tuple[float, bool]
+        (fill_value, found_metadata)
+        If metadata not found, returns (-999.0, False)
+    """
+    try:
+        with h5py.File(h5_path, "r") as f:
+            if 'original_fill_value' in f.attrs:
+                fill_val = float(f.attrs['original_fill_value'])
+                is_nan = bool(f.attrs.get('fill_value_is_nan', False))
+                if is_nan:
+                    print(f"   📋 Metadata: Original fill value was NaN (stored as -999.0)")
+                    return -999.0, True
+                else:
+                    print(f"   📋 Metadata: Original fill value was {fill_val}")
+                    return fill_val, True
+            else:
+                return -999.0, False
+    except Exception as e:
+        print(f"   ⚠️  Could not read fill value metadata: {e}")
+        return -999.0, False
+
+
+def load_hdf5_slice(h5_path: Path, elevation_key: str, scalar: str = "vp", mask_values: list = None) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Load a single elevation slice; mask known fill values.
+    
+    Parameters
+    ----------
+    mask_values : list, optional
+        List of values to mask as NaN (in addition to -999.0)
+    """
+    if mask_values is None:
+        mask_values = []
+    
     try:
         with h5py.File(h5_path, "r") as f:
             if elevation_key not in f:
@@ -156,6 +193,11 @@ def load_hdf5_slice(h5_path: Path, elevation_key: str, scalar: str = "vp") -> Tu
 
     # Always mask standard fill values
     data = np.where(data == -999.0, np.nan, data)
+    
+    # Mask additional values if specified
+    for mask_val in mask_values:
+        if not np.isnan(mask_val):  # Can't use == with NaN
+            data = np.where(data == mask_val, np.nan, data)
 
     return lat, lon, data
 
@@ -249,22 +291,25 @@ def detect_elevations_from_csv(
         return elevation_strings
         
     except Exception as e:
-        print(f"❌ Error detecting elevations from CSV: {e}")
+        print(f"âŒ Error detecting elevations from CSV: {e}")
         raise e
 
 
 def calculate_global_ln_ratio_limits(
-    h5_path1: Path, h5_path2: Path, scalar: str, elevations: List[str]
+    h5_path1: Path, h5_path2: Path, scalar: str, elevations: List[str], mask_values: list = None
 ) -> Tuple[float, float]:
     """Calculate symmetric natural log ratio limits across specified elevations."""
-    print(f"📊 Calculating global symmetric Ln Ratio limits for {scalar}...")
+    if mask_values is None:
+        mask_values = []
+    
+    print(f"ðŸ“Š Calculating global symmetric Ln Ratio limits for {scalar}...")
     max_abs_ln_ratio = 0.0
     found_valid_ratio = False
 
     for elev in elevations:
         try:
-            _, _, data1 = load_hdf5_slice(h5_path1, elev, scalar)
-            _, _, data2 = load_hdf5_slice(h5_path2, elev, scalar)
+            _, _, data1 = load_hdf5_slice(h5_path1, elev, scalar, mask_values=mask_values)
+            _, _, data2 = load_hdf5_slice(h5_path2, elev, scalar, mask_values=mask_values)
 
             if data1.shape != data2.shape:
                 print(f"   Skipping elevation {elev}: Shape mismatch {data1.shape} vs {data2.shape}")
@@ -304,8 +349,18 @@ def determine_global_limits(
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
     percentile: float = 2.0,
+    mask_values: list = None,
 ) -> Tuple[float, float]:
-    """Percentile-based global color limits unless user overrides."""
+    """Percentile-based global color limits unless user overrides.
+    
+    Parameters
+    ----------
+    mask_values : list, optional
+        Additional values to mask (beyond -999.0 and NaN)
+    """
+    if mask_values is None:
+        mask_values = []
+    
     if vmin is not None and vmax is not None:
         # If user provides limits, validate them
         if vmin >= vmax:
@@ -327,6 +382,10 @@ def determine_global_limits(
                     arr = f[k][scalar][:]
                     # Mask fill values before calculating percentiles
                     mask = (arr != -999.0) & ~np.isnan(arr)
+                    # Also mask additional values
+                    for mask_val in mask_values:
+                        if not np.isnan(mask_val):
+                            mask = mask & (arr != mask_val)
                     arr = arr[mask]
                     if arr.size > 0:
                         vals.append(arr.ravel())
@@ -820,6 +879,9 @@ def main():
     parser.add_argument("--no-cartopy", action="store_true", help="Disable cartopy.")
     parser.add_argument("--no-outline-marker", action="store_true", help="Remove black outline from CSV scatter points (use when data is very dense).")
     parser.add_argument("--dpi", type=int, default=150, help="DPI for saved figures (default: 150).")
+    parser.add_argument("--mask-value", type=float, action="append", dest="mask_values",
+                        help="Value(s) to mask in HDF5 data (e.g., fill values like 0.0). Can be specified multiple times. "
+                             "If not specified, will try to read from HDF5 metadata. -999.0 is always masked.")
 
     args = parser.parse_args()
 
@@ -900,6 +962,24 @@ def main():
             out_dir = Path.cwd() / f"tomo_maps{output_suffix}"
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    # --- Determine Mask Values ---
+    # Read metadata from HDF5 if available and user didn't specify mask values
+    mask_values_list = args.mask_values if args.mask_values else []
+    
+    if args.h5file1 is not None and not args.mask_values:
+        # Try to read fill value from HDF5 metadata
+        fill_val, found = read_fill_value_metadata(args.h5file1)
+        if found and fill_val != -999.0:  # -999.0 is always masked, no need to add again
+            mask_values_list.append(fill_val)
+            print(f"   🎯 Will mask value {fill_val} from HDF5 metadata")
+    
+    if args.mask_values:
+        print(f"   🎯 User-specified mask values: {mask_values_list}")
+    
+    # Ensure -999.0 is in the list (though it's handled separately in the code)
+    if -999.0 not in mask_values_list:
+        mask_values_list.append(-999.0)
+
     # --- Determine HDF5 Elevations to Plot ---
     if csv_only_mode and args.h5file1 is None:
         # CSV-only mode without HDF5
@@ -948,7 +1028,8 @@ def main():
 
     # --- Determine Global Color Limits ---
     if is_ratio_mode:
-        plot_vmin, plot_vmax = calculate_global_ln_ratio_limits(args.h5file1, args.compared, args.scalar, elevations_to_plot)
+        plot_vmin, plot_vmax = calculate_global_ln_ratio_limits(args.h5file1, args.compared, args.scalar, 
+                                                                  elevations_to_plot, mask_values=mask_values_list)
         if args.vmin is not None or args.vmax is not None:
              print("   Note: User-specified --vmin/--vmax are ignored for ratio plots. Using calculated symmetric range.")
     elif csv_only_mode and args.h5file1 is None:
@@ -969,7 +1050,8 @@ def main():
             print(f"📊 Using default {args.scalar} limits: {plot_vmin:.3f} .. {plot_vmax:.3f}")
             print(f"   (Specify --vmin and --vmax to override)")
     else:
-        plot_vmin, plot_vmax = determine_global_limits(args.h5file1, args.scalar, args.vmin, args.vmax)
+        plot_vmin, plot_vmax = determine_global_limits(args.h5file1, args.scalar, args.vmin, args.vmax, 
+                                                        mask_values=mask_values_list)
 
 
     use_cartopy = HAS_CARTOPY and not args.no_cartopy
@@ -990,10 +1072,10 @@ def main():
                 plot_data = data1
                 lat, lon = lat1, lon1
             else:
-                lat1, lon1, data1 = load_hdf5_slice(args.h5file1, elev, args.scalar)
+                lat1, lon1, data1 = load_hdf5_slice(args.h5file1, elev, args.scalar, mask_values=mask_values_list)
 
                 if is_ratio_mode:
-                    lat2, lon2, data2 = load_hdf5_slice(args.compared, elev, args.scalar)
+                    lat2, lon2, data2 = load_hdf5_slice(args.compared, elev, args.scalar, mask_values=mask_values_list)
                     with np.errstate(divide='ignore', invalid='ignore'):
                         valid_mask = (data1 > 0) & (data2 > 0) & ~np.isnan(data1) & ~np.isnan(data2)
                         ratio_data = np.full(data1.shape, np.nan)
