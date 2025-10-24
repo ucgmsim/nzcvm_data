@@ -615,16 +615,6 @@ Example: `overlay_vs_elev-5.00.png`
 
 ---
 
-## Citation
-
-If you use this tool in your research, please cite:
-
-```
-[Your citation information here]
-```
-
----
-
 ## Support
 
 For issues or questions:
