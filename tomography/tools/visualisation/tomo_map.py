@@ -7,7 +7,7 @@
 - Optionally overlay point data from a CSV file, loading only points near the specified HDF5 elevation slice.
 
 Usage:
-    tomo_2dmapper.py h5file1 [--compared h5file2] \\
+    tomo_map.py h5file1 [--compared h5file2] \\
                             [--csv-data csvfile --lon-col LON_COL --lat-col LAT_COL --depth-col DEPTH_COL [--depth-is-elevation] --scalar-col SCALAR_COL [--depth-tolerance TOLERANCE] [--skip-rows N] [--sep SEP]] \\
                             [--scalar {vp,vs,rho}] [--vmin VMIN] [--vmax VMAX] \\
                             [--cmap CMAP] [--elevations ELEVATIONS [ELEVATIONS ...]] \\
