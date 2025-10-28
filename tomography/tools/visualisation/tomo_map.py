@@ -1080,7 +1080,7 @@ def main(
     dpi : int, optional
         DPI for saved figures.
     mask_value : list of float, optional
-        Value(s) to mask in HDF5 data.
+        Value(s) to mask in HDF5 data. Note that missing values (NaN) are stored as -999.0 in HDF5, which is always masked.
 
     Returns
     -------
