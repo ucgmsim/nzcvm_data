@@ -186,11 +186,11 @@ When using `--with-csv` or `--csv-only`, you must specify:
 
 ### CSV Parsing Options
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--skip-rows N` | 0 | Skip N header rows |
+| Option | Default | Description                                   |
+|--------|---------|-----------------------------------------------|
+| `--skip-rows N` | 0 | Skip N rows to reach the first data row       |
 | `--sep SEP` | `,` | Column separator (use `'\s+'` for whitespace) |
-| `--depth-is-elevation` | False | If depth column is elevation (positive up) |
+| `--depth-is-elevation` | False | If depth column is elevation (positive up)    |
 | `--depth-tolerance TOL` | 0.1 | Tolerance (km) for matching CSV to elevations |
 
 ### Visualization Options
@@ -220,6 +220,7 @@ When using `--with-csv` or `--csv-only`, you must specify:
 |--------|-------------|
 | `--output-dir DIR` | Output directory |
 | `--no-cartopy` | Use matplotlib only (no map features) |
+| `--mask-value VALUE [VALUE ...]` | Value(s) to mask in HDF5 data (in addition to -999.0) |
 
 ---
 
@@ -266,13 +267,13 @@ Index  Column        Use For
 
 **Format 1: Space-separated with headers**
 ```bash
---skip-rows 2        # Skip 2 header lines
+--skip-rows 2        # Skip 2 lines to jump to the first data row
 --sep '\s+'          # Use whitespace separator
 ```
 
 **Format 2: Comma-separated**
 ```bash
---skip-rows 1        # Skip 1 header line
+--skip-rows 1        # Skip 1 line
 --sep ','            # Use comma separator (default)
 ```
 
@@ -624,4 +625,3 @@ For issues or questions:
 - Try CSV-only mode first to isolate problems
 
 ---
-
