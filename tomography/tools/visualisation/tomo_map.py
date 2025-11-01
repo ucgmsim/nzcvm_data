@@ -7,12 +7,12 @@
 - Optionally overlay point data from a CSV file, loading only points near the specified HDF5 elevation slice.
 
 Usage:
-    tomo_map.py h5file1 [--compared h5file2] \\
-                            [--csv-data csvfile --lon-col LON_COL --lat-col LAT_COL --depth-col DEPTH_COL [--depth-is-elevation] --scalar-col SCALAR_COL [--depth-tolerance TOLERANCE] [--skip-rows N] [--sep SEP]] \\
-                            [--scalar {vp,vs,rho}] [--vmin VMIN] [--vmax VMAX] \\
-                            [--cmap CMAP] [--elevations ELEVATIONS [ELEVATIONS ...]] \\
-                            [--output-dir OUTPUT_DIR] [--no-cartopy] [--dpi DPI] \\
-                            [--auto-elevations] [--mask-value MASK_VALUE [MASK_VALUE ...]] [--no-outline-marker]
+    tomo_map.py h5file1 [--compared h5file2] \
+                            [--csv-data csvfile --lon-col LON_COL --lat-col LAT_COL --depth-col DEPTH_COL [--depth-is-elevation] --scalar-col SCALAR_COL [--depth-tolerance TOLERANCE] [--skip-rows N] [--sep SEP]] \
+                            [--scalar {vp,vs,rho}] [--vmin VMIN] [--vmax VMAX] \
+                            [--cmap CMAP] [--elevations ELEVATIONS [ELEVATIONS ...]] \
+                            [--output-dir OUTPUT_DIR] [--no-cartopy] [--dpi DPI] \
+                            [--auto-elevations] [--mask-value MASK_VALUE [MASK_VALUE ...]] [--no-outline-marker] [--limits-mode {global,local}] [--lonlat-tolerance LONLAT_TOLERANCE]
 
 Modes:
   1. Standard Plot: Provide only h5file1. Plots scalar data from h5file1.
@@ -33,6 +33,8 @@ Arguments & Options:
   --scalar-col SCALAR_COL Column index for the scalar value (matching --scalar) in the CSV file (0-based indices, required if using CSV).
   --depth-tolerance TOLERANCE
                         Tolerance (in km) for matching CSV points to H5 elevations (default: 0.1 km).
+  --lonlat-tolerance LONLAT_TOLERANCE
+                        Tolerance (in degrees) for matching CSV lon/lat to H5 grid points (default: 1e-6).
   --skip-rows N         Number of rows to skip at the beginning of the CSV file (default: 0).
   --sep SEP             Delimiter used in the CSV file (default: ',').
   --scalar              Scalar field to plot (vp, vs, rho). Default: vs.
@@ -45,6 +47,8 @@ Arguments & Options:
   --no-outline-marker   Remove black outline from CSV scatter points.
   --dpi                 DPI for saved figures. Default: 150.
   --mask-value          Value(s) to mask in HDF5 data (in addition to -999.0).
+  --limits-mode         Color limits mode: global (across all elevations) or local (per elevation slice). Default: global.
+  --diff-tolerance      Numeric tolerance for displaying exceeding differences in overlay mode (optional).
 """
 
 import warnings
@@ -56,6 +60,8 @@ import h5py
 import matplotlib.pyplot as plt
 import numpy as np
 import typer
+from scipy.spatial import KDTree
+from scipy.interpolate import RegularGridInterpolator
 
 from qcore import cli
 
@@ -378,7 +384,7 @@ def detect_elevations_from_csv(
         return elevation_strings
         
     except Exception as e:
-        print(f"âŒ Error detecting elevations from CSV: {e}")
+        print(f"❌ Error detecting elevations from CSV: {e}")
         raise e
 
 
@@ -409,14 +415,14 @@ def calculate_global_ln_ratio_limits(
     if mask_values is None:
         mask_values = []
     
-    print(f"ðŸ“Š Calculating global symmetric Ln Ratio limits for {scalar}...")
+    print(f"📊 Calculating global symmetric Ln Ratio limits for {scalar}...")
     max_abs_ln_ratio = 0.0
     found_valid_ratio = False
 
     for elev in elevations:
         try:
-            _, _, data1 = load_hdf5_slice(h5_path1, elev, scalar, mask_values=mask_values)
-            _, _, data2 = load_hdf5_slice(h5_path2, elev, scalar, mask_values=mask_values)
+            lat1, lon1, data1 = load_hdf5_slice(h5_path1, elev, scalar, mask_values=mask_values)
+            lat2, lon2, data2 = load_hdf5_slice(h5_path2, elev, scalar, mask_values=mask_values)
 
             if data1.shape != data2.shape:
                 print(f"   Skipping elevation {elev}: Shape mismatch {data1.shape} vs {data2.shape}")
@@ -555,6 +561,93 @@ def determine_global_limits(
         print(f"❌ Error calculating global limits for {h5_path}: {e}")
         # Fallback to defaults in case of error
         return (0.0, 1.0)
+
+def calculate_global_csv_limits(
+    csv_path: Path,
+    scalar_col: int,
+    scalar: str,
+    percentile: float = 2.0,
+    skip_rows: int = 0,
+    sep: str = ',',
+    chunksize: int = 100000,
+) -> Tuple[float, float]:
+    """
+    Calculate global limits from all scalar values in CSV, ignoring elevations.
+
+    Parameters
+    ----------
+    csv_path : Path
+        Path to CSV.
+    scalar_col : int
+        Column index for scalar.
+    scalar : str
+        Scalar name for defaults.
+    percentile : float
+        Percentile.
+    skip_rows : int
+        Rows to skip.
+    sep : str
+        Separator.
+    chunksize : int
+        Chunksize.
+
+    Returns
+    -------
+    tuple[float, float]
+        (vmin, vmax)
+    """
+    print(f"📊 Calculating global {scalar} limits from all CSV data...")
+    vals = []
+    try:
+        iterator = pd.read_csv(
+            csv_path,
+            chunksize=chunksize,
+            skiprows=skip_rows,
+            sep=sep,
+            header=None,
+            low_memory=True,
+        )
+        for chunk in iterator:
+            scalar_vals = chunk.iloc[:, scalar_col]
+            scalar_vals = pd.to_numeric(scalar_vals, errors='coerce').dropna()
+            if len(scalar_vals) > 0:
+                vals.append(scalar_vals.values)
+
+        if not vals:
+            print("   No valid data found in CSV. Using defaults.")
+            if scalar == 'vs':
+                return 0.0, 5.0
+            elif scalar == 'vp':
+                return 0.0, 9.0
+            elif scalar == 'rho':
+                return 1.0, 4.0
+            else:
+                return 0.0, 10.0
+
+        all_vals = np.concatenate(vals)
+        calc_vmin = float(np.percentile(all_vals, percentile))
+        calc_vmax = float(np.percentile(all_vals, 100 - percentile))
+
+        if calc_vmin >= calc_vmax:
+            calc_vmin = float(np.min(all_vals))
+            calc_vmax = float(np.max(all_vals))
+        if np.isclose(calc_vmin, calc_vmax):
+            calc_vmin -= 0.1
+            calc_vmax += 0.1
+
+        print(f"   Global range from CSV: {calc_vmin:.3f} .. {calc_vmax:.3f}")
+        return calc_vmin, calc_vmax
+
+    except Exception as e:
+        print(f"❌ Error calculating global CSV limits: {e}")
+        if scalar == 'vs':
+            return 0.0, 5.0
+        elif scalar == 'vp':
+            return 0.0, 9.0
+        elif scalar == 'rho':
+            return 1.0, 4.0
+        else:
+            return 0.0, 10.0
 
 # ----------------------------
 # CSV Data Loading (Fixed for dateline crossing)
@@ -1012,6 +1105,7 @@ def main(
     depth_is_elevation: bool = False,
     scalar_col: int | None = None,
     depth_tolerance: float = 0.1,
+    lonlat_tolerance: float = 1e-6,
     skip_rows: int = 0,
     sep: str = ',',
     scalar: str = 'vs',
@@ -1025,6 +1119,8 @@ def main(
     no_outline_marker: bool = False,
     dpi: int = 150,
     mask_value: List[float] | None  = None,
+    limits_mode: str = "global",
+    diff_tolerance: float | None = None,
 ):
     """
     2D Map Viewer for Tomography Data with Ratio and CSV Overlay Capabilities.
@@ -1055,6 +1151,8 @@ def main(
         Column index for the scalar value in the CSV file.
     depth_tolerance : float, optional
         Tolerance (in km) for matching CSV points to H5 elevations. Default is 0.1 km.
+    lonlat_tolerance : float, optional
+        Tolerance (in degrees) for matching CSV lon/lat to H5 grid points. Default is 1e-6.
     skip_rows : int, optional
         Number of rows to skip to reach the first data row in the CSV file. Default is 0.
     sep : str, optional
@@ -1081,6 +1179,10 @@ def main(
         DPI for saved figures.
     mask_value : list of float, optional
         Value(s) to mask in HDF5 data. Note that missing values (NaN) are stored as -999.0 in HDF5, which is always masked.
+    limits_mode : str, optional
+        Color limits mode: global (across all elevations) or local (per elevation slice). Default: global.
+    diff_tolerance : float, optional
+        Numeric tolerance for displaying exceeding differences in overlay mode.
 
     Returns
     -------
@@ -1228,35 +1330,33 @@ def main(
 
     print(f"📍 Plotting {len(elevations_to_plot)} HDF5 elevation slice(s). Output → {out_dir}")
 
-    # --- Determine Global Color Limits ---
-    if is_ratio_mode:
-        plot_vmin, plot_vmax = calculate_global_ln_ratio_limits(h5file1, compared, scalar,
-                                                                  elevations_to_plot, mask_values=mask_values_list)
-        if vmin is not None or vmax is not None:
-             print("   Note: User-specified --vmin/--vmax are ignored for ratio plots. Using calculated symmetric range.")
-    elif csv_only_mode and h5file1 is None:
-        # CSV-only mode without HDF5: use provided limits or defaults
-        if vmin is not None and vmax is not None:
-            plot_vmin, plot_vmax = vmin, vmax
-            print(f"📊 Using user-specified {scalar} limits: {plot_vmin:.3f} .. {plot_vmax:.3f}")
-        else:
-            # Use typical defaults for seismic velocities
-            if scalar == 'vs':
-                plot_vmin, plot_vmax = 0.0, 5.0
-            elif scalar == 'vp':
-                plot_vmin, plot_vmax = 0.0, 9.0
-            elif scalar == 'rho':
-                plot_vmin, plot_vmax = 1.0, 4.0
-            else:
-                plot_vmin, plot_vmax = 0.0, 10.0
-            print(f"📊 Using default {scalar} limits: {plot_vmin:.3f} .. {plot_vmax:.3f}")
-            print(f"   (Specify --vmin and --vmax to override)")
-    else:
-        plot_vmin, plot_vmax = determine_global_limits(h5file1, scalar, vmin, vmax,
-                                                        mask_values=mask_values_list)
+    # --- Handle limits mode ---
+    limits_mode = limits_mode.lower()
+    if limits_mode not in ["global", "local"]:
+        raise typer.Exit("❌ Invalid --limits-mode. Must be 'global' or 'local'.")
 
+    print(f"📊 Using limits mode: {limits_mode}")
+
+    use_fixed_limits = vmin is not None and vmax is not None
+    if use_fixed_limits:
+        global_vmin = vmin
+        global_vmax = vmax
+        print(f"📊 Using fixed user-specified limits: {global_vmin:.3f} .. {global_vmax:.3f}")
+    else:
+        global_vmin = None
+        global_vmax = None
+        if limits_mode == "global":
+            if is_ratio_mode:
+                global_vmin, global_vmax = calculate_global_ln_ratio_limits(h5file1, compared, scalar, elevations_to_plot, mask_values=mask_values_list)
+            elif csv_only_mode and h5file1 is None:
+                global_vmin, global_vmax = calculate_global_csv_limits(with_csv, scalar_col, scalar, skip_rows=skip_rows, sep=sep)
+            else:
+                global_vmin, global_vmax = determine_global_limits(h5file1, scalar, percentile=2.0, mask_values=mask_values_list)
 
     use_cartopy = HAS_CARTOPY and not no_cartopy
+
+    # --- Initialize differences collection for overlay mode ---
+    all_diffs = [] if is_overlay_mode else None
 
     # --- Main Plotting Loop ---
     for i, elev in enumerate(elevations_to_plot):
@@ -1278,6 +1378,29 @@ def main(
 
                 if is_ratio_mode:
                     lat2, lon2, data2 = load_hdf5_slice(compared, elev, scalar, mask_values=mask_values_list)
+
+                    # Check if grids match
+                    grids_match = (
+                        data1.shape == data2.shape and
+                        np.allclose(lat1, lat2) and
+                        np.allclose(lon1, lon2)
+                    )
+
+                    if not grids_match:
+                        print(f"   Elevation {elev}: Grids differ. Interpolating compared data to base grid.")
+                        # Create meshgrid for base (target) points
+                        lon_grid1, lat_grid1 = np.meshgrid(lon1, lat1)  # Shape: (len(lat1), len(lon1))
+
+                        # Points for interpolation: (lat, lon) pairs, raveled
+                        points = np.column_stack((lat_grid1.ravel(), lon_grid1.ravel()))
+
+                        # Interpolator for data2 on its grid
+                        interpolator = RegularGridInterpolator((lat2, lon2), data2, method='linear', bounds_error=False, fill_value=np.nan)
+
+                        # Interpolate
+                        interp_values = interpolator(points)
+                        data2 = interp_values.reshape(data1.shape)  # Reshape to match base
+
                     with np.errstate(divide='ignore', invalid='ignore'):
                         valid_mask = (data1 > 0) & (data2 > 0) & ~np.isnan(data1) & ~np.isnan(data2)
                         ratio_data = np.full(data1.shape, np.nan)
@@ -1303,6 +1426,96 @@ def main(
                      print(f"   ❌ Error loading CSV data for elevation {elev}: {csv_e}")
                      csv_data_slice = None
 
+            # --- Compute differences if in overlay mode (not csv-only) ---
+            if is_overlay_mode and csv_data_slice is not None and not csv_data_slice.empty and not csv_only_mode:
+                print(f"   📊 Finding common points between H5 and CSV at {len(csv_data_slice)} points...")
+                # Create grid points for KDTree
+                lon_grid, lat_grid = np.meshgrid(lon, lat)
+                points = np.column_stack((lon_grid.ravel(), lat_grid.ravel()))
+                tree = KDTree(points)
+                query_points = csv_data_slice[['lon', 'lat']].values
+                dists, idxs = tree.query(query_points)
+                mask = dists < lonlat_tolerance
+                num_common = np.sum(mask)
+                print(f"   Found {num_common} common points within lon/lat tolerance {lonlat_tolerance}.")
+                if num_common > 0:
+                    valid_h5 = plot_data.ravel()[idxs[mask]]
+                    valid_csv = csv_data_slice['scalar'].values[mask]
+                    valid_lons = csv_data_slice['lon'].values[mask]
+                    valid_lats = csv_data_slice['lat'].values[mask]
+                    diffs = valid_h5 - valid_csv
+
+                    for lon_p, lat_p, h5_p, csv_p, diff_p in zip(valid_lons, valid_lats, valid_h5, valid_csv, diffs):
+                        all_diffs.append({
+                            'elevation': float(elev.replace('_','.')),
+                            'lon': lon_p,
+                            'lat': lat_p,
+                            'scalar_h5': h5_p,
+                            'scalar_csv': csv_p,
+                            'difference': diff_p
+                        })
+                else:
+                    print(f"   ⚠️ No common points for elevation {elev_float_str} km.")
+
+            # --- Determine plot_vmin and plot_vmax ---
+            if use_fixed_limits:
+                plot_vmin = global_vmin
+                plot_vmax = global_vmax
+            elif limits_mode == "global":
+                plot_vmin = global_vmin
+                plot_vmax = global_vmax
+            else:  # local
+                percentile = 2.0
+                if is_ratio_mode:
+                    with np.errstate(divide='ignore', invalid='ignore'):
+                        valid_mask = (data1 > 0) & (data2 > 0) & ~np.isnan(data1) & ~np.isnan(data2)
+                        if np.any(valid_mask):
+                            ln_ratios = np.log(data2[valid_mask] / data1[valid_mask])
+                            max_abs_ln_ratio = np.nanmax(np.abs(ln_ratios)) if np.any(ln_ratios) else 0.1
+                            if not np.isfinite(max_abs_ln_ratio):
+                                max_abs_ln_ratio = 0.1
+                        else:
+                            max_abs_ln_ratio = 0.1
+                    limit = max(max_abs_ln_ratio, 0.1)
+                    plot_vmin = -limit
+                    plot_vmax = limit
+                    print(f"   Local symmetric range: [{plot_vmin:.3f} .. {plot_vmax:.3f}]")
+                elif csv_only_mode and h5file1 is None:
+                    if csv_data_slice is not None and not csv_data_slice.empty:
+                        vals = csv_data_slice['scalar'].values
+                        if len(vals) > 0:
+                            plot_vmin = np.percentile(vals, percentile)
+                            plot_vmax = np.percentile(vals, 100 - percentile)
+                            if plot_vmin >= plot_vmax:
+                                plot_vmin = np.min(vals)
+                                plot_vmax = np.max(vals)
+                            if np.isclose(plot_vmin, plot_vmax):
+                                plot_vmin -= 0.1
+                                plot_vmax += 0.1
+                            print(f"   Local range from CSV: {plot_vmin:.3f} .. {plot_vmax:.3f}")
+                        else:
+                            plot_vmin, plot_vmax = 0.0, 10.0
+                    else:
+                        plot_vmin, plot_vmax = 0.0, 10.0
+                else:
+                    # Standard or overlay: use HDF5 slice
+                    mask = (plot_data != -999.0) & ~np.isnan(plot_data)
+                    for mask_val in mask_values_list:
+                        if not np.isnan(mask_val):
+                            mask &= (plot_data != mask_val)
+                    vals = plot_data[mask]
+                    if len(vals) > 0:
+                        plot_vmin = np.percentile(vals, percentile)
+                        plot_vmax = np.percentile(vals, 100 - percentile)
+                        if plot_vmin >= plot_vmax:
+                            plot_vmin = np.min(vals)
+                            plot_vmax = np.max(vals)
+                        if np.isclose(plot_vmin, plot_vmax):
+                            plot_vmin -= 0.1
+                            plot_vmax += 0.1
+                        print(f"   Local range: {plot_vmin:.3f} .. {plot_vmax:.3f}")
+                    else:
+                        plot_vmin, plot_vmax = 0.0, 10.0
 
             # --- Create Plot ---
             fig, ax = create_map_plot(
@@ -1335,6 +1548,22 @@ def main(
             print(f"   ❌ Skipping HDF5 elevation {elev}: {e}")
         except Exception as e:
             print(f"   ❌ An unexpected error occurred for HDF5 elevation {elev}: {e}")
+
+    # --- Save and display differences if collected ---
+    if is_overlay_mode and all_diffs:
+        diff_df = pd.DataFrame(all_diffs)
+        diff_file = out_dir / 'differences.csv'
+        diff_df.to_csv(diff_file, index=False)
+        print(f"✅ Saved differences to {diff_file}")
+
+        if diff_tolerance is not None:
+            exceeding = diff_df[abs(diff_df['difference']) > diff_tolerance]
+            if not exceeding.empty:
+                print(f"\n⚠️ Points exceeding tolerance {diff_tolerance}: {len(exceeding)}")
+                for _, row in exceeding.iterrows():
+                    print(f"   Elevation: {row['elevation']:.2f} km, Lon: {row['lon']:.3f}, Lat: {row['lat']:.3f}, Diff: {row['difference']:.3f}")
+            else:
+                print(f"\n✅ No points exceed tolerance {diff_tolerance}")
 
     print("\n✨ Done.")
 
