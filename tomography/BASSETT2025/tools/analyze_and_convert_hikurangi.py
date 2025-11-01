@@ -31,7 +31,7 @@ def read_hikurangi_txt(txt_path: str | Path) -> pd.DataFrame:
     ----------
     txt_path : str or Path
         Path to the Hikurangi TXT file.
-    
+
     Returns
     -------
     pd.DataFrame
@@ -227,9 +227,13 @@ def interpolate_hikurangi_to_extended_grid(
     extended_grid: dict
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
-    Interpolate Hikurangi data onto extended grid, then apply rectangular mask AFTER.
+    Interpolate Hikurangi data onto extended grid with convex hull masking AFTER interpolation.
     
-    This avoids edge artifacts by interpolating first, then masking.
+    This approach:
+    1. Interpolates to the full extended grid first (avoiding edge artifacts)
+    2. Then applies convex hull mask to remove extrapolated regions
+
+    This gives smooth interpolation while respecting actual data coverage.
     
     Parameters
     ----------
@@ -291,20 +295,26 @@ def interpolate_hikurangi_to_extended_grid(
             rho_flat = griddata(data_points, rho_vals, grid_points,
                               method="linear", fill_value=np.nan)
             
-            # STEP 2: Apply rectangular mask AFTER interpolation
-            # This avoids edge artifacts from premature clipping
-            data_lon_min, data_lon_max = data_points[:, 0].min(), data_points[:, 0].max()
-            data_lat_min, data_lat_max = data_points[:, 1].min(), data_points[:, 1].max()
-            
-            grid_lons = grid_points[:, 0]
-            grid_lats = grid_points[:, 1]
-            
-            inside_box = ((grid_lons >= data_lon_min) & (grid_lons <= data_lon_max) &
-                         (grid_lats >= data_lat_min) & (grid_lats <= data_lat_max))
-            
-            vp_flat[~inside_box] = np.nan
-            vs_flat[~inside_box] = np.nan
-            rho_flat[~inside_box] = np.nan
+            # STEP 2: Apply convex hull mask AFTER interpolation
+            # This prevents extrapolation beyond actual data coverage
+            if len(data_points) >= 3:
+                try:
+                    hull = ConvexHull(data_points)
+                    hull_path = data_points[hull.vertices]
+
+                    from matplotlib.path import Path as MplPath
+                    path = MplPath(hull_path)
+                    inside_hull = path.contains_points(grid_points)
+
+                    # Mask points outside convex hull
+                    vp_flat[~inside_hull] = np.nan
+                    vs_flat[~inside_hull] = np.nan
+                    rho_flat[~inside_hull] = np.nan
+
+                except Exception as e:
+                    print(f"      ⚠️  Could not compute convex hull: {e}")
+                    # Fallback to no masking if hull computation fails
+                    pass
             
             # Reshape to 2D grid
             vp_stack[iz] = vp_flat.reshape((nlat, nlon))
@@ -482,7 +492,8 @@ def main():
     print("="*70)
     print(f"\n✅ EP2020-compatible spacing")
     print(f"✅ Extends beyond 180° meridian (captures all Hikurangi data)")
-    print(f"✅ Upright rectangular coverage")
+    print(f"✅ Upright rectangular grid structure")
+    print(f"✅ Convex hull masking (follows actual data boundary)")
     print(f"✅ Masking applied AFTER interpolation (no edge artifacts)")
     print(f"✅ Optimized compression for sparse data")
 
