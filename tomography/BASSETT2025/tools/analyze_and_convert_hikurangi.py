@@ -299,41 +299,54 @@ def interpolate_hikurangi_to_extended_grid(
             # Use the actual data point locations to define boundary more precisely
             if len(data_points) >= 3:
                 try:
-                    from scipy.spatial import ConvexHull
+                    from scipy.spatial import ConvexHull, cKDTree
                     from matplotlib.path import Path as MplPath
 
                     # Compute convex hull from actual data points
                     hull = ConvexHull(data_points)
                     hull_vertices = hull.vertices
-
-                    # Get hull boundary points in order
                     hull_path = data_points[hull_vertices]
 
-                    # Option: Shrink hull slightly inward to be more conservative
-                    # This prevents edge extrapolation artifacts
-                    centroid = data_points.mean(axis=0)
-                    shrink_factor = 0.995  # Shrink by 0.5% toward centroid
-                    hull_path_adjusted = centroid + shrink_factor * (hull_path - centroid)
-
-                    # Create mask
-                    path = MplPath(hull_path_adjusted)
-                    inside_boundary = path.contains_points(grid_points)
+                    # Create mask from convex hull
+                    path = MplPath(hull_path)
+                    inside_hull = path.contains_points(grid_points)
 
                     # Additionally, check if grid points are too far from any data point
-                    # This catches extrapolation that convex hull might miss
-                    from scipy.spatial import cKDTree
+                    # Build KD-tree for fast nearest-neighbor lookup
                     tree = cKDTree(data_points)
                     distances, _ = tree.query(grid_points, k=1)
 
-                    # Maximum distance threshold (in degrees)
-                    # Set to about 3x the grid spacing to allow smooth interpolation
-                    max_distance = 3 * np.median([abs(np.diff(np.unique(data_points[:, 0]))).min(),
-                                                   abs(np.diff(np.unique(data_points[:, 1]))).min()])
+                    # Calculate a reasonable distance threshold
+                    # Find typical spacing between data points
+                    if len(data_points) > 1000:
+                        # Sample for efficiency
+                        sample_idx = np.random.choice(len(data_points), 1000, replace=False)
+                        sample_points = data_points[sample_idx]
+                        sample_tree = cKDTree(sample_points)
+                        sample_dists, _ = sample_tree.query(sample_points, k=2)  # k=2 to skip self
+                        typical_spacing = np.median(sample_dists[:, 1])  # Second neighbor (first is self)
+                    else:
+                        # Use all points
+                        tree_temp = cKDTree(data_points)
+                        all_dists, _ = tree_temp.query(data_points, k=2)
+                        typical_spacing = np.median(all_dists[:, 1])
+
+                    # Maximum distance: 2x typical data spacing
+                    # This is conservative - only allows interpolation very close to data
+                    max_distance = 2.0 * typical_spacing
 
                     too_far = distances > max_distance
 
                     # Combined mask: inside hull AND not too far from data
-                    valid_points = inside_boundary & ~too_far
+                    valid_points = inside_hull & ~too_far
+
+                    # Debug output
+                    if (iz + 1) % 50 == 0 or iz == 0:
+                        n_hull = inside_hull.sum()
+                        n_distance = (~too_far).sum()
+                        n_final = valid_points.sum()
+                        print(f"      Masking: hull={n_hull}, distance={n_distance}, final={n_final}")
+                        print(f"      Typical spacing: {typical_spacing:.6f}°, max_dist: {max_distance:.6f}°")
 
                     # Apply mask
                     vp_flat[~valid_points] = np.nan
@@ -342,6 +355,8 @@ def interpolate_hikurangi_to_extended_grid(
 
                 except Exception as e:
                     print(f"      ⚠️  Boundary computation error: {e}")
+                    import traceback
+                    traceback.print_exc()
                     # Fallback to simple convex hull
                     try:
                         hull = ConvexHull(data_points)
