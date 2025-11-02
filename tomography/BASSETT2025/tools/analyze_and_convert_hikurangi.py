@@ -295,26 +295,63 @@ def interpolate_hikurangi_to_extended_grid(
             rho_flat = griddata(data_points, rho_vals, grid_points,
                               method="linear", fill_value=np.nan)
             
-            # STEP 2: Apply convex hull mask AFTER interpolation
-            # This prevents extrapolation beyond actual data coverage
+            # STEP 2: Apply precise boundary mask AFTER interpolation
+            # Use the actual data point locations to define boundary more precisely
             if len(data_points) >= 3:
                 try:
-                    hull = ConvexHull(data_points)
-                    hull_path = data_points[hull.vertices]
-
+                    from scipy.spatial import ConvexHull
                     from matplotlib.path import Path as MplPath
-                    path = MplPath(hull_path)
-                    inside_hull = path.contains_points(grid_points)
 
-                    # Mask points outside convex hull
-                    vp_flat[~inside_hull] = np.nan
-                    vs_flat[~inside_hull] = np.nan
-                    rho_flat[~inside_hull] = np.nan
+                    # Compute convex hull from actual data points
+                    hull = ConvexHull(data_points)
+                    hull_vertices = hull.vertices
+
+                    # Get hull boundary points in order
+                    hull_path = data_points[hull_vertices]
+
+                    # Option: Shrink hull slightly inward to be more conservative
+                    # This prevents edge extrapolation artifacts
+                    centroid = data_points.mean(axis=0)
+                    shrink_factor = 0.995  # Shrink by 0.5% toward centroid
+                    hull_path_adjusted = centroid + shrink_factor * (hull_path - centroid)
+
+                    # Create mask
+                    path = MplPath(hull_path_adjusted)
+                    inside_boundary = path.contains_points(grid_points)
+
+                    # Additionally, check if grid points are too far from any data point
+                    # This catches extrapolation that convex hull might miss
+                    from scipy.spatial import cKDTree
+                    tree = cKDTree(data_points)
+                    distances, _ = tree.query(grid_points, k=1)
+
+                    # Maximum distance threshold (in degrees)
+                    # Set to about 3x the grid spacing to allow smooth interpolation
+                    max_distance = 3 * np.median([abs(np.diff(np.unique(data_points[:, 0]))).min(),
+                                                   abs(np.diff(np.unique(data_points[:, 1]))).min()])
+
+                    too_far = distances > max_distance
+
+                    # Combined mask: inside hull AND not too far from data
+                    valid_points = inside_boundary & ~too_far
+
+                    # Apply mask
+                    vp_flat[~valid_points] = np.nan
+                    vs_flat[~valid_points] = np.nan
+                    rho_flat[~valid_points] = np.nan
 
                 except Exception as e:
-                    print(f"      ⚠️  Could not compute convex hull: {e}")
-                    # Fallback to no masking if hull computation fails
-                    pass
+                    print(f"      ⚠️  Boundary computation error: {e}")
+                    # Fallback to simple convex hull
+                    try:
+                        hull = ConvexHull(data_points)
+                        path = MplPath(data_points[hull.vertices])
+                        inside = path.contains_points(grid_points)
+                        vp_flat[~inside] = np.nan
+                        vs_flat[~inside] = np.nan
+                        rho_flat[~inside] = np.nan
+                    except:
+                        pass
             
             # Reshape to 2D grid
             vp_stack[iz] = vp_flat.reshape((nlat, nlon))
