@@ -64,6 +64,9 @@ def load_nzcvm_grid(h5_path: str | Path, extend_lon_deg: float = 0.0) -> tuple[n
     """
     Load NZCVM grid coordinates from reference HDF5 file.
 
+    Supports both old format (coordinates in each group) and new optimized format
+    (coordinates at root level).
+
     Parameters
     ----------
     h5_path : str or Path
@@ -78,11 +81,23 @@ def load_nzcvm_grid(h5_path: str | Path, extend_lon_deg: float = 0.0) -> tuple[n
         Tuple containing (latitudes, longitudes, depths).
     """
     with h5py.File(h5_path, "r") as f:
-        depth_keys = sorted(f.keys(), key=lambda x: float(x))
+        # Check for optimized format first (coordinates at root level)
+        if 'latitudes' in f and 'longitudes' in f:
+            # New optimized format
+            lat = f["latitudes"][:]
+            lon = f["longitudes"][:]
+        else:
+            # Old format (coordinates in first group)
+            depth_keys_temp = sorted([k for k in f.keys() if k not in ['latitudes', 'longitudes', 'coords']],
+                                   key=lambda x: float(x))
+            group0 = f[depth_keys_temp[0]]
+            lat = group0["latitudes"][:]
+            lon = group0["longitudes"][:]
+
+        # Get depth keys (skip coordinate datasets at root if present)
+        depth_keys = sorted([k for k in f.keys() if k not in ['latitudes', 'longitudes', 'coords']],
+                          key=lambda x: float(x))
         depth = np.array([float(k) for k in depth_keys])
-        group0 = f[depth_keys[0]]
-        lat = group0["latitudes"][:]
-        lon = group0["longitudes"][:]
 
     # Extend longitude grid if requested
     if extend_lon_deg > 0:
@@ -196,7 +211,8 @@ def write_epstyle_hdf5(
     vs_stack: np.ndarray,
     rho_stack: np.ndarray,
     compression_level: int = 4,
-    original_fill_value: float = np.nan
+    original_fill_value: float = np.nan,
+    optimized_structure: bool = True
 ) -> None:
     """
     Write EP-style tomography HDF5 file with compression.
@@ -226,6 +242,9 @@ def write_epstyle_hdf5(
     original_fill_value : float
         Original fill value used during interpolation (before conversion to -999.0).
         Stored as metadata for visualization tools.
+    optimized_structure : bool, optional
+        If True (default), store coordinates once at root level (saves ~400MB).
+        If False, use old format with coordinates in each group.
     """
     # Create coordinate meshgrid (keep as float64 for best compression with shuffle)
     lon_grid, lat_grid = np.meshgrid(lons, lats)
@@ -276,31 +295,49 @@ def write_epstyle_hdf5(
         f.attrs['fill_value_is_nan'] = bool(np.isnan(original_fill_value))
         f.attrs['description'] = 'Eberhart-Phillips tomography on uniform NZCVM grid'
         f.attrs['creation_date'] = pd.Timestamp.now().isoformat()
+        f.attrs['schema'] = "NZTomographyLevelStacked v2" if optimized_structure else "NZTomographyLevelStacked v1"
+        f.attrs['optimized_structure'] = optimized_structure
+
+        # Store coordinates at root level if using optimized structure
+        if optimized_structure:
+            f.create_dataset("latitudes", data=lats,
+                           dtype=np.float64,
+                           compression="gzip",
+                           compression_opts=compression_level,
+                           shuffle=True)
+            f.create_dataset("longitudes", data=lons,
+                           dtype=np.float64,
+                           compression="gzip",
+                           compression_opts=compression_level,
+                           shuffle=True)
+            print(f"   Stored coordinates at root level (optimized format)")
 
         for iz, depth in enumerate(depth_list):
             grp_name = f"{depth:.0f}" if depth == int(depth) else f"{depth:.1f}"
             grp = f.create_group(grp_name)
 
-            # Store lat/lon as float64 with compression and shuffle
-            grp.create_dataset("latitudes", data=lats,
-                             dtype=np.float64,
-                             compression="gzip",
-                             compression_opts=compression_level,
-                             shuffle=True)
-            grp.create_dataset("longitudes", data=lons,
-                             dtype=np.float64,
-                             compression="gzip",
-                             compression_opts=compression_level,
-                             shuffle=True)
+            # Only store coordinates in group if using old format
+            if not optimized_structure:
+                # Store lat/lon as float64 with compression and shuffle
+                grp.create_dataset("latitudes", data=lats,
+                                 dtype=np.float64,
+                                 compression="gzip",
+                                 compression_opts=compression_level,
+                                 shuffle=True)
+                grp.create_dataset("longitudes", data=lons,
+                                 dtype=np.float64,
+                                 compression="gzip",
+                                 compression_opts=compression_level,
+                                 shuffle=True)
 
-            # Coords as float64 with compression, shuffle, and optimized chunking
-            # Regular grids compress EXTREMELY well with shuffle (36x compression!)
-            grp.create_dataset("coords", data=coords,
-                             dtype=np.float64,
-                             compression="gzip",
-                             compression_opts=compression_level,
-                             shuffle=True,
-                             chunks=coords_chunk_size)
+                # Coords as float64 with compression, shuffle, and optimized chunking
+                # Regular grids compress EXTREMELY well with shuffle (36x compression!)
+                grp.create_dataset("coords", data=coords,
+                                 dtype=np.float64,
+                                 compression="gzip",
+                                 compression_opts=compression_level,
+                                 shuffle=True,
+                                 chunks=coords_chunk_size)
 
             # Data arrays with compression, shuffle, and optimized chunking
             grp.create_dataset("vp", data=vp_stack[iz],
@@ -513,6 +550,11 @@ Examples:
         action="store_true",
         help="Only use depths from reference grid, ignore input-only depths"
     )
+    parser.add_argument(
+        "--old-format",
+        action="store_true",
+        help="Use old format with coordinates in each group (wastes ~400MB). Default: use optimized format."
+    )
 
     args = parser.parse_args()
 
@@ -571,7 +613,8 @@ Examples:
     print("\n   Writing to output HDF5...")
     write_epstyle_hdf5(args.out_h5, lat, lon, final_depths, vp, vs, rho,
                        compression_level=args.compression,
-                       original_fill_value=fill_value)
+                       original_fill_value=fill_value,
+                       optimized_structure=not args.old_format)
 
     print("\n" + "=" * 70)
     print("CONVERSION COMPLETE!")

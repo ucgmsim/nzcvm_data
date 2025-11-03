@@ -16,6 +16,8 @@ import h5py
 import numpy as np
 import typer
 
+from hdf5_utils import get_depth_groups
+
 app = typer.Typer(pretty_exceptions_enable=False)
 
 VARS_DEFAULT = ("vp", "vs", "rho")
@@ -43,7 +45,10 @@ def sort_key_level(s: str):
 
 def list_root_groups(h5: h5py.File) -> list[str]:
     """
-    List all root groups in an HDF5 file.
+    List all depth groups in an HDF5 file (excludes coordinate datasets).
+
+    Supports both old format (coordinates in each group) and new optimized format
+    (coordinates at root level).
 
     Parameters
     ----------
@@ -53,9 +58,9 @@ def list_root_groups(h5: h5py.File) -> list[str]:
     Returns
     -------
     list[str]
-        List of root group names.
+        List of depth group names.
     """
-    return [k for k in h5.keys() if isinstance(h5[k], h5py.Group)]
+    return get_depth_groups(h5)
 
 
 def summarize_file(path: str) -> list[str]:

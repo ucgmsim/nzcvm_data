@@ -54,6 +54,7 @@ Arguments & Options:
 import warnings
 from pathlib import Path
 from typing import List, Optional, Tuple, Union
+import sys
 
 import pandas as pd
 import h5py
@@ -64,6 +65,10 @@ from scipy.spatial import KDTree
 from scipy.interpolate import RegularGridInterpolator
 
 from qcore import cli
+
+# Add parent directory to path for hdf5_utils import
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from hdf5_utils import get_coordinates
 
 # Suppress specific pandas warning about dtype_backend
 warnings.filterwarnings(
@@ -228,17 +233,8 @@ def load_hdf5_slice(h5_path: Path, elevation_key: str, scalar: str = "vp", mask_
             if elevation_key not in f:
                 raise KeyError(f"Elevation key '{elevation_key}' not found in {h5_path}")
             grp = f[elevation_key]
-            # Load lat/lon only if needed later, handle potential absence
-            lat = grp.get("latitudes", None)
-            lon = grp.get("longitudes", None)
-            if lat is None or lon is None:
-                 # Attempt to load from root if missing in group (less common structure)
-                 lat = f.get("latitudes", None) if lat is None else lat
-                 lon = f.get("longitudes", None) if lon is None else lon
-                 if lat is None or lon is None:
-                     raise KeyError(f"Latitude or Longitude dataset not found in group '{elevation_key}' or root of {h5_path}")
-            lat = lat[:] # Load into memory
-            lon = lon[:]
+            # Load coordinates (supports both old and optimized formats)
+            lat, lon = get_coordinates(f, grp)
 
             if scalar not in grp:
                  raise KeyError(f"Scalar '{scalar}' not found in group '{elevation_key}' in {h5_path}")

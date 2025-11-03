@@ -82,14 +82,23 @@ def load_ep2020_grid(ep2020_path: str | Path) -> dict:
     print("="*70)
     
     with h5py.File(ep2020_path, 'r') as f:
-        # Get first group to read coordinate arrays
-        first_group = list(f.keys())[0]
-        lats = f[first_group]['latitudes'][:]
-        lons = f[first_group]['longitudes'][:]
-        
-        # Get all elevation levels
+        # Read coordinates (supports both old and optimized formats)
+        if 'latitudes' in f and 'longitudes' in f:
+            # New optimized format (coordinates at root level)
+            lats = f['latitudes'][:]
+            lons = f['longitudes'][:]
+        else:
+            # Old format (coordinates in first group)
+            first_group = list(f.keys())[0]
+            lats = f[first_group]['latitudes'][:]
+            lons = f[first_group]['longitudes'][:]
+
+        # Get all elevation levels (skip coordinate datasets at root if present)
         elevations = []
         for key in f.keys():
+            # Skip coordinate datasets
+            if key in ['latitudes', 'longitudes', 'coords']:
+                continue
             try:
                 # Handle both integer and decimal group names
                 if '_' in key:
@@ -101,7 +110,7 @@ def load_ep2020_grid(ep2020_path: str | Path) -> dict:
                 elevations.append(elev)
             except ValueError:
                 continue
-        
+
         elevations = np.sort(elevations)
     
     print(f"\n   Grid dimensions: {len(lats)} lat × {len(lons)} lon")
@@ -397,13 +406,14 @@ def write_extended_hdf5(
     rho_stack: np.ndarray,
     compression_level: int = 4,
     use_shuffle: bool = False,
-    coord_dtype: str = 'float32'
+    coord_dtype: str = 'float32',
+    optimized_structure: bool = True
 ):
     """
     Write Hikurangi data in extended HDF5 format.
-    
+
     Uses EP2020 spacing but extends beyond 180° to capture all data.
-    
+
     Parameters
     ----------
     output_path : str or Path
@@ -424,6 +434,9 @@ def write_extended_hdf5(
         Enable shuffle filter (keep False for sparse data).
     coord_dtype : str
         Coordinate data type.
+    optimized_structure : bool, optional
+        If True (default), store coordinates once at root level (saves ~400MB).
+        If False, use old format with coordinates in each group.
     """
     print("\n" + "="*70)
     print("WRITING EXTENDED HDF5 FILE")
@@ -454,26 +467,43 @@ def write_extended_hdf5(
     chunk_size = (min(50, nlat), min(50, nlon))
     coords_chunk_lat = (min(1000, nlat),)
     coords_chunk_lon = (min(1000, nlon),)
-    
+
     with h5py.File(output_path, "w") as f:
+        # Store metadata
+        f.attrs['schema'] = "NZTomographyLevelStacked v2" if optimized_structure else "NZTomographyLevelStacked v1"
+        f.attrs['optimized_structure'] = optimized_structure
+        f.attrs['description'] = 'Hikurangi tomography on EP2020-compatible extended grid'
+        f.attrs['fill_value_nan_representation'] = -999.0
+
+        # Store coordinates at root level if using optimized structure
+        if optimized_structure:
+            f.create_dataset("latitudes", data=lats.astype(coord_dtype),
+                           compression="gzip", compression_opts=compression_level,
+                           shuffle=use_shuffle, chunks=coords_chunk_lat)
+            f.create_dataset("longitudes", data=lons.astype(coord_dtype),
+                           compression="gzip", compression_opts=compression_level,
+                           shuffle=use_shuffle, chunks=coords_chunk_lon)
+            print(f"   Stored coordinates at root level (optimized format)")
+
         for iz, elev in enumerate(elevations):
             elev_rounded = round(elev, 2)
-            
+
             if abs(elev_rounded - round(elev_rounded)) < 1e-6:
                 grp_name = str(int(round(elev_rounded)))
             else:
                 grp_name = f"{elev_rounded:.2f}".replace('.', '_').replace('-_', '-')
-            
+
             grp = f.create_group(grp_name)
-            
-            # Store coordinates
-            grp.create_dataset("latitudes", data=lats.astype(coord_dtype),
-                             compression="gzip", compression_opts=compression_level,
-                             shuffle=use_shuffle, chunks=coords_chunk_lat)
-            grp.create_dataset("longitudes", data=lons.astype(coord_dtype),
-                             compression="gzip", compression_opts=compression_level,
-                             shuffle=use_shuffle, chunks=coords_chunk_lon)
-            
+
+            # Only store coordinates in group if using old format
+            if not optimized_structure:
+                grp.create_dataset("latitudes", data=lats.astype(coord_dtype),
+                                 compression="gzip", compression_opts=compression_level,
+                                 shuffle=use_shuffle, chunks=coords_chunk_lat)
+                grp.create_dataset("longitudes", data=lons.astype(coord_dtype),
+                                 compression="gzip", compression_opts=compression_level,
+                                 shuffle=use_shuffle, chunks=coords_chunk_lon)
+
             # Store data
             grp.create_dataset("vp", data=vp_out[iz], dtype=np.float32,
                              compression="gzip", compression_opts=compression_level,
@@ -484,7 +514,7 @@ def write_extended_hdf5(
             grp.create_dataset("rho", data=rho_out[iz], dtype=np.float32,
                              compression="gzip", compression_opts=compression_level,
                              shuffle=use_shuffle, chunks=chunk_size)
-            
+
             if (iz + 1) % 20 == 0 or iz == 0 or iz == nz - 1:
                 print(f"   Written group '{grp_name}'")
     
@@ -536,7 +566,8 @@ def main():
     write_extended_hdf5(
         output_h5, extended_grid, elevations,
         vp_stack, vs_stack, rho_stack,
-        compression_level, use_shuffle, coord_dtype
+        compression_level, use_shuffle, coord_dtype,
+        optimized_structure=True  # Use optimized format (saves ~400MB)
     )
     
     print("\n" + "="*70)

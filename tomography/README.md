@@ -55,7 +55,95 @@ The `module` specifies the name of the accompanying Python code that prescribes 
 
 ## Data Format
 
-Tomography model data is stored in HDF5 format. For details on the structure and contents of these files, see the [Data Formats](DataFormats.md) page.
+Tomography model data is stored in HDF5 format. Two format versions are supported:
+
+### Optimized Format (v2, Recommended)
+
+The optimized format stores coordinates once at the root level, saving ~400MB per file:
+
+```
+/ (root)
+├── latitudes (1400,)          # Stored once at root
+├── longitudes (800,)          # Stored once at root
+├── -750/                      # Depth group
+│   ├── vp (1400, 800)        # P-wave velocity
+│   ├── vs (1400, 800)        # S-wave velocity
+│   └── rho (1400, 800)       # Density
+├── -85/                       # Another depth group
+│   ├── vp (1400, 800)
+│   ├── vs (1400, 800)
+│   └── rho (1400, 800)
+...
+```
+
+**Attributes** (root level):
+- `schema`: "NZTomographyLevelStacked v2"
+- `optimized_structure`: True
+- `data_dtype_vp_vs_rho`: "float32" or "float64"
+- `coord_dtype_lat_lon`: "float64"
+- `compression`: "gzip:4"
+
+**Benefits**:
+- ~12-15% file size reduction
+- Faster I/O (coordinates read once)
+- Guaranteed coordinate consistency
+
+### Legacy Format (v1)
+
+The old format duplicates coordinates in each depth group:
+
+```
+/ (root)
+├── -750/
+│   ├── latitudes (1400,)     # Duplicated in each group
+│   ├── longitudes (800,)     # Duplicated in each group
+│   ├── vp (1400, 800)
+│   ├── vs (1400, 800)
+│   └── rho (1400, 800)
+├── -85/
+│   ├── latitudes (1400,)     # Same data, duplicated
+│   ├── longitudes (800,)     # Same data, duplicated
+│   ├── vp (1400, 800)
+│   ├── vs (1400, 800)
+│   └── rho (1400, 800)
+...
+```
+
+### Data Types and Compression
+
+- **Coordinates**: float64 for precision
+- **Velocity/Density**: float32 (sufficient for ~0.1% precision)
+- **Compression**: gzip level 4 with shuffle filter
+- **Chunking**: (256, 256) for 2D datasets
+
+### Reading HDF5 Files
+
+All reading utilities in `tools/` support both formats automatically via `hdf5_utils.py`:
+
+```python
+import h5py
+from hdf5_utils import get_coordinates, load_depth_data
+
+# Automatic format detection
+with h5py.File('ep2020.h5', 'r') as f:
+    # Works with both v1 and v2 formats
+    lat, lon = get_coordinates(f)
+    data = load_depth_data(f, -85, variables=['vp', 'vs', 'rho'])
+```
+
+### Converting to Optimized Format
+
+Use `optimize_hdf5_structure.py` to convert existing files:
+
+```bash
+python tools/optimize_hdf5_structure.py input.h5 output.h5
+```
+
+New files created with `tomo_in2h5.py` use the optimized format by default:
+
+```bash
+python tools/tomo_in2h5.py input_dir/ model_name --optimized
+```
 
 ## References
 

@@ -88,6 +88,7 @@ def convert_ascii_to_hdf5(
     dtype_opt: str = "f64",  # "f64" or "f32" for vp/vs/rho
     gzip_level: int = 4,  # 1..9
     shuffle: bool = True,
+    optimized_structure: bool = True,
 ):
     """
     Convert ASCII tomography files to HDF5 format.
@@ -107,6 +108,9 @@ def convert_ascii_to_hdf5(
         Gzip compression level 1..9 (default 4).
     shuffle : bool, optional
         Enable shuffle filter (default is True).
+    optimized_structure : bool, optional
+        If True (default), store coordinates once at root level.
+        If False, use old format with coordinates in each group (wastes ~400MB).
 
     """
 
@@ -131,13 +135,54 @@ def convert_ascii_to_hdf5(
         # file-level metadata to advertise decisions
         h5f.attrs["created"] = datetime.utcnow().isoformat() + "Z"
         h5f.attrs["generator"] = "tomo_in2h5.py"
-        h5f.attrs["schema"] = "NZTomographyLevelStacked v1"
+        h5f.attrs["schema"] = "NZTomographyLevelStacked v2" if optimized_structure else "NZTomographyLevelStacked v1"
         h5f.attrs["data_dtype_vp_vs_rho"] = (
             "float32" if data_dtype == np.float32 else "float64"
         )
         h5f.attrs["coord_dtype_lat_lon"] = "float64"
         h5f.attrs["compression"] = f"gzip:{gzip_level}"
         h5f.attrs["shuffle"] = bool(shuffle)
+        h5f.attrs["optimized_structure"] = optimized_structure
+
+        # If using optimized structure, read and store coordinates once at root level
+        if optimized_structure:
+            # Get coordinates from first elevation's rho file
+            first_elev = elevations[0]
+            elev_file_str = (
+                str(int(first_elev)) if first_elev == int(first_elev)
+                else f"{first_elev:.2f}".replace(".", "p")
+            )
+            ref_file = input_path / f"surf_tomography_rho_elev{elev_file_str}.in"
+
+            if not ref_file.exists():
+                raise FileNotFoundError(f"Reference file not found: {ref_file}")
+
+            # Read coordinates
+            with open(ref_file, "r") as f:
+                nlat, nlon = map(int, f.readline().split())
+                latitudes = np.array(
+                    [float(x) for x in f.readline().split()], dtype=coord_dtype
+                )
+                longitudes = np.array(
+                    [float(x) for x in f.readline().split()], dtype=coord_dtype
+                )
+
+            # Store at root level
+            h5f.create_dataset(
+                "latitudes",
+                data=latitudes,
+                compression="gzip",
+                compression_opts=gzip_level,
+                shuffle=shuffle,
+            )
+            h5f.create_dataset(
+                "longitudes",
+                data=longitudes,
+                compression="gzip",
+                compression_opts=gzip_level,
+                shuffle=shuffle,
+            )
+            print(f"Stored coordinates at root level: latitudes{latitudes.shape}, longitudes{longitudes.shape}")
 
         for elev in elevations:
             elev_file_str = (
@@ -149,7 +194,7 @@ def convert_ascii_to_hdf5(
             )
             g = h5f.create_group(elev_group_name)
 
-            # Load coords from rho file
+            # Load coords from rho file (for old format or to get dimensions)
             ref_file = input_path / f"surf_tomography_rho_elev{elev_file_str}.in"
             if not ref_file.exists():
                 print(f"Warning: missing {ref_file}, skipping elevation {elev}")
@@ -165,21 +210,22 @@ def convert_ascii_to_hdf5(
                     [float(x) for x in f.readline().split()], dtype=coord_dtype
                 )
 
-            # coords - let h5py auto-chunk 1D arrays
-            g.create_dataset(
-                "latitudes",
-                data=latitudes,
-                compression="gzip",
-                compression_opts=gzip_level,
-                shuffle=shuffle,
-            )
-            g.create_dataset(
-                "longitudes",
-                data=longitudes,
-                compression="gzip",
-                compression_opts=gzip_level,
-                shuffle=shuffle,
-            )
+            # Only store coordinates in group if using old format
+            if not optimized_structure:
+                g.create_dataset(
+                    "latitudes",
+                    data=latitudes,
+                    compression="gzip",
+                    compression_opts=gzip_level,
+                    shuffle=shuffle,
+                )
+                g.create_dataset(
+                    "longitudes",
+                    data=longitudes,
+                    compression="gzip",
+                    compression_opts=gzip_level,
+                    shuffle=shuffle,
+                )
 
             # fields
             for vtype in vtypes:
@@ -236,6 +282,12 @@ def convert_tomo_to_h5(
     ] = "f32",
     gzip: Annotated[int, typer.Option(help="gzip level 1..9 (default 4)")] = 4,
     shuffle: Annotated[bool, typer.Option(help="Enable shuffle filter")] = True,
+    optimized: Annotated[
+        bool,
+        typer.Option(
+            help="Use optimized structure (coordinates at root level, saves ~400MB)"
+        ),
+    ] = True,
 ):
     """
     Convert ASCII tomography files to HDF5 format.
@@ -258,6 +310,8 @@ def convert_tomo_to_h5(
         Gzip compression level 1..9 (default 4).
     shuffle : bool, optional
         Enable shuffle filter (default is True).
+    optimized : bool, optional
+        Use optimized structure with coordinates at root level (default True, saves ~400MB).
 
     """
 
@@ -268,6 +322,7 @@ def convert_tomo_to_h5(
         dtype_opt=dtype,
         gzip_level=gzip,
         shuffle=shuffle,
+        optimized_structure=optimized,
     )
 
 

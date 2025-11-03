@@ -17,6 +17,8 @@ import pandas as pd
 import seaborn as sns
 import typer
 
+from hdf5_utils import get_coordinates, get_depth_groups
+
 app = typer.Typer(pretty_exceptions_enable=False)
 
 
@@ -54,6 +56,9 @@ def load_hdf5_data(h5_file: str) -> pd.DataFrame:
     """
     Load a single depth slice from the HDF5 tomography file into a flat DataFrame.
 
+    Supports both old format (coordinates in each group) and new optimized format
+    (coordinates at root level).
+
     Parameters
     ----------
     h5_file : str
@@ -65,11 +70,11 @@ def load_hdf5_data(h5_file: str) -> pd.DataFrame:
         DataFrame containing flattened tomography data from the shallowest depth slice.
     """
     with h5py.File(h5_file, "r") as f:
-        depth_keys = sorted(f.keys(), key=lambda x: float(x))
+        depth_keys = get_depth_groups(f)
         group = f[depth_keys[0]]
 
-        lat = group["latitudes"][:]
-        lon = group["longitudes"][:]
+        # Use utility function that handles both formats
+        lat, lon = get_coordinates(f, group)
         vp = group["vp"][:]  # shape (nlat, nlon)
         lon_grid, lat_grid = np.meshgrid(lon, lat)
 
@@ -86,20 +91,33 @@ def check_latlon_consistency(h5_file: str) -> None:
     """
     Verify that all depth groups share identical latitude/longitude arrays.
 
+    Supports both old format (coordinates in each group) and new optimized format
+    (coordinates at root level).
+
     Parameters
     ----------
     h5_file : str
         Path to the HDF5 tomography file to check.
     """
     with h5py.File(h5_file, "r") as f:
-        first_group = next(iter(f.keys()))
-        lat_ref = f[first_group]["latitudes"][:]
-        lon_ref = f[first_group]["longitudes"][:]
+        # Check if using optimized format
+        if 'latitudes' in f and 'longitudes' in f:
+            print("✅ Using optimized format (coordinates stored at root level).")
+            print("   All depth groups share the same coordinates by design.")
+            return
+
+        # Old format - check each group
+        depth_groups = get_depth_groups(f)
+        if not depth_groups:
+            print("❌ No depth groups found in file.")
+            return
+
+        first_group = depth_groups[0]
+        lat_ref, lon_ref = get_coordinates(f, first_group)
 
         all_good = True
-        for depth in f.keys():
-            lat = f[depth]["latitudes"][:]
-            lon = f[depth]["longitudes"][:]
+        for depth in depth_groups:
+            lat, lon = get_coordinates(f, depth)
 
             if not (np.allclose(lat, lat_ref) and np.allclose(lon, lon_ref)):
                 print(f"Mismatch in lat/lon at depth: {depth}")

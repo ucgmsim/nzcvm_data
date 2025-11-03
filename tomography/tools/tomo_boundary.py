@@ -10,6 +10,7 @@ HDF5 file as input.
 
 from pathlib import Path
 from typing import Annotated
+import sys
 
 import geojson
 import h5py
@@ -18,6 +19,10 @@ import typer
 from shapely.geometry import MultiPoint
 
 from qcore import cli
+
+# Add current directory to path for hdf5_utils import
+sys.path.insert(0, str(Path(__file__).parent))
+from hdf5_utils import get_coordinates
 
 app = typer.Typer(pretty_exceptions_enable=False)
 
@@ -53,18 +58,8 @@ def extract_single_boundary_geojson(
         If the convex hull operation does not result in a Polygon.
     """
     with h5py.File(hdf5_file_path, "r") as f:
-        # Use the first available group to extract lat/lon
-        first_group_name = next(iter(f.keys()))
-        group = None
-        for key in f.keys():
-            if 'latitudes' in f[key] and 'longitudes' in f[key]:
-                group = f[key]
-                break
-        if group is None:
-            raise RuntimeError("No group with 'latitudes' and 'longitudes' found in HDF5 file.")
-
-        lats = group["latitudes"][:]
-        lons = group["longitudes"][:]
+        # Load coordinates (supports both old and optimized formats)
+        lats, lons = get_coordinates(f)
 
         # Construct edge points only
         lon_grid, lat_grid = np.meshgrid(lons, lats)
