@@ -36,6 +36,47 @@ import pandas as pd
 from shapely.geometry import MultiPoint, mapping
 
 
+def normalize_longitudes(lons: np.ndarray, threshold: float = 0.0) -> tuple[np.ndarray, bool]:
+    """
+    Normalize longitudes to 0-360° if data crosses dateline.
+
+    Detects if data has negative longitudes (which represent values >180°)
+    and converts to 0-360° convention to avoid boundary issues.
+
+    Parameters
+    ----------
+    lons : np.ndarray
+        Longitude values (may be in -180 to 180° or 0-360° convention).
+    threshold : float
+        Threshold for detecting dateline crossing. If we have longitudes
+        both above this and below -threshold, we assume dateline crossing.
+
+    Returns
+    -------
+    tuple[np.ndarray, bool]
+        Normalized longitudes and whether normalization was applied.
+    """
+    lon_min = lons.min()
+    lon_max = lons.max()
+
+    # Check if we have negative longitudes (likely dateline crossing)
+    has_negative = lon_min < threshold
+    has_positive = lon_max > threshold
+
+    if has_negative and has_positive:
+        # Likely crossing dateline, convert to 0-360°
+        normalized = lons.copy()
+        normalized[normalized < 0] += 360.0
+
+        print(f"   🌐 Dateline crossing detected!")
+        print(f"      Original range: {lon_min:.3f}° to {lon_max:.3f}°")
+        print(f"      Normalized range: {normalized.min():.3f}° to {normalized.max():.3f}°")
+
+        return normalized, True
+
+    return lons, False
+
+
 def detect_file_type(file_path: Path) -> str:
     """
     Detect if file is HDF5 or CSV/TXT.
@@ -62,7 +103,7 @@ def detect_file_type(file_path: Path) -> str:
         return 'csv'
 
 
-def extract_boundary_from_hdf5(h5_path: Path) -> np.ndarray:
+def extract_boundary_from_hdf5(h5_path: Path, normalize_lon: bool = True) -> np.ndarray:
     """
     Extract boundary points from HDF5 file.
 
@@ -72,6 +113,8 @@ def extract_boundary_from_hdf5(h5_path: Path) -> np.ndarray:
     ----------
     h5_path : Path
         Path to HDF5 file.
+    normalize_lon : bool
+        Convert negative longitudes to 0-360° convention (default: True).
 
     Returns
     -------
@@ -101,6 +144,12 @@ def extract_boundary_from_hdf5(h5_path: Path) -> np.ndarray:
     print(f"   Latitude range: {lats.min():.3f}° to {lats.max():.3f}°")
     print(f"   Longitude range: {lons.min():.3f}° to {lons.max():.3f}°")
 
+    # Normalize longitudes if requested
+    if normalize_lon:
+        lons, was_normalized = normalize_longitudes(lons)
+        if was_normalized:
+            print(f"      ✓ Converted to 0-360° convention")
+
     # Create edge points only (not all grid points)
     lon_grid, lat_grid = np.meshgrid(lons, lats)
     edge_coords = []
@@ -126,7 +175,8 @@ def extract_boundary_from_csv(
     sep: str = r'\s+',
     depth_col: int = None,
     depth_filter: float = None,
-    depth_tolerance: float = 0.1
+    depth_tolerance: float = 0.1,
+    normalize_lon: bool = True
 ) -> np.ndarray:
     """
     Extract boundary points from CSV/TXT file.
@@ -149,6 +199,8 @@ def extract_boundary_from_csv(
         Depth value to filter on.
     depth_tolerance : float
         Tolerance for depth filtering.
+    normalize_lon : bool
+        Convert negative longitudes to 0-360° convention (default: True).
 
     Returns
     -------
@@ -179,6 +231,12 @@ def extract_boundary_from_csv(
         mask = np.abs(depths - depth_filter) <= depth_tolerance
         points = points[mask]
         print(f"   Filtered to depth {depth_filter} ± {depth_tolerance}: {len(points)} points")
+
+    # Normalize longitudes if requested
+    if normalize_lon:
+        points[:, 0], was_normalized = normalize_longitudes(points[:, 0])
+        if was_normalized:
+            print(f"      ✓ Converted to 0-360° convention")
 
     print(f"   Total points: {len(points):,}")
     print(f"   Longitude range: {points[:, 0].min():.3f}° to {points[:, 0].max():.3f}°")
@@ -323,6 +381,11 @@ Examples:
         default='convex_hull',
         help='Type of boundary polygon (default: convex_hull)'
     )
+    parser.add_argument(
+        '--no-normalize-lon',
+        action='store_true',
+        help='Do not normalize negative longitudes to 0-360° (default: normalize)'
+    )
 
     args = parser.parse_args()
 
@@ -339,7 +402,10 @@ Examples:
 
     # Extract boundary points
     if file_type == 'hdf5':
-        points = extract_boundary_from_hdf5(args.input_file)
+        points = extract_boundary_from_hdf5(
+            args.input_file,
+            normalize_lon=not args.no_normalize_lon
+        )
     else:  # CSV
         if args.lon_col is None or args.lat_col is None:
             print("\n❌ ERROR: CSV/TXT files require --lon-col and --lat-col", file=sys.stderr)
@@ -353,7 +419,8 @@ Examples:
             sep=args.sep,
             depth_col=args.depth_col,
             depth_filter=args.depth_filter,
-            depth_tolerance=args.depth_tolerance
+            depth_tolerance=args.depth_tolerance,
+            normalize_lon=not args.no_normalize_lon
         )
 
     # Create GeoJSON

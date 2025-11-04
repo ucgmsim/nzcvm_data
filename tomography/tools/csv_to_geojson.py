@@ -30,6 +30,47 @@ import pandas as pd
 from shapely.geometry import MultiPoint, Point, mapping
 
 
+def normalize_longitudes(lons: np.ndarray, threshold: float = 0.0) -> tuple[np.ndarray, bool]:
+    """
+    Normalize longitudes to 0-360° if data crosses dateline.
+
+    Detects if data has negative longitudes (which represent values >180°)
+    and converts to 0-360° convention to avoid boundary issues.
+
+    Parameters
+    ----------
+    lons : np.ndarray
+        Longitude values (may be in -180 to 180° or 0-360° convention).
+    threshold : float
+        Threshold for detecting dateline crossing. If we have longitudes
+        both above this and below -threshold, we assume dateline crossing.
+
+    Returns
+    -------
+    tuple[np.ndarray, bool]
+        Normalized longitudes and whether normalization was applied.
+    """
+    lon_min = lons.min()
+    lon_max = lons.max()
+
+    # Check if we have negative longitudes (likely dateline crossing)
+    has_negative = lon_min < threshold
+    has_positive = lon_max > threshold
+
+    if has_negative and has_positive:
+        # Likely crossing dateline, convert to 0-360°
+        normalized = lons.copy()
+        normalized[normalized < 0] += 360.0
+
+        print(f"   🌐 Dateline crossing detected!")
+        print(f"      Original range: {lon_min:.3f}° to {lon_max:.3f}°")
+        print(f"      Normalized range: {normalized.min():.3f}° to {normalized.max():.3f}°")
+
+        return normalized, True
+
+    return lons, False
+
+
 def read_csv_with_columns(
     csv_path: str | Path,
     lon_col: int,
@@ -40,7 +81,8 @@ def read_csv_with_columns(
     sep: str = r"\s+",
     depth_col: Optional[int] = None,
     depth_filter: Optional[float] = None,
-    depth_tolerance: Optional[float] = None
+    depth_tolerance: Optional[float] = None,
+    normalize_lon: bool = True
 ) -> pd.DataFrame:
     """
     Read CSV file with specified column indices.
@@ -67,6 +109,9 @@ def read_csv_with_columns(
         Depth value to filter on.
     depth_tolerance : float, optional
         Tolerance for depth filtering.
+    normalize_lon : bool
+        Convert negative longitudes to 0-360° convention (default: True).
+        Useful for data crossing the dateline.
 
     Returns
     -------
@@ -102,6 +147,12 @@ def read_csv_with_columns(
         'lon': df.iloc[:, lon_col],
         'lat': df.iloc[:, lat_col]
     })
+
+    # Normalize longitudes if requested (handles dateline crossing)
+    if normalize_lon:
+        result['lon'], was_normalized = normalize_longitudes(result['lon'].values)
+        if was_normalized:
+            print(f"      ✓ Converted to 0-360° convention")
 
     # Extract depth if specified
     if depth_col is not None:
@@ -397,6 +448,13 @@ Examples:
         help='Tolerance for depth filtering (default: 0.1)'
     )
 
+    # Longitude normalization
+    parser.add_argument(
+        '--no-normalize-lon',
+        action='store_true',
+        help='Do not normalize negative longitudes to 0-360° (default: normalize)'
+    )
+
     # GeoJSON options
     parser.add_argument(
         '--boundary-type',
@@ -440,7 +498,8 @@ Examples:
         sep=args.sep,
         depth_col=args.depth_col,
         depth_filter=args.depth_filter,
-        depth_tolerance=args.depth_tolerance
+        depth_tolerance=args.depth_tolerance,
+        normalize_lon=not args.no_normalize_lon
     )
 
     # Create GeoJSON
