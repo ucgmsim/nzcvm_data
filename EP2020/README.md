@@ -10,7 +10,7 @@ This model is explicitly defined in the `nzcvm_registry.yaml` file, which acts a
 * **Author:** Eberhart-Phillips et al. (2020)
 * **Title:** New Zealand Wide model 2.2 seismic velocity and Q structure
 * **Data Path:** `global/tomography/ep2020.h5`
-* **Elevation Layers (`elev`):** The model is defined on 20 discrete elevation layers, specified in kilometers. These layers range from 15 km above sea level down to 750 km below, providing a deep velocity profile.
+* **Elevation Layers (`elev`):** The model is defined on 25 discrete elevation layers, specified in kilometers. These layers range from 15 km above sea level down to 750 km below, providing a deep velocity profile.
 
 ## Data Integration and Visualization
 
