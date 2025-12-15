@@ -1,17 +1,24 @@
 tomography:
   - name: EP2010
     elev: [ 15, 1, -3, -8, -15, -23, -30, -38, -48, -65, -85, -105, -130, -155, -185, -225, -275, -370, -620, -750 ]
-    path: tomography/EP2010/ep2010.h5
+    path: tomography/EP2010/EP2010_New.h5
     author: Eberhart-Phillips et al. (2010)
     title: Establishing a Versatile 3-d seismic Velocity Model for New Zealand
     url: https://10.1785/gssrl.81.6.992
 
+  - name: EP2017
+    elev: [ 15, 1, -1, -3, -5, -8, -15, -23, -30, -34, -38, -42, -48, -55, -65, -85, -105, -130, -155, -185, -225, -275, -370, -620, -750 ]
+    path: tomography/EP2017/EP2017_New.h5
+    author: Eberhart-Phillips et al. (2017)
+    title: New Zealand Wide model 2.1 seismic velocity and Qs and Qp models for New Zealand
+    url: https://zenodo.org/record/1043558
+    
   - name: EP2020
     elev: [ 15, 1, -1, -3, -5, -8, -15, -23, -30, -34, -38, -42, -48, -55, -65, -85, -105, -130, -155, -185, -225, -275, -370, -620, -750 ]
-    path: tomography/EP2020/ep2020.h5
+    path: tomography/EP2020/EP2020_New.h5
     author: Eberhart-Phillips et al. (2020)
     title: New Zealand Wide model 2.2 seismic velocity and Qs and Qp models for New Zealand
-    url: https://10.5281/zenodo.3779523
+    url: https://zenodo.org/records/3779523
 
 
   - name: CHOW2020_EP2020_MIX
@@ -21,13 +28,21 @@ tomography:
     url:
       - https://doi.org/10.1093/gji/ggaa381
       - https://core.geo.vuw.ac.nz/d/feae69f61ea54f81bee1
-
+      
+    
+  - name: EP2022
+    elev: [15,1, -1, -3, -5, -8, -15, -23, -30, -34, -38, -42, -48, -55, -65, -85, -105, -130, -155, -185, -225, -275, -370, -620, -750 ]
+    path: tomography/EP2022/EP2022_New.h5
+    author: Eberhart-Phillips et al. (2022)
+    title: New Zealand Wide model 2.3 seismic velocity and Qs and Qp models for New Zealand
+    url: https://zenodo.org/records/5098356
+    
   - name: EP2025
-    elev: [ 1, -3, -8, -15, -23, -30, -38, -48, -65, -85, -105, -130, -155, -185, -225, -275, -370, -620, -750 ]
-    path: tomography/EP2025/ep2025.h5
+    elev: [15,1, -1, -3, -5, -8, -15, -23, -30, -34, -38, -42, -48, -55, -65, -85, -105, -130, -155, -185, -225, -275, -370, -620, -750 ]
+    path: tomography/EP2025/EP2025_New.h5
     author: Eberhart-Phillips et al. (2025)
-    title: New Zealand Wide model 2.2 seismic velocity and Qs and Qp models for New Zealand
-    url: n/a
+    title: New Zealand Wide model 3.1 seismic velocity and Qs and Qp models for New Zealand
+    url: Through Email
 
 basin:
   - name: Canterbury_v18p1
