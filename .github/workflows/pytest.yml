@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: nschloe/action-cached-lfs-checkout@v1
 
       - name: Setup UV
         uses: astral-sh/setup-uv@v5
