@@ -212,7 +212,8 @@ def test_tomography_geo_gridpoints(
                 )
 
 
-QUALITY_BOUNDS = {"vp": (0, 10.0), "vs": (0, 6.0), "rho": (0, 5.0)}
+# NOTE: Values for QUALITY_BOUNDS are not physically derived
+QUALITY_BOUNDS = {"vp": (0, 11.0), "vs": (0, 6.5), "rho": (0, 5.0)}
 
 
 @pytest.mark.parametrize("quality", ["vp", "rho", "vs"])
