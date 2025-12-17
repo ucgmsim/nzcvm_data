@@ -1,8 +1,7 @@
 import itertools
 import re
-from json import JSONDecodeError
 from pathlib import Path
-from typing import NotRequired, TypedDict
+from typing import NotRequired, TypedDict, no_type_check
 
 import h5py
 import numpy as np
@@ -25,6 +24,7 @@ def nzcvm_root() -> Path:
     return Path(__file__).parent.parent
 
 
+@no_type_check
 def test_nzcvm_registry_schema(nzcvm_registry_path: Path) -> None:
     path = Regex(
         # See https://stackoverflow.com/a/537876
@@ -83,7 +83,6 @@ def test_nzcvm_registry_schema(nzcvm_registry_path: Path) -> None:
     registry_schema = Schema(
         {
             "tomography": [tomography_entry],
-            "basin": [basin_entry],
             "basin": [basin_entry],
             "submodel": [submodel_schema],
             "vs30": [vs30_schema],
@@ -413,43 +412,6 @@ def read_smoothing_boundary(smoothing_path: Path) -> shapely.LineString:
     return shapely.LineString(coords)
 
 
-from pathlib import Path
-
-import shapely
-
-
-def test_basin_smoothing_contained_in_boundaries(
-    subtests: SubTests, nzcvm_root: Path, basin: Basin, tmp_path: Path
-) -> None:
-    if "smoothing" not in basin:
-        pytest.skip("basin has no smoothing boundary")
-
-    # 1. Load Basin Boundaries
-    boundaries = []
-    for boundary in basin["boundaries"]:
-        boundary_path = nzcvm_root / Path(boundary)
-        geojson_str = boundary_path.read_text()
-        geom_collection = shapely.from_geojson(geojson_str)
-        boundaries.append(geom_collection)
-
-    boundary_geometry = shapely.union_all(boundaries)
-
-    # 2. Load Smoothing Boundary
-    smoothing_surface_path = nzcvm_root / Path(basin["smoothing"])
-    smoothing_boundary = read_smoothing_boundary(smoothing_surface_path)
-
-    # 3. Perform Check
-    is_contained = boundary_geometry.contains(smoothing_boundary)
-
-    # 4. Handle Failure and Save Artifacts
-    if not is_contained:
-        # Calculate intersection for debugging
-        intersection = shapely.intersection(boundary_geometry, smoothing_boundary)
-
-        # Use a slug for the filename (assuming basin has a name or ID)
-        basin_name = basin.get("name", "unknown_basin").replace(" ", "_")
-
-
 def test_basin_smoothing_contained_in_boundaries(
     subtests: SubTests, nzcvm_root: Path, basin: Basin
 ) -> None:
@@ -510,7 +472,6 @@ def test_basin_surfaces_contain_boundaries(
 
 def test_vs30_file_exists(nzcvm_root: Path, vs30: Vs30) -> None:
     relative_path = Path(vs30["path"])
-    name = vs30["name"]
 
     vs30_path = nzcvm_root / relative_path
     assert vs30_path.exists(), f"Vs30 file missing at {vs30_path}"
@@ -518,7 +479,7 @@ def test_vs30_file_exists(nzcvm_root: Path, vs30: Vs30) -> None:
 
 def test_vs30_is_valid_hdf5(nzcvm_root: Path, vs30: Vs30) -> None:
     relative_path = Path(vs30["path"])
-    name = vs30["name"]
+
     vs30_path = nzcvm_root / relative_path
 
     try:
@@ -529,12 +490,12 @@ def test_vs30_is_valid_hdf5(nzcvm_root: Path, vs30: Vs30) -> None:
             assert "latitude" in f.keys()
             assert "longitude" in f.keys()
     except Exception as e:
+        name = vs30["name"]
         pytest.fail(f"Vs30 file {name} is not a valid hdf5 file: {e}")
 
 
 def test_vs30_geo_gridpoints(nzcvm_root: Path, vs30: Vs30) -> None:
     relative_path = Path(vs30["path"])
-    name = vs30["name"]
     vs30_path = nzcvm_root / relative_path
 
     with h5py.File(vs30_path, "r") as f:
