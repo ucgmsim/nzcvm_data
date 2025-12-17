@@ -1,10 +1,16 @@
+import itertools
+import re
+from json import JSONDecodeError
 from pathlib import Path
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
 import h5py
 import numpy as np
 import pytest
+import shapely
 import yaml
+from attr import dataclass
+from pytest import Metafunc
 from pytest_subtests import SubTests
 from schema import Optional, Or, Regex, Schema, SchemaError
 
@@ -102,14 +108,47 @@ class Tomography(TypedDict):
     url: str
 
 
-def pytest_generate_tests(metafunc) -> None:
+class Surface(TypedDict):
+    path: str
+    submodel: NotRequired[str]
+
+
+class Basin(TypedDict):
+    name: str
+    author: str
+    notes: list[str]
+    wiki_images: list[str]
+    boundaries: list[str]
+    surfaces: list[Surface]
+    smoothing: NotRequired[str]
+
+
+class Vs30(TypedDict):
+    name: str
+    path: str
+
+
+class Submodel(TypedDict):
+    name: str
+    type: str
+    module: str
+    data: NotRequired[str]
+
+
+def pytest_generate_tests(metafunc: Metafunc) -> None:
+    registry_path = Path(__file__).parent.parent / "nzcvm_registry.yaml"
+    with open(registry_path) as f:
+        registry = yaml.safe_load(f)
     if "model" in metafunc.fixturenames:
         # This assumes you have access to the registry here
         # It creates a separate test case for every model entry
-        registry_path = Path(__file__).parent.parent / "nzcvm_registry.yaml"
-        with open(registry_path) as f:
-            registry = yaml.safe_load(f)
         metafunc.parametrize("model", registry["tomography"], ids=lambda m: m["name"])
+    elif "basin" in metafunc.fixturenames:
+        metafunc.parametrize("basin", registry["basin"], ids=lambda m: m["name"])
+    elif "vs30" in metafunc.fixturenames:
+        metafunc.parametrize("vs30", registry["vs30"], ids=lambda m: m["name"])
+    elif "submodel" in metafunc.fixturenames:
+        metafunc.parametrize("submodel", registry["submodel"], ids=lambda m: m["name"])
 
 
 def test_tomography_paths_exist(nzcvm_root: Path, model: Tomography) -> None:
@@ -226,3 +265,356 @@ def test_tomography_quality(
                 assert quality_max <= max, (
                     f"Quality {quality} maximum value ({quality_max=}) is less than {max}."
                 )
+
+
+def test_basin_boundaries_exist(
+    subtests: SubTests, nzcvm_root: Path, basin: Basin
+) -> None:
+    for boundary in basin["boundaries"]:
+        boundary_relative_path = Path(boundary)
+        name = basin["name"]
+        with subtests.test(
+            msg=f"Checking boundary {boundary_relative_path.stem}",
+            basin=name,
+            boundary=boundary_relative_path.stem,
+        ):
+            boundary_path = nzcvm_root / boundary_relative_path
+            assert boundary_path.exists()
+
+
+def test_basin_boundaries_are_valid_geojson(
+    subtests: SubTests, nzcvm_root: Path, basin: Basin
+) -> None:
+    for boundary in basin["boundaries"]:
+        boundary_relative_path = Path(boundary)
+        name = basin["name"]
+        boundary_name = boundary_relative_path.stem
+
+        with subtests.test(
+            msg=f"Checking boundary {boundary_name}", basin=name, boundary=boundary_name
+        ):
+            boundary_path = nzcvm_root / boundary_relative_path
+
+            try:
+                geojson_str = boundary_path.read_text()
+                geom_collection = shapely.from_geojson(geojson_str)
+            except (OSError, ValueError, Exception) as e:
+                pytest.fail(f"Model {name} has invalid boundary {boundary_name}: {e}")
+
+            assert isinstance(geom_collection, shapely.GeometryCollection)
+            assert shapely.is_valid(geom_collection), (
+                "Geometry is topologically invalid"
+            )
+
+            assert not shapely.is_empty(geom_collection), "Geometry is empty"
+
+            assert all(
+                isinstance(geom, shapely.Polygon) for geom in geom_collection.geoms
+            )
+
+
+def test_basin_paths_exist(nzcvm_root: Path, basin: Basin) -> None:
+    if match := re.match(r"^(\w+)_v\d+p\d+$", basin["name"]):
+        basin_canonical_name = match.group(1)
+        assert basin_canonical_name
+        basin_path = nzcvm_root / "regional" / basin_canonical_name
+        assert basin_path.exists()
+        if "wiki_images" in basin:
+            assert all(
+                (basin_path / Path(image)).exists() for image in basin["wiki_images"]
+            )
+    else:
+        pytest.fail("basin name does not follow structure name_vxxpxx")
+
+
+def test_basin_surfaces_exist(
+    subtests: SubTests, nzcvm_root: Path, basin: Basin
+) -> None:
+    for surface in basin["surfaces"]:
+        relative_surface_path = Path(surface["path"])
+        name = basin["name"]
+        surface_name = relative_surface_path.stem
+        with subtests.test(
+            msg=f"Checking surface {surface_name}", basin=name, surface=surface_name
+        ):
+            surface_path = nzcvm_root / relative_surface_path
+            assert surface_path.exists()
+
+
+def test_basin_surfaces_are_valid_hdf5(
+    subtests: SubTests, nzcvm_root: Path, basin: Basin
+) -> None:
+    for surface in basin["surfaces"]:
+        relative_surface_path = Path(surface["path"])
+        name = basin["name"]
+        surface_name = relative_surface_path.stem
+        with subtests.test(
+            msg=f"Checking surface {surface_name}", basin=name, surface=surface_name
+        ):
+            surface_path = nzcvm_root / relative_surface_path
+            try:
+                with h5py.File(surface_path, "r") as f:
+                    assert "elevation" in f.keys()
+                    assert "latitude" in f.keys()
+                    assert "longitude" in f.keys()
+            except Exception as e:
+                pytest.fail(f"{surface_name} is not a valid hdf5 file: {e}")
+
+
+def test_surface_geo_gridpoints(
+    subtests: SubTests, nzcvm_root: Path, basin: Basin
+) -> None:
+    for surface in basin["surfaces"]:
+        relative_surface_path = Path(surface["path"])
+        name = basin["name"]
+        surface_name = relative_surface_path.stem
+        with subtests.test(
+            msg=f"Checking surface {surface_name}", basin=name, surface=surface_name
+        ):
+            surface_path = nzcvm_root / relative_surface_path
+            with h5py.File(surface_path, "r") as f:
+                latitude = np.array(f["latitude"])
+                longitude = np.array(f["longitude"])
+
+                lat_diffs_km = np.diff(latitude) * LAT_DEGREES_PER_KM
+                assert np.all(lat_diffs_km > 0), "Latitudes not strictly ascending"
+                assert latitude[0] >= -90 and latitude[-1] <= 90, (
+                    "Latitudes must be between -90 and 90."
+                )
+
+                lon_diffs_deg = np.diff(longitude)  # Shape (N-1,)
+                assert np.all(lon_diffs_deg > 0), "Longitudes not strictly ascending"
+                assert longitude[0] >= 0 and longitude[-1] <= 185, (
+                    "Longitudes must be between 0 and 185."
+                )
+
+                elevation = np.array(f["elevation"])
+                assert elevation.shape == (len(latitude), len(longitude)), (
+                    "Elevation shape must be match latitude and longitude"
+                )
+                assert not np.isnan(elevation).any(), "Elevations cannot be NaN"
+                assert elevation.min() >= -10000, "Elevations cannot be below -10000m"
+                assert elevation.max() <= 10000, "Elevations cannot be above 10000m"
+
+
+def read_smoothing_boundary(smoothing_path: Path) -> shapely.LineString:
+    coords: list[tuple[float, float]] = []
+    with open(smoothing_path, "r") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            line_coords = re.split(r"\s+", line)
+            assert len(line_coords) == 2
+            lon_str, lat_str = line_coords
+            assert lon_str and lat_str
+            coords.append((float(lon_str), float(lat_str)))
+
+    return shapely.LineString(coords)
+
+
+from pathlib import Path
+
+import shapely
+
+
+def test_basin_smoothing_contained_in_boundaries(
+    subtests: SubTests, nzcvm_root: Path, basin: Basin, tmp_path: Path
+) -> None:
+    if "smoothing" not in basin:
+        pytest.skip("basin has no smoothing boundary")
+
+    # 1. Load Basin Boundaries
+    boundaries = []
+    for boundary in basin["boundaries"]:
+        boundary_path = nzcvm_root / Path(boundary)
+        geojson_str = boundary_path.read_text()
+        geom_collection = shapely.from_geojson(geojson_str)
+        boundaries.append(geom_collection)
+
+    boundary_geometry = shapely.union_all(boundaries)
+
+    # 2. Load Smoothing Boundary
+    smoothing_surface_path = nzcvm_root / Path(basin["smoothing"])
+    smoothing_boundary = read_smoothing_boundary(smoothing_surface_path)
+
+    # 3. Perform Check
+    is_contained = boundary_geometry.contains(smoothing_boundary)
+
+    # 4. Handle Failure and Save Artifacts
+    if not is_contained:
+        # Calculate intersection for debugging
+        intersection = shapely.intersection(boundary_geometry, smoothing_boundary)
+
+        # Use a slug for the filename (assuming basin has a name or ID)
+        basin_name = basin.get("name", "unknown_basin").replace(" ", "_")
+
+
+def test_basin_smoothing_contained_in_boundaries(
+    subtests: SubTests, nzcvm_root: Path, basin: Basin
+) -> None:
+    if "smoothing" not in basin:
+        pytest.skip("basin has no smoothing boundary")
+
+    boundaries = []
+    for boundary in basin["boundaries"]:
+        boundary_relative_path = Path(boundary)
+        boundary_path = nzcvm_root / boundary_relative_path
+        geojson_str = boundary_path.read_text()
+        geom_collection = shapely.from_geojson(geojson_str)
+        boundaries.append(geom_collection)
+
+    # Add a small smoothing boundary buffer to account for the fact
+    # that smoothing boundary is not perfectly contained in the basin
+    # boundary.
+    boundary_geometry = shapely.buffer(shapely.union_all(boundaries), 0.001)
+    smoothing_surface_relative_path = basin["smoothing"]
+    smoothing_surface_path = nzcvm_root / Path(smoothing_surface_relative_path)
+    smoothing_boundary = read_smoothing_boundary(smoothing_surface_path)
+
+    assert boundary_geometry.contains(smoothing_boundary)
+
+
+def test_basin_surfaces_contain_boundaries(
+    subtests: SubTests, nzcvm_root: Path, basin: Basin
+) -> None:
+    for boundary, surface in itertools.product(basin["boundaries"], basin["surfaces"]):
+        boundary_relative_path = Path(boundary)
+        surface_relative_path = Path(surface["path"])
+        basin_name = basin["name"]
+        boundary_name = boundary_relative_path.stem
+        surface_name = surface_relative_path.stem
+
+        with subtests.test(
+            msg=f"Checking boundary {boundary_name}",
+            basin=basin_name,
+            boundary=boundary_name,
+            surface=surface_name,
+        ):
+            boundary_path = nzcvm_root / boundary_relative_path
+
+            geojson_str = boundary_path.read_text()
+            geom_collection = shapely.from_geojson(geojson_str)
+            surface_path = nzcvm_root / surface_relative_path
+            with h5py.File(surface_path, "r") as f:
+                latitudes = np.array(f["latitude"])
+                longitudes = np.array(f["longitude"])
+            elevation_boundary = shapely.box(
+                xmin=longitudes.min(),
+                xmax=longitudes.max(),
+                ymin=latitudes.min(),
+                ymax=latitudes.max(),
+            )
+            assert shapely.contains(elevation_boundary, geom_collection)
+
+
+def test_vs30_file_exists(nzcvm_root: Path, vs30: Vs30) -> None:
+    relative_path = Path(vs30["path"])
+    name = vs30["name"]
+
+    vs30_path = nzcvm_root / relative_path
+    assert vs30_path.exists(), f"Vs30 file missing at {vs30_path}"
+
+
+def test_vs30_is_valid_hdf5(nzcvm_root: Path, vs30: Vs30) -> None:
+    relative_path = Path(vs30["path"])
+    name = vs30["name"]
+    vs30_path = nzcvm_root / relative_path
+
+    try:
+        with h5py.File(vs30_path, "r") as f:
+            assert "elevation" in f.keys(), (
+                "Dataset 'elevation' (vs30) missing from HDF5"
+            )
+            assert "latitude" in f.keys()
+            assert "longitude" in f.keys()
+    except Exception as e:
+        pytest.fail(f"Vs30 file {name} is not a valid hdf5 file: {e}")
+
+
+def test_vs30_geo_gridpoints(nzcvm_root: Path, vs30: Vs30) -> None:
+    relative_path = Path(vs30["path"])
+    name = vs30["name"]
+    vs30_path = nzcvm_root / relative_path
+
+    with h5py.File(vs30_path, "r") as f:
+        latitude = np.array(f["latitude"])
+        longitude = np.array(f["longitude"])
+        vs30_values = np.array(f["elevation"])
+
+        lat_diffs = np.diff(latitude)
+        assert np.all(lat_diffs > 0), "Latitudes not strictly ascending"
+        assert latitude[0] >= -90 and latitude[-1] <= 90, (
+            "Latitudes out of world bounds"
+        )
+
+        lon_diffs = np.diff(longitude)
+        assert np.all(lon_diffs > 0), "Longitudes not strictly ascending"
+        assert longitude[0] >= 0 and longitude[-1] <= 185, (
+            "Longitudes out of NZCVM bounds"
+        )
+
+        assert vs30_values.shape == (len(latitude), len(longitude)), (
+            f"Vs30 shape {vs30_values.shape} does not match lat/lon dimensions"
+        )
+
+        assert not np.isnan(vs30_values).any(), "Vs30 data contains NaNs"
+        assert vs30_values.min() >= 0, (
+            f"Vs30 values below 0 detected: {vs30_values.min()}"
+        )
+        assert vs30_values.max() <= 2000, (
+            f"Vs30 values above 2000 detected: {vs30_values.max()}"
+        )
+
+
+def test_submodel_data_exists_where_relevant(
+    nzcvm_root: Path, submodel: Submodel
+) -> None:
+    assert ("data" in submodel) == (submodel["type"] == "vm1d"), (
+        "Submodel has data iff submodel is a vm1d"
+    )
+    if "data" in submodel:
+        data_relative_path = Path(submodel["data"])
+        data_path = nzcvm_root / data_relative_path
+        assert data_path.exists()
+
+
+@dataclass
+class SubmodelData:
+    vp: float
+    vs: float
+    rho: float
+    qp: float
+    qs: float
+    thickness: float
+
+
+def parse_submodel_data(submodel_path: Path) -> list[SubmodelData]:
+    rows = []
+    with open(submodel_path, "r") as f:
+        header = next(f).strip()
+        assert header == "DEF HST"
+        for line in f:
+            row = re.split(r"\s+", line.strip())
+            floats = [float(x) for x in row]
+            assert len(floats) == 6
+            rows.append(SubmodelData(*floats))
+    return rows
+
+
+def test_submodel_data_is_valid(
+    subtests: SubTests, nzcvm_root: Path, submodel: Submodel
+) -> None:
+    if "data" in submodel:
+        data_relative_path = Path(submodel["data"])
+        data_path = nzcvm_root / data_relative_path
+        data = parse_submodel_data(data_path)
+        vp_min, vp_max = QUALITY_BOUNDS["vp"]
+        assert all(vp_min <= row.vp <= vp_max for row in data)
+        vs_min, vs_max = QUALITY_BOUNDS["vs"]
+        assert all(vs_min <= row.vs <= vs_max for row in data)
+        assert all(row.thickness >= 0 for row in data)
+        assert all(row.qp > 0 for row in data)
+        assert all(row.qs > 0 for row in data)
+    else:
+        pytest.skip(f"Submodel {submodel['name']} has no data")
