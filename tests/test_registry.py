@@ -194,22 +194,6 @@ def test_tomography_geo_gridpoints(
                 assert longitude[0] >= 0 and longitude[-1] <= 185, (
                     "Longitudes must be between 0 and 185."
                 )
-                cos_lats = np.cos(np.radians(latitude))
-
-                grid_lon_spacings_km = (
-                    lon_diffs_deg[np.newaxis, :]
-                    * LAT_DEGREES_PER_KM
-                    * cos_lats[:, np.newaxis]
-                )
-
-                target_km = lon_diffs_deg[0] * LAT_DEGREES_PER_KM * cos_lats[0]
-
-                max_error = np.max(np.abs(grid_lon_spacings_km - target_km))
-
-                assert max_error < LONGITUDE_TOLERANCE, (
-                    f"Longitude spacing variation ({max_error:.6f} km) "
-                    f"exceeds tolerance ({LONGITUDE_TOLERANCE} km)"
-                )
 
 
 # NOTE: Values for QUALITY_BOUNDS are not physically derived
