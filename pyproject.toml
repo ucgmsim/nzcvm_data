@@ -3,11 +3,7 @@
 name = "nzcvm_data"
 version = "0.1.0"
 description = "Integrity checks for NZCVM data registry"
-dependencies = [
-    "numpy>=2.3.5",
-    "pytest-subtests>=0.15.0",
-    "schema>=0.7.8",
-]
+dependencies = ["numpy>=2.3.5", "pytest-subtests>=0.15.0", "schema>=0.7.8"]
 
 
 [project.optional-dependencies]
@@ -15,3 +11,4 @@ test = ["h5py>=3.15.1", "pytest>=9.0.2", "pyyaml>=6.0.3"]
 # Even though this isn't a python package, these dev dependencies can
 # still prove useful for writing tests.
 dev = ["ruff", "numpydoc", "ty"]
+types = []
