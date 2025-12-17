@@ -45,7 +45,10 @@ def test_nzcvm_registry_schema(nzcvm_registry_path: Path) -> None:
             "path": path,
             "author": str,
             Optional("title"): str,
-            "url": Or(url, [url], None),  # Handles single URL, list of URLs, or empty
+            Optional("url"): Or(
+                url,
+                [url],
+            ),  # Handles single URL, list of URLs, or empty
         }
     )
 
