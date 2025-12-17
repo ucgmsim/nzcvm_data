@@ -19,4 +19,4 @@ jobs:
           enable-cache: true
 
       - name: Run type checking with ty
-        run: uv run --extra dev --extra types ty check
+        run: uv run --all-extras ty check
