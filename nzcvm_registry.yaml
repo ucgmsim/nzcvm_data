@@ -56,8 +56,7 @@ basin:
         submodel: miocene_submod_v1
       - path: regional/Canterbury/Canterbury_Paleogene_WGS84.h5
         submodel: paleogene_submod_v1
-      - path: regional/Canterbury/Canterbury_Basement_WGS84.h5
-
+      - path: regional/Canterbury/Canterbury_basement_WGS84.h5
 
   - name: Canterbury_v18p2
     boundaries:
@@ -71,8 +70,7 @@ basin:
         submodel: miocene_submod_v1
       - path: regional/Canterbury/Canterbury_Paleogene_WGS84.h5
         submodel: paleogene_submod_v1
-      - path: regional/Canterbury/Canterbury_Basement_WGS84.h5
-
+      - path: regional/Canterbury/Canterbury_basement_WGS84.h5
 
   - name: Canterbury_v18p3
     boundaries:
@@ -86,8 +84,7 @@ basin:
         submodel: miocene_submod_v1
       - path: regional/Canterbury/Canterbury_Paleogene_WGS84.h5
         submodel: paleogene_submod_v1
-      - path: regional/Canterbury/Canterbury_Basement_WGS84.h5
-
+      - path: regional/Canterbury/Canterbury_basement_WGS84.h5
 
   - name: Canterbury_v19p1
     type: 4
@@ -337,7 +334,7 @@ basin:
     surfaces:
       - path: surface/NZ_DEM_HD.h5
         submodel: canterbury1d_v2
-      - path : regional/Wellington/Wellington_basement_WGS84_v19p6.h5
+      - path: regional/Wellington/Wellington_basement_WGS84_v19p6.h5
     smoothing: regional/Wellington/Wellington_smoothing.txt
 
 
@@ -738,7 +735,6 @@ basin:
     wiki_images:
       - images/NI_mideast.png
       - images/Gisborne_basin_map.png
-      - images/grisborne_basement.png
     notes:
       - (Comment from the author)
       - Stop at Moto River, working around the East Cape from Gisborne. Haurere Point should be included in Whakatane
