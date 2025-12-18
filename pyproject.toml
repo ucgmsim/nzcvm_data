@@ -1,6 +1,7 @@
 
 [project]
 name = "nzcvm_data"
+requires-python = ">=3.11"
 version = "0.1.0"
 description = "Integrity checks for NZCVM data registry"
 dependencies = ["numpy>=2.3.5", "pytest-subtests>=0.15.0", "schema>=0.7.8"]

@@ -424,7 +424,10 @@ def test_basin_smoothing_contained_in_boundaries(
         boundary_path = nzcvm_root / boundary_relative_path
         geojson_str = boundary_path.read_text()
         geom_collection = shapely.from_geojson(geojson_str)
-        boundaries.append(geom_collection)
+        assert isinstance(geom_collection, shapely.GeometryCollection)
+        for geom in geom_collection.geoms:
+            assert isinstance(geom, shapely.Polygon)
+            boundaries.append(geom.exterior)
 
     # Add a small smoothing boundary buffer to account for the fact
     # that smoothing boundary is not perfectly contained in the basin
