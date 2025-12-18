@@ -27,7 +27,7 @@ tomography:
       ]
     author: Eberhart-Phillips et al. (2010)
     title: Establishing a Versatile 3-d seismic Velocity Model for New Zealand
-    url: https://10.1785/gssrl.81.6.992
+    url: https://www.seismosoc.org/Publications/srl/SRL_81/srl_81-6_eberhart-phillips_et_al-esupp/Table_S1.txt
 
   - name: EP2017
     path: tomography/EP2017/EP2017.h5
