@@ -319,7 +319,7 @@ tomography:
         -620,
         -750,
       ]
-    path: tomography/EP2022/EP2022_New.h5
+    path: tomography/EP2022/EP2022.h5
     author: Eberhart-Phillips et al. (2022)
     title: New Zealand Wide model 2.3 seismic velocity and Qs and Qp models for New Zealand
     url: https://zenodo.org/records/5098356
