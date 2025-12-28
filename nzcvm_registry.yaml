@@ -164,7 +164,16 @@ tomography:
     author: Eberhart-Phillips et al. (2025)
     title: New Zealand Wide model 3.1 seismic velocity and Qs and Qp models for New Zealand
     url: Personal communication (pending publication)
-
+    
+  - name: SW2025
+    path: tomography/SW2025/SW2025_EP2022_Merge.h5
+    elev: [ 15, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -20, -21, -22, -23, -24, -25, -26, -27, -28, -29, -30, -31, -32, -33, -34, -35, -36, -37, -38, -39, -40, -41, -42, -43, -44, -45, -46, -47, -48, -49, -50, -51, -52, -53, -54, -55, -56, -57, -58, -59, -60, -65, -85, -105, -130, -155, -185, -225, -275, -370, -620, -750 ]
+    author: Wu et al. (2025)
+    title: Seismic azimuthal anisotropy of New Zealand revealed by adjoint-state traveltime tomography
+    url: Full Model Data - Personal Communication, Downsampled data published in https://doi.org/10.21979/N9/QKU80S
+    
+    
+    
 basin:
   - name: Canterbury_v18p1
     boundaries:
