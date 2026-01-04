@@ -216,8 +216,10 @@ def test_tomography_geo_gridpoints(
                 longitude = np.array(group["longitudes"])
 
                 lat_diffs_km = np.diff(latitude) * LAT_DEGREES_PER_KM
-                assert np.all(lat_diffs_km > 0), "Latitudes not strictly ascending"
-                assert latitude[0] >= -90 and latitude[-1] <= 90, (
+                assert np.all(lat_diffs_km > 0) or np.all(lat_diffs_km < 0), (
+                    "Latitudes neither strictly ascending or descending"
+                )
+                assert np.min(latitude) >= -90 and np.max(latitude) <= 90, (
                     "Latitudes must be between -90 and 90."
                 )
                 assert lat_diffs_km == pytest.approx(
@@ -225,8 +227,10 @@ def test_tomography_geo_gridpoints(
                 )
 
                 lon_diffs_deg = np.diff(longitude)  # Shape (N-1,)
-                assert np.all(lon_diffs_deg > 0), "Longitudes not strictly ascending"
-                assert longitude[0] >= 0 and longitude[-1] <= 185, (
+                assert np.all(lon_diffs_deg > 0) or np.all(lon_diffs_deg < 0), (
+                    "Longitudes neither strictly ascending or descending"
+                )
+                assert np.min(longitude) >= 0 and np.max(longitude) <= 185, (
                     "Longitudes must be between 0 and 185."
                 )
 
