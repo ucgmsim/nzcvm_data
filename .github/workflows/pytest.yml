@@ -3,7 +3,8 @@ on: [pull_request]
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on:
+      group: big-data
     steps:
       - name: Checkout code
         uses: nschloe/action-cached-lfs-checkout@v1
