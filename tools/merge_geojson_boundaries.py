@@ -17,8 +17,7 @@ import pandas as pd
 import typer
 from fiona.errors import DriverError
 from matplotlib import cm  # for colour palettes
-from matplotlib.colors import to_hex
-
+from matplotlib.colors import ListedColormap, to_hex
 from qcore import cli
 
 app = typer.Typer(pretty_exceptions_enable=False)
@@ -40,13 +39,15 @@ def colour_cycle(n: int) -> list[str]:
     list[str]
         A list of n HEX colour strings.
     """
-    base = [to_hex(c) for c in cm.get_cmap("tab10").colors]
+    tab10 = cm.get_cmap("tab10")
+    assert isinstance(tab10, ListedColormap)
+    base = [to_hex(c) for c in tab10.colors]  # type: ignore[invalid-argument-type]
     if n <= len(base):
         return base[:n]
 
     # Need more colours – extend with a continuous palette
     extra_needed = n - len(base)
-    extra = [to_hex(cm.viridis(i / extra_needed)) for i in range(extra_needed)]
+    extra = [to_hex(cm.viridis(i / extra_needed)) for i in range(extra_needed)]  # type: ignore[unresolved-attribute]
     return base + extra
 
 
