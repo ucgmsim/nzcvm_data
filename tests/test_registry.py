@@ -11,7 +11,7 @@ import shapely
 import yaml
 from pytest import Metafunc
 from pytest_subtests import SubTests
-from schema import Optional, Or, Regex, Schema, SchemaError
+from schema import And, Optional, Or, Regex, Schema, SchemaError
 
 
 @pytest.fixture(scope="session")
@@ -28,11 +28,13 @@ def nzcvm_root() -> Path:
 def test_nzcvm_registry_schema(nzcvm_registry_path: Path) -> None:
     path = Regex(
         # See https://stackoverflow.com/a/537876
+        # Posted by Darron.
+        # Retreived 2025-12-17, License - CC BY-SA 2.5
         r"[^\0]+",
         error="Must be valid unix path.",
     )
-    ident = Regex(r"^[a-zA-Z_][a-zA-Z0-9_]*$", error="Must be valid python identifier.")
-    # Source - https://stackoverflow.com/a
+    ident = And(str, str.isidentifier)
+    # Source - https://stackoverflow.com/a/3809435
     # Posted by Daveo, modified by community. See post 'Timeline' for change history
     # Retrieved 2025-12-17, License - CC BY-SA 4.0
     url = Or(
@@ -377,13 +379,17 @@ def test_surface_geo_gridpoints(
                 longitude = np.array(f["longitude"])
 
                 lat_diffs_km = np.diff(latitude) * LAT_DEGREES_PER_KM
-                assert np.all(lat_diffs_km > 0) or np.all(lat_diffs_km < 0), "Latitudes not monotonic"
+                assert np.all(lat_diffs_km > 0) or np.all(lat_diffs_km < 0), (
+                    "Latitudes not monotonic"
+                )
                 assert latitude[0] >= -90 and latitude[-1] <= 90, (
                     "Latitudes must be between -90 and 90."
                 )
 
                 lon_diffs_deg = np.diff(longitude)  # Shape (N-1,)
-                assert np.all(lon_diffs_deg > 0) or np.all(lon_diffs_deg < 0), "Longitudes not monotonic"
+                assert np.all(lon_diffs_deg > 0) or np.all(lon_diffs_deg < 0), (
+                    "Longitudes not monotonic"
+                )
                 assert longitude[0] >= 0 and longitude[-1] <= 185, (
                     "Longitudes must be between 0 and 185."
                 )
@@ -578,7 +584,7 @@ def test_submodel_data_is_valid(
         vs_min, vs_max = QUALITY_BOUNDS["vs"]
         rho_min, rho_max = QUALITY_BOUNDS["rho"]
         for i, row in enumerate(data):
-            with subtests.test(msg=f"Checking row {i+1}", row=row):
+            with subtests.test(msg=f"Checking row {i + 1}", row=row):
                 assert vp_min <= row.vp <= vp_max, f"Vp {row.vp} out of bounds"
                 assert vs_min <= row.vs <= vs_max, f"Vs {row.vs} out of bounds"
                 assert rho_min <= row.rho <= rho_max, f"Rho {row.rho} out of bounds"
