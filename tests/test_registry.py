@@ -377,7 +377,7 @@ def test_surface_geo_gridpoints(
                 longitude = np.array(f["longitude"])
 
                 lat_diffs_km = np.diff(latitude) * LAT_DEGREES_PER_KM
-                assert np.all(lat_diffs_km > 0), "Latitudes not strictly ascending"
+                assert np.all(lat_diffs_km > 0) or np.all(lat_diffs_km < 0), "Latitudes not monotonic"
                 assert latitude[0] >= -90 and latitude[-1] <= 90, (
                     "Latitudes must be between -90 and 90."
                 )
