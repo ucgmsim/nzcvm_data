@@ -26,7 +26,7 @@ tomography:
     path: tomography/EP2010/ep2010.h5
     author: Eberhart-Phillips et al. (2010)
     title: Establishing a Versatile 3-d seismic Velocity Model for New Zealand
-    url: https://10.1785/gssrl.81.6.992
+    url: https://doi.org/10.1785/gssrl.81.6.992
 
   - name: EP2020
     elev:
@@ -60,7 +60,7 @@ tomography:
     path: tomography/EP2020/ep2020.h5
     author: Eberhart-Phillips et al. (2020)
     title: New Zealand Wide model 2.2 seismic velocity and Qs and Qp models for New Zealand
-    url: https://10.5281/zenodo.3779523
+    url: https://doi.org/10.5281/zenodo.3779523
 
 basin:
   - name: Canterbury_v18p1

@@ -8,6 +8,7 @@ import h5py
 import numpy as np
 import pytest
 import shapely
+import validators
 import yaml
 from pytest import Metafunc
 from pytest_subtests import SubTests
@@ -34,13 +35,8 @@ def test_nzcvm_registry_schema(nzcvm_registry_path: Path) -> None:
         error="Must be valid unix path.",
     )
     ident = And(str, str.isidentifier)
-    # Source - https://stackoverflow.com/a/3809435
-    # Posted by Daveo, modified by community. See post 'Timeline' for change history
-    # Retrieved 2025-12-17, License - CC BY-SA 4.0
     url = Or(
-        Regex(
-            r"https?://(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"
-        ),
+        And(str, validators.url),
         "Personal communication (pending publication)",
         error='Must be a valid URL, or "Personal communication (pending publication)"',
     )
