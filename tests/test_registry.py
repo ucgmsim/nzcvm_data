@@ -1,5 +1,6 @@
 import itertools
 import re
+from dataclasses import dataclass
 from pathlib import Path
 from typing import NotRequired, TypedDict, no_type_check
 
@@ -8,7 +9,6 @@ import numpy as np
 import pytest
 import shapely
 import yaml
-from attr import dataclass
 from pytest import Metafunc
 from pytest_subtests import SubTests
 from schema import Optional, Or, Regex, Schema, SchemaError
