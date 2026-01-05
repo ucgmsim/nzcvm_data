@@ -404,7 +404,7 @@ def read_smoothing_boundary(smoothing_path: Path) -> shapely.LineString:
             line = line.strip()
             if not line:
                 continue
-            line_coords = re.split(r"\s+", line)
+            line_coords = line.strip().split()
             assert len(line_coords) == 2
             lon_str, lat_str = line_coords
             assert lon_str and lat_str
@@ -560,7 +560,7 @@ def parse_submodel_data(submodel_path: Path) -> list[SubmodelData]:
         header = next(f).strip()
         assert header == "DEF HST"
         for line in f:
-            row = re.split(r"\s+", line.strip())
+            row = line.strip().split()
             floats = [float(x) for x in row]
             assert len(floats) == 6
             rows.append(SubmodelData(*floats))
