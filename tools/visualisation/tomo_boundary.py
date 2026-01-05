@@ -1,6 +1,7 @@
 """
-This script extracts the geographical boundary from a tomography HDF5 file
-and saves it as a GeoJSON file. It computes the convex hull of the grid points
+This script extracts the geographical boundary from a tomography HDF5 file and saves it as a GeoJSON file.
+
+It computes the convex hull of the grid points
 defined by the latitude and longitude arrays in the HDF5 file to determine
 the boundary polygon.
 
@@ -14,10 +15,10 @@ from typing import Annotated
 import geojson
 import h5py
 import numpy as np
+import shapely
 import typer
-from shapely.geometry import MultiPoint
-
 from qcore import cli
+from shapely.geometry import MultiPoint
 
 app = typer.Typer(pretty_exceptions_enable=False)
 
@@ -53,15 +54,15 @@ def extract_single_boundary_geojson(
         If the convex hull operation does not result in a Polygon.
     """
     with h5py.File(hdf5_file_path, "r") as f:
-        # Use the first available group to extract lat/lon
-        first_group_name = next(iter(f.keys()))
         group = None
         for key in f.keys():
-            if 'latitudes' in f[key] and 'longitudes' in f[key]:
+            if "latitudes" in f[key] and "longitudes" in f[key]:
                 group = f[key]
                 break
         if group is None:
-            raise RuntimeError("No group with 'latitudes' and 'longitudes' found in HDF5 file.")
+            raise RuntimeError(
+                "No group with 'latitudes' and 'longitudes' found in HDF5 file."
+            )
 
         lats = group["latitudes"][:]
         lons = group["longitudes"][:]
@@ -81,7 +82,7 @@ def extract_single_boundary_geojson(
         # Compute convex hull
         hull = MultiPoint(edge_coords).convex_hull
 
-        if hull.geom_type != "Polygon":
+        if not isinstance(hull, shapely.Polygon):
             raise RuntimeError("Convex hull did not produce a polygon.")
 
         coords = [list(p) for p in hull.exterior.coords]
