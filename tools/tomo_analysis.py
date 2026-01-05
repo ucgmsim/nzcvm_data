@@ -36,16 +36,19 @@ def load_txt_ep_format(txt_file: str) -> pd.DataFrame:
         DataFrame containing tomography data with columns for coordinates and properties.
     """
     col_names = [
-        "vp", "vp_o_vs", "vs", "rho", "sf_vp", "sf_vp_o_vs",
-        "x", "y", "depth", "lat", "lon"
+        "vp",
+        "vp_o_vs",
+        "vs",
+        "rho",
+        "sf_vp",
+        "sf_vp_o_vs",
+        "x",
+        "y",
+        "depth",
+        "lat",
+        "lon",
     ]
-    df = pd.read_csv(
-        txt_file,
-        sep=r"\s+",
-        skiprows=2,
-        names=col_names,
-        engine="python"
-    )
+    df = pd.read_csv(txt_file, sep=r"\s+", skiprows=2, names=col_names, engine="python")
     # NOTE: do NOT force-convert lon here; plotting handles 0–360 or -180..180
     return df
 
@@ -73,12 +76,14 @@ def load_hdf5_data(h5_file: str) -> pd.DataFrame:
         vp = group["vp"][:]  # shape (nlat, nlon)
         lon_grid, lat_grid = np.meshgrid(lon, lat)
 
-        df = pd.DataFrame({
-            "lat": lat_grid.ravel().astype(np.float32),
-            "lon": lon_grid.ravel().astype(np.float32),
-            "vp": vp.ravel().astype(np.float32),
-            "depth": float(depth_keys[0])
-        })
+        df = pd.DataFrame(
+            {
+                "lat": lat_grid.ravel().astype(np.float32),
+                "lon": lon_grid.ravel().astype(np.float32),
+                "vp": vp.ravel().astype(np.float32),
+                "depth": float(depth_keys[0]),
+            }
+        )
     return df
 
 
@@ -139,8 +144,10 @@ def check_grid_spacing(lat: np.ndarray, lon: np.ndarray, tol: float = 1e-6) -> N
 
     # Longitude spacing in km varies with latitude
     latitudes_for_conversion = np.linspace(lat.min(), lat.max(), num=1000)
-    lon_km_spacings = unique_lon_spacings[:, np.newaxis] * 111.32 * np.cos(
-        np.radians(latitudes_for_conversion)
+    lon_km_spacings = (
+        unique_lon_spacings[:, np.newaxis]
+        * 111.32
+        * np.cos(np.radians(latitudes_for_conversion))
     )
     lon_km_min = np.min(lon_km_spacings, axis=1)
     lon_km_max = np.max(lon_km_spacings, axis=1)
@@ -227,25 +234,25 @@ def choose_projection_and_extent(lats: np.ndarray, lons: np.ndarray):
     pad_lon = 0.5
     pad_lat = 0.5
     minlat = max(-90.0, float(lats.min()) - pad_lat)
-    maxlat = min( 90.0, float(lats.max()) + pad_lat)
+    maxlat = min(90.0, float(lats.max()) + pad_lat)
 
-    has_over_180   = np.nanmax(lons) > 180.0
-    has_negative   = np.nanmin(lons) < 0.0
-    crosses_dl     = has_over_180 or has_negative
+    has_over_180 = np.nanmax(lons) > 180.0
+    has_negative = np.nanmin(lons) < 0.0
+    crosses_dl = has_over_180 or has_negative
 
     if crosses_dl:
         # Use 180-centered axes; compute extent in that axes' native range [-180,180)
         ax_crs = ccrs.PlateCarree(central_longitude=180)
-        lons_c = lons_centered_180(lons)                # <<< key fix (NOT 0..360)
+        lons_c = lons_centered_180(lons)  # <<< key fix (NOT 0..360)
         minlon = max(-180.0, float(lons_c.min()) - pad_lon)
-        maxlon = min( 180.0, float(lons_c.max()) + pad_lon)
+        maxlon = min(180.0, float(lons_c.max()) + pad_lon)
         extent = (minlon, maxlon, minlat, maxlat)
-        extent_crs = ax_crs                              # extent expressed in axes CRS
+        extent_crs = ax_crs  # extent expressed in axes CRS
     else:
         # Standard case: compute extent in data CRS and pass with data_crs
         ax_crs = ccrs.PlateCarree()
         minlon = max(-180.0, float(lons.min()) - pad_lon)
-        maxlon = min( 180.0, float(lons.max()) + pad_lon)
+        maxlon = min(180.0, float(lons.max()) + pad_lon)
         extent = (minlon, maxlon, minlat, maxlat)
         extent_crs = data_crs
 
@@ -273,22 +280,26 @@ def plot_spatial_distribution(df: pd.DataFrame, title_suffix: str = "") -> None:
     ax = plt.axes(projection=ax_crs)
 
     # Set extent in the CRS it was computed in
-    ax.set_extent(extent, crs=extent_crs)
+    # type checker ignores are because cartopy lacks stubs: SciTools/cartopy#2304
+    ax.set_extent(extent, crs=extent_crs)  # type: ignore[unresolved-attribute]
 
-    ax.add_feature(cfeature.COASTLINE, linewidth=0.8)
-    ax.add_feature(cfeature.BORDERS, linestyle=":", linewidth=0.6)
-    ax.add_feature(cfeature.LAND, facecolor="lightgray", edgecolor="none")
-    ax.add_feature(cfeature.OCEAN, facecolor="lightsteelblue", edgecolor="none")
-    ax.add_feature(cfeature.LAKES, alpha=0.5)
-    ax.add_feature(cfeature.RIVERS, linewidth=0.5)
+    ax.add_feature(cfeature.COASTLINE, linewidth=0.8)  # type: ignore[unresolved-attribute]
+    ax.add_feature(cfeature.BORDERS, linestyle=":", linewidth=0.6)  # type: ignore[unresolved-attribute]
+    ax.add_feature(cfeature.LAND, facecolor="lightgray", edgecolor="none")  # type: ignore[unresolved-attribute]
+    ax.add_feature(cfeature.OCEAN, facecolor="lightsteelblue", edgecolor="none")  # type: ignore[unresolved-attribute]
+    ax.add_feature(cfeature.LAKES, alpha=0.5)  # type: ignore[unresolved-attribute]
+    ax.add_feature(cfeature.RIVERS, linewidth=0.5)  # type: ignore[unresolved-attribute]
 
     ax.scatter(
-        df["lon"], df["lat"],
-        s=1, c="red", alpha=0.5,
-        transform=data_crs,   # input data CRS is always standard lon/lat
-        label="Model Grid"
+        df["lon"],
+        df["lat"],
+        s=1,
+        c="red",
+        alpha=0.5,
+        transform=data_crs,  # input data CRS is always standard lon/lat
+        label="Model Grid",
     )
-    gl = ax.gridlines(draw_labels=True, linestyle="--", linewidth=0.5)
+    gl = ax.gridlines(draw_labels=True, linestyle="--", linewidth=0.5)  # type: ignore[invalid-argument-type]
     try:
         gl.right_labels = False
         gl.top_labels = False
@@ -368,9 +379,7 @@ def analyze(
     input_file: Annotated[
         Path,
         typer.Argument(
-            exists=True,
-            dir_okay=False,
-            help="Input tomography file (.txt or .h5)"
+            exists=True, dir_okay=False, help="Input tomography file (.txt or .h5)"
         ),
     ],
 ) -> None:

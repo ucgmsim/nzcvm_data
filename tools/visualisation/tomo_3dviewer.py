@@ -23,7 +23,8 @@ import pyvista as pv
 import typer
 from pyvista.plotting.camera import Camera
 from pyvistaqt import QtInteractor
-from qtpy.QtCore import Qt
+from qcore import cli
+from qtpy.QtCore import Qt  # type: ignore[unresolved-import]
 from qtpy.QtWidgets import (
     QApplication,
     QCheckBox,
@@ -34,8 +35,6 @@ from qtpy.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-
-from qcore import cli
 
 app = typer.Typer(pretty_exceptions_enable=False)
 
@@ -132,7 +131,9 @@ def load_stacked_slices(
         - scalar_values np.ndarray: A 3d array containing scalar data of shape (n_elevations, n_latitudes, n_longitudes).
     """
     with h5py.File(h5_path, "r") as f:
-        keys = sorted((k for k in f.keys() if is_number(k)), key=float, reverse=True)
+        keys: list[str] = sorted(
+            (str(k) for k in f.keys() if is_number(k)), key=float, reverse=True
+        )  # type: ignore[invalid-assignment]
         sample = f[keys[0]]
         lat_full = sample["latitudes"][:]
         lon_full = sample["longitudes"][:]
@@ -164,7 +165,7 @@ def make_flat_surfaces(
     lat: np.ndarray,
     scalar_values: np.ndarray,
     gap: float = 0.1,
-) -> list[tuple[pv.StructuredGrid, float, float, float]]:
+) -> tuple[dict[float, pv.StructuredGrid], float, float]:
     """Create a list of PyVista surfaces from stacked 2D data.
 
     Each slice in the data cube is converted into a flat surface mesh,
@@ -195,7 +196,7 @@ def make_flat_surfaces(
 
     """
 
-    grid_dict = {}
+    grid_dict: dict[float, pv.StructuredGrid] = {}
     global_min = np.min(scalar_values)
     global_max = np.max(scalar_values)
 
@@ -207,7 +208,7 @@ def make_flat_surfaces(
         surf["values"] = scalar_values[iz].ravel(order="C")
         grid_dict[float(elevations[iz])] = surf
 
-    return grid_dict, global_min, global_max
+    return grid_dict, float(global_min), float(global_max)
 
 
 class TomoApp(QMainWindow):
@@ -238,12 +239,12 @@ class TomoApp(QMainWindow):
         self,
         title: str,
         scalar_name: str,
-        grid_dict: dict[pv.StructuredGrid],
+        grid_dict: dict[float, pv.StructuredGrid],
         clim: tuple[float, float],
         points_by_elevation: Optional[dict[float, np.ndarray]] = None,
         debug: bool = False,
-    ):
-        """Initialize the Tomography 3D Viewer application."""
+    ):  # numpydoc ignore=PR01
+        """Initialise tomography app."""
 
         super().__init__()
         self.debug = debug
@@ -522,7 +523,16 @@ def launch_viewer(
     points_by_elevation = None
     if txt:
         df = read_ep_txt(txt)
-        df_filtered = df[np.any(np.isclose(df['elevation'].values[:, None], [float(d) for d in elevations], atol=1e-3), axis=1)]
+        df_filtered = df[
+            np.any(
+                np.isclose(
+                    df["elevation"].values[:, None],
+                    [float(d) for d in elevations],
+                    atol=1e-3,
+                ),
+                axis=1,
+            )
+        ]
         if debug:
             print(df_filtered.head())
         points_by_elevation = {
