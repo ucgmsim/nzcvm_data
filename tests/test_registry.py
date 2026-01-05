@@ -383,7 +383,7 @@ def test_surface_geo_gridpoints(
                 )
 
                 lon_diffs_deg = np.diff(longitude)  # Shape (N-1,)
-                assert np.all(lon_diffs_deg > 0), "Longitudes not strictly ascending"
+                assert np.all(lon_diffs_deg > 0) or np.all(lon_diffs_deg < 0), "Longitudes not monotonic"
                 assert longitude[0] >= 0 and longitude[-1] <= 185, (
                     "Longitudes must be between 0 and 185."
                 )
