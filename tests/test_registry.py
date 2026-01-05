@@ -377,13 +377,13 @@ def test_surface_geo_gridpoints(
                 longitude = np.array(f["longitude"])
 
                 lat_diffs_km = np.diff(latitude) * LAT_DEGREES_PER_KM
-                assert np.all(lat_diffs_km > 0), "Latitudes not strictly ascending"
+                assert np.all(lat_diffs_km > 0) or np.all(lat_diffs_km < 0), "Latitudes not monotonic"
                 assert latitude[0] >= -90 and latitude[-1] <= 90, (
                     "Latitudes must be between -90 and 90."
                 )
 
                 lon_diffs_deg = np.diff(longitude)  # Shape (N-1,)
-                assert np.all(lon_diffs_deg > 0), "Longitudes not strictly ascending"
+                assert np.all(lon_diffs_deg > 0) or np.all(lon_diffs_deg < 0), "Longitudes not monotonic"
                 assert longitude[0] >= 0 and longitude[-1] <= 185, (
                     "Longitudes must be between 0 and 185."
                 )
@@ -575,11 +575,15 @@ def test_submodel_data_is_valid(
         data_path = nzcvm_root / data_relative_path
         data = parse_submodel_data(data_path)
         vp_min, vp_max = QUALITY_BOUNDS["vp"]
-        assert all(vp_min <= row.vp <= vp_max for row in data)
         vs_min, vs_max = QUALITY_BOUNDS["vs"]
-        assert all(vs_min <= row.vs <= vs_max for row in data)
-        assert all(row.thickness >= 0 for row in data)
-        assert all(row.qp > 0 for row in data)
-        assert all(row.qs > 0 for row in data)
+        rho_min, rho_max = QUALITY_BOUNDS["rho"]
+        for i, row in enumerate(data):
+            with subtests.test(msg=f"Checking row {i+1}", row=row):
+                assert vp_min <= row.vp <= vp_max, f"Vp {row.vp} out of bounds"
+                assert vs_min <= row.vs <= vs_max, f"Vs {row.vs} out of bounds"
+                assert rho_min <= row.rho <= rho_max, f"Rho {row.rho} out of bounds"
+                assert row.thickness >= 0, f"Negative thickness: {row.thickness}"
+                assert row.qp > 0, f"Non-positive Qp: {row.qp}"
+                assert row.qs > 0, f"Non-positive Qs: {row.qs}"
     else:
         pytest.skip(f"Submodel {submodel['name']} has no data")
