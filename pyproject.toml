@@ -1,0 +1,74 @@
+
+[project]
+name = "nzcvm_data"
+requires-python = ">=3.12"
+version = "0.1.0"
+description = "Integrity checks for NZCVM data registry"
+
+[project.optional-dependencies]
+test = [
+  "h5py>=3.15.1",
+  "pytest>=9.0.2",
+  "pyyaml>=6.0.3",
+  "geojson>=3.2.0",
+  "shapely>=2.1.2",
+  "schema>=0.7.8",
+  "pytest-subtests>=0.15.0",
+  "validators>=0.35.0",
+]
+# Even though this isn't a python package, these dev dependencies can
+# still prove useful for writing tests.
+dev = ["ruff", "numpydoc", "ty", "deptry"]
+types = ["types-shapely>=2.1.0.20250917"]
+tools = [
+  "cartopy>=0.25.0",
+  "fiona>=1.10.1",
+  "geojson>=3.2.0",
+  "geopandas>=1.1.2",
+  "h5py>=3.15.1",
+  "matplotlib>=3.10.8",
+  "numpy>=2.3.5",
+  "pandas>=2.3.3",
+  "plotly>=6.5.0",
+  "pyproj>=3.7.2",
+  "pytz>=2025.2",
+  "pyvista>=0.46.4",
+  "pyvistaqt>=0.11.3",
+  "pyyaml>=6.0.3",
+  "qcore>=1.11.1",
+  "qtpy>=2.4.3",
+  "scipy>=1.16.3",
+  "seaborn>=0.13.2",
+  "shapely>=2.1.2",
+  "typer>=0.21.0",
+  "velocity-modelling>=2025.12.1",
+]
+
+
+[tool.deptry]
+pep621_dev_dependency_groups = ["test", "dev", "types"]
+
+
+[tool.numpydoc_validation]
+checks = [
+  "GL05",
+  "GL08",
+  "GL10",
+  "PR01",
+  "PR02",
+  "PR03",
+  "PR04",
+  "PR05",
+  "PR06",
+  "PR07",
+  "RT01",
+  "RT02",
+  "RT03",
+  "RT04",
+  "YD01",
+]
+# remember to use single quotes for regex in TOML
+exclude = [ # don't report on objects that match any of these regex
+  '\.undocumented_method$',
+  '\.__repr__$',
+]

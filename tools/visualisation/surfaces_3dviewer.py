@@ -15,9 +15,8 @@ import h5py
 import numpy as np
 import plotly.graph_objects as go
 import typer
-from scipy.interpolate import RegularGridInterpolator
-
 from qcore import cli
+from scipy.interpolate import RegularGridInterpolator
 
 app = typer.Typer(pretty_exceptions_enable=False)
 
@@ -165,7 +164,7 @@ def plot_stacked_surfaces(
     # z-axis range (symmetric if diverging cmap)
     if elev_range is None:
         all_elev = np.concatenate([v[2].ravel() for v in data_dict.values()])
-        elev_range = [all_elev.min(), all_elev.max()]
+        elev_range = (float(all_elev.min()), float(all_elev.max()))
     z_min, z_max = elev_range
     vmax = max(abs(z_min), abs(z_max))
     vmin = -vmax

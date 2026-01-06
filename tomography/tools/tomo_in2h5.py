@@ -17,7 +17,7 @@ instead.
 """
 
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Annotated
 
@@ -129,7 +129,7 @@ def convert_ascii_to_hdf5(
 
     with h5py.File(output_path, "w") as h5f:
         # file-level metadata to advertise decisions
-        h5f.attrs["created"] = datetime.utcnow().isoformat() + "Z"
+        h5f.attrs["created"] = datetime.now(timezone.utc).isoformat() + "Z"
         h5f.attrs["generator"] = "tomo_in2h5.py"
         h5f.attrs["schema"] = "NZTomographyLevelStacked v1"
         h5f.attrs["data_dtype_vp_vs_rho"] = (
