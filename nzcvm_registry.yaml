@@ -183,7 +183,7 @@ tomography:
     url: Full Model Data - Personal Communication, Downsampled data published in https://doi.org/10.21979/N9/QKU80S
     
   - name: DB2025
-    path: tomography/DB2025/DB2025_EP2025_Merge.h5
+    path: tomography/DB2025/DB2025_EP2025_SmoothConvolve.h5
     elev: 
       [ 
       15.0, 3.0, 2.5, 2.0, 1.5, 1.0, 0.5, -0.0, -0.5, -1.0,
