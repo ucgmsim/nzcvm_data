@@ -166,7 +166,7 @@ tomography:
     url: Personal communication (pending publication)
     
   - name: SW2025
-    path: tomography/SW2025/SW2025_EP2022_Merge.h5
+    path: tomography/SW2025/SW2025_EP2022_SmoothConvolve.h5
     elev: 
       [
       15, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7, -8,
