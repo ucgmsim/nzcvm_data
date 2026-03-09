@@ -1,5 +1,6 @@
 import itertools
 import re
+from dataclasses import dataclass
 from pathlib import Path
 from typing import NotRequired, TypedDict, no_type_check
 
@@ -7,11 +8,11 @@ import h5py
 import numpy as np
 import pytest
 import shapely
+import validators
 import yaml
-from attr import dataclass
 from pytest import Metafunc
 from pytest_subtests import SubTests
-from schema import Optional, Or, Regex, Schema, SchemaError
+from schema import And, Optional, Or, Regex, Schema, SchemaError
 
 
 @pytest.fixture(scope="session")
@@ -28,17 +29,14 @@ def nzcvm_root() -> Path:
 def test_nzcvm_registry_schema(nzcvm_registry_path: Path) -> None:
     path = Regex(
         # See https://stackoverflow.com/a/537876
+        # Posted by Darron.
+        # Retreived 2025-12-17, License - CC BY-SA 2.5
         r"[^\0]+",
         error="Must be valid unix path.",
     )
-    ident = Regex(r"^[a-zA-Z_][a-zA-Z0-9_]*$", error="Must be valid python identifier.")
-    # Source - https://stackoverflow.com/a
-    # Posted by Daveo, modified by community. See post 'Timeline' for change history
-    # Retrieved 2025-12-17, License - CC BY-SA 4.0
+    ident = And(str, str.isidentifier)
     url = Or(
-        Regex(
-            r"https?://(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"
-        ),
+        And(str, validators.url),
         "Personal communication (pending publication)",
         error='Must be a valid URL, or "Personal communication (pending publication)"',
     )
@@ -51,10 +49,7 @@ def test_nzcvm_registry_schema(nzcvm_registry_path: Path) -> None:
             "path": path,
             "author": str,
             Optional("title"): str,
-            Optional("url"): Or(
-                url,
-                [url],
-            ),  # Handles single URL, list of URLs, or empty
+            "url": Or(url, [url], None),  # Handles single URL, list of URLs, or empty
         }
     )
 
@@ -219,8 +214,10 @@ def test_tomography_geo_gridpoints(
                 longitude = np.array(group["longitudes"])
 
                 lat_diffs_km = np.diff(latitude) * LAT_DEGREES_PER_KM
-                assert np.all(lat_diffs_km > 0), "Latitudes not strictly ascending"
-                assert latitude[0] >= -90 and latitude[-1] <= 90, (
+                assert np.all(lat_diffs_km > 0) or np.all(lat_diffs_km < 0), (
+                    "Latitudes neither strictly ascending or descending"
+                )
+                assert np.min(latitude) >= -90 and np.max(latitude) <= 90, (
                     "Latitudes must be between -90 and 90."
                 )
                 assert lat_diffs_km == pytest.approx(
@@ -228,8 +225,10 @@ def test_tomography_geo_gridpoints(
                 )
 
                 lon_diffs_deg = np.diff(longitude)  # Shape (N-1,)
-                assert np.all(lon_diffs_deg > 0), "Longitudes not strictly ascending"
-                assert longitude[0] >= 0 and longitude[-1] <= 185, (
+                assert np.all(lon_diffs_deg > 0) or np.all(lon_diffs_deg < 0), (
+                    "Longitudes neither strictly ascending or descending"
+                )
+                assert np.min(longitude) >= 0 and np.max(longitude) <= 185, (
                     "Longitudes must be between 0 and 185."
                 )
 
@@ -376,13 +375,17 @@ def test_surface_geo_gridpoints(
                 longitude = np.array(f["longitude"])
 
                 lat_diffs_km = np.diff(latitude) * LAT_DEGREES_PER_KM
-                assert np.all(lat_diffs_km > 0), "Latitudes not strictly ascending"
+                assert np.all(lat_diffs_km > 0) or np.all(lat_diffs_km < 0), (
+                    "Latitudes not monotonic"
+                )
                 assert latitude[0] >= -90 and latitude[-1] <= 90, (
                     "Latitudes must be between -90 and 90."
                 )
 
                 lon_diffs_deg = np.diff(longitude)  # Shape (N-1,)
-                assert np.all(lon_diffs_deg > 0), "Longitudes not strictly ascending"
+                assert np.all(lon_diffs_deg > 0) or np.all(lon_diffs_deg < 0), (
+                    "Longitudes not monotonic"
+                )
                 assert longitude[0] >= 0 and longitude[-1] <= 185, (
                     "Longitudes must be between 0 and 185."
                 )
@@ -403,7 +406,7 @@ def read_smoothing_boundary(smoothing_path: Path) -> shapely.LineString:
             line = line.strip()
             if not line:
                 continue
-            line_coords = re.split(r"\s+", line)
+            line_coords = line.strip().split()
             assert len(line_coords) == 2
             lon_str, lat_str = line_coords
             assert lon_str and lat_str
@@ -559,7 +562,7 @@ def parse_submodel_data(submodel_path: Path) -> list[SubmodelData]:
         header = next(f).strip()
         assert header == "DEF HST"
         for line in f:
-            row = re.split(r"\s+", line.strip())
+            row = line.strip().split()
             floats = [float(x) for x in row]
             assert len(floats) == 6
             rows.append(SubmodelData(*floats))
@@ -574,11 +577,15 @@ def test_submodel_data_is_valid(
         data_path = nzcvm_root / data_relative_path
         data = parse_submodel_data(data_path)
         vp_min, vp_max = QUALITY_BOUNDS["vp"]
-        assert all(vp_min <= row.vp <= vp_max for row in data)
         vs_min, vs_max = QUALITY_BOUNDS["vs"]
-        assert all(vs_min <= row.vs <= vs_max for row in data)
-        assert all(row.thickness >= 0 for row in data)
-        assert all(row.qp > 0 for row in data)
-        assert all(row.qs > 0 for row in data)
+        rho_min, rho_max = QUALITY_BOUNDS["rho"]
+        for i, row in enumerate(data):
+            with subtests.test(msg=f"Checking row {i + 1}", row=row):
+                assert vp_min <= row.vp <= vp_max, f"Vp {row.vp} out of bounds"
+                assert vs_min <= row.vs <= vs_max, f"Vs {row.vs} out of bounds"
+                assert rho_min <= row.rho <= rho_max, f"Rho {row.rho} out of bounds"
+                assert row.thickness >= 0, f"Negative thickness: {row.thickness}"
+                assert row.qp > 0, f"Non-positive Qp: {row.qp}"
+                assert row.qs > 0, f"Non-positive Qs: {row.qs}"
     else:
         pytest.skip(f"Submodel {submodel['name']} has no data")

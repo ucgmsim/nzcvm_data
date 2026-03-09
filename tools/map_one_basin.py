@@ -53,7 +53,7 @@ class EsriWorldImageryTiles(cimgt.GoogleTiles):
         return url
 
 
-def load_basement(file_path: Path) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def load_basement(file_path: Path) -> tuple[np.ndarray, np.ndarray, np.ndarray] | None:
     """
     Load basement file containing latitude, longitude, and raster data.
 
@@ -78,7 +78,7 @@ def load_basement(file_path: Path) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     file_path = Path(file_path)
     if not file_path.exists():
         print(f"Error: Basement file {file_path} does not exist.")
-        return None, None, None
+        return None
     try:
         with file_path.open("r") as f:
             lines = f.readlines()
@@ -179,7 +179,7 @@ def load_boundary(
 def plot_data(
     basement_file: Path,
     boundary_files: list[Path],
-    smoothing_file: Path,
+    smoothing_file: Path | None,
     basin_name: str,
     out_dir: Path,
 ):
@@ -201,7 +201,11 @@ def plot_data(
 
     """
     # Load basement data
-    lats, lons, raster = load_basement(basement_file)
+    if basement := load_basement(basement_file):
+        lats, lons, raster = basement
+    else:
+        raise ValueError("Basement file does not contain valid data.")
+
     if lats is None:
         return
 
@@ -245,12 +249,13 @@ def plot_data(
     # Create map
     fig = plt.figure(figsize=(12, 12))
     ax = plt.axes(projection=ccrs.PlateCarree())
-    ax.set_extent(extent, crs=ccrs.PlateCarree())
+    # type checker ignores are because cartopy lacks stubs: SciTools/cartopy#2304
+    ax.set_extent(extent, crs=ccrs.PlateCarree())  # type: ignore[unresolved-attribute]
 
     # Add Esri World Imagery basemap using custom tile class
     # Tested a few other tile classes, but Esri World Imagery looks the best and processes quickly
     esri_imagery = EsriWorldImageryTiles()
-    ax.add_image(esri_imagery, 12)  # Zoom level 12 for high detail
+    ax.add_image(esri_imagery, 12)  # type: ignore[invalid-argument-type] # Zoom level 12 for high detail
 
     # Add town names
     shp = shpreader.natural_earth(
@@ -274,7 +279,7 @@ def plot_data(
             )
 
     # Add gridlines
-    gl = ax.gridlines(
+    gl = ax.gridlines(  # type: ignore[invalid-argument-type]
         draw_labels=True, linewidth=0.5, color="gray", alpha=0.5, linestyle="--"
     )
     gl.top_labels = gl.right_labels = False
