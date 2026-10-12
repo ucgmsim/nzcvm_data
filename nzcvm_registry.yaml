@@ -64,6 +64,7 @@ tomography:
 
 basin:
   - name: Canterbury_v18p1
+    type: 4
     boundaries:
       - regional/Canterbury/Canterbury_outline_WGS84.geojson
     surfaces:
@@ -78,6 +79,7 @@ basin:
       - path: regional/Canterbury/Canterbury_basement_WGS84.h5
 
   - name: Canterbury_v18p2
+    type: 4
     boundaries:
       - regional/Canterbury/Canterbury_outline_WGS84.geojson
     surfaces:
@@ -92,6 +94,7 @@ basin:
       - path: regional/Canterbury/Canterbury_basement_WGS84.h5
 
   - name: Canterbury_v18p3
+    type: 4
     boundaries:
       - regional/Canterbury/Canterbury_outline_WGS84.geojson
     surfaces:
@@ -328,6 +331,7 @@ basin:
     smoothing: regional/Nelson/Nelson_smoothing.txt
 
   - name: Wellington_v19p1
+    type: 3
     boundaries:
       - regional/Wellington/Wellington_outline_WGS84.geojson
     surfaces:
@@ -337,6 +341,7 @@ basin:
     smoothing: regional/Wellington/Wellington_smoothing.txt
 
   - name: Wellington_v19p6
+    type: 3
     boundaries:
       - regional/Wellington/Wellington_outline_WGS84.geojson
     surfaces:
