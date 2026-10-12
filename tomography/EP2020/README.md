@@ -12,6 +12,11 @@ This model is explicitly defined in the `nzcvm_registry.yaml` file, which acts a
 * **Data Path:** `global/tomography/ep2020.h5`
 * **Elevation Layers (`elev`):** The model is defined on 25 discrete elevation layers, specified in kilometers. These layers range from 15 km above sea level down to 750 km below, providing a deep velocity profile.
 
+## Files
+
+* `ep2020.h5`: the model interpolated onto a uniform latitude–longitude grid (see below).
+* `ep2020.csv`: the original EP2020 ASCII table (whitespace-delimited despite the extension). `nzcvm tomography convert` reads this file to build the `ep2020.zarr` tomography model.
+
 ## Data Integration and Visualization
 
 The raw data for the EP2020 model consists of scattered points of seismic velocity measurements. For use within the 3D velocity model, this data is processed by interpolating these points onto a regular, uniform grid. The interpolated data forms a series of smooth velocity planes at different elevations.
